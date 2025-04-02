@@ -37,8 +37,6 @@ Source: "Setup\Locales\ru\locale.ini"; DestDir: "{userappdata}\SHTRIH-M\OposShtr
 Source: "Setup\Logo\*.*"; DestDir: "{app}\Bin\Logo"; Flags: ignoreversion; components: main;
 ; Drivers
 Source: "Setup\zint.dll"; DestDir: "{app}\Bin"; Flags: ignoreversion; components: main;
-Source: "Setup\zlib1.dll"; DestDir: "{app}\Bin"; Flags: ignoreversion; components: main;
-Source: "Setup\libpng15.dll"; DestDir: "{app}\Bin"; Flags: ignoreversion; components: main;
 Source: "Bin\SmScale.dll"; DestDir: "{app}\Bin"; Flags: ignoreversion regserver; components: main;
 Source: "Bin\SmFiscalPrinter.dll"; DestDir: "{app}\Bin"; Flags: ignoreversion regserver; components: main;
 ;Source: "Bin\SmFiscalPrinter.RUS"; DestDir: "{app}\Bin"; Flags: ignoreversion; components: main;

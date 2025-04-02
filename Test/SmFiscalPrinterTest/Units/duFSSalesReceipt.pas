@@ -9,7 +9,7 @@ uses
   TestFramework,
   // This
   fmuTest, fmuSelect, fmuEMail, fmuPhone, CustomReceipt, RegExpr, LogFile,
-  FormUtils;
+  FormUtils, FSSalesREceipt;
 
 type
   { TFSSalesReceiptTest }
@@ -23,6 +23,7 @@ type
 
     procedure CheckShowEMailDlg;
     procedure CheckDisableWindow;
+    procedure TestPrintRecItem;
   published
     procedure TestRegExpr;
   end;
@@ -124,6 +125,26 @@ begin
 
   DisableForms(Form1.Handle);
   Form1.SetFocus;
+end;
+
+procedure TFSSalesReceiptTest.TestPrintRecItem;
+var
+  Receipt: TFSSalesREceipt;
+  Context: TReceiptContext;
+begin
+  Context.RecType := 0;
+  Context.Filter := nil;
+  Context.Printer := nil;
+  Context.State := nil;
+  Context.FiscalReceiptStation := 0;
+  Receipt := TFSSalesReceipt.Create(Context);
+  try
+    Receipt.PrintRecItem('',  1.23, 1, 1, 1.23, '');
+
+
+  finally
+    Receipt.Free;
+  end;
 end;
 
 initialization

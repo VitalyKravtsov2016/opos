@@ -250,6 +250,7 @@ type
     procedure TestEncoding;
 
     procedure CheckNonFiscal;
+    procedure CheckGetTax;
 
 
     property Driver: ToleFiscalPrinter read FDriver;
@@ -1236,6 +1237,7 @@ begin
   DIO_GET_DEPARTMENT            = 16; // get department value
   DIO_SET_DEPARTMENT            = 17; // set department value
 *)
+
 end;
 
 procedure TFiscalPrinterTest.CheckDuplicateReceipt;
@@ -2128,6 +2130,14 @@ begin
   {$ENDIF}
 end;
 
+
+procedure TFiscalPrinterTest.CheckGetTax;
+begin
+  Printer.Parameters.VatCodeEnabled := False;
+  CheckEquals(1, Printer.getTax('', 1), 'Printer.getTax(1)');
+  CheckEquals(6, Printer.getTax('', 6), 'Printer.getTax(6)');
+  CheckEquals(100, Printer.getTax('', 100), 'Printer.getTax(100)');
+end;
 
 initialization
   RegisterTest('', TFiscalPrinterTest.Suite);

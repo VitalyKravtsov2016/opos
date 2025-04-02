@@ -1,23 +1,21 @@
 [Closed Files]
-File_0=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinter2.pas',0,1,141,102,160,0,0
-File_1=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\oleFiscalPrinter.pas',0,1,350,1,372,0,0
-File_2=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,3873,2,3896,0,0
-File_3=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duLogFile.pas',0,1,176,20,180,0,0
-File_4=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterTypes.pas',0,1,647,1,658,0,0
-File_5=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\SharedPrinter.pas',0,1,402,32,420,0,0
-File_6=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\MockFiscalPrinterDevice.pas',0,1,365,2,383,0,0
-File_7=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\PrinterParametersX.pas',0,1,14,23,24,0,0
-File_8=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\TextFiscalPrinterDevice.pas',0,1,1352,2,1369,0,0
-File_9=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',0,1,1,1,1,0,0
+File_0=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinterDevice.pas',0,1,297,35,313,0,0
+File_1=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',0,1,6189,21,6196,0,0
+File_2=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\uZintBarcode.pas',0,1,1,11,17,0,0
+File_3=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\uZintInterface.pas',0,1,1,102,24,0,0
+File_4=SourceModule,'D:\Projects\OposShtrih\Source\Shared\StringUtils.pas',0,1,151,1,169,0,0
+File_5=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\DirectIOAPI.pas',0,1,28,25,39,0,0
+File_6=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,2414,27,2426,0,0
+File_7=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duLogFile.pas',0,1,172,40,179,0,0
+File_8=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,1661,66,1670,0,0
+File_9=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\ReceiptItem.pas',0,1,481,11,491,0,0
 
 [Modules]
-Module0=D:\Projects\OposShtrih\Test\AcceptanceTest\AcceptanceTest.dpr
-Count=1
-EditWindowCount=1
+Count=0
+EditWindowCount=0
 TypeLibWindowCount=3
 
 [D:\Projects\OposShtrih\Test\AcceptanceTest\AcceptanceTest.dpr]
-ModuleType=SourceModule
 FormState=0
 FormOnTop=0
 
@@ -93,38 +91,6 @@ FormOnTop=0
 FormState=0
 FormOnTop=0
 
-[EditWindow0]
-ViewCount=1
-CurrentView=0
-View0=0
-CodeExplorer=CodeExplorer@EditWindow0
-MessageView=MessageView@EditWindow0
-Create=1
-Visible=1
-State=0
-Left=484
-Top=147
-Width=1302
-Height=682
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=1286
-ClientHeight=643
-LeftPanelSize=0
-LeftPanelClients=CodeExplorer@EditWindow0
-LeftPanelData=00000400010000000C000000436F64654578706C6F7265720000000000000000000000000000000000FFFFFFFF
-RightPanelSize=0
-BottomPanelSize=0
-BottomPanelClients=MessageView@EditWindow0
-BottomPanelData=00000400010000000B0000004D657373616765566965770000000000000000000000000000000000FFFFFFFF
-
-[View0]
-Module=D:\Projects\OposShtrih\Test\AcceptanceTest\AcceptanceTest.dpr
-CursorX=34
-CursorY=11
-TopLine=1
-LeftCol=1
-
 [TypeLibEditWindow0]
 Create=1
 Visible=0
@@ -189,7 +155,8 @@ LRDockWidth=320
 Dockable=1
 
 [Breakpoints]
-Count=0
+Count=1
+Breakpoint0='D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',6584,'',0,1,'',1,0,0,'',1,'','',''
 
 [AddressBreakpoints]
 Count=0
@@ -456,38 +423,6 @@ ClientWidth=367
 ClientHeight=156
 TBDockHeight=151
 LRDockWidth=383
-Dockable=1
-
-[CodeExplorer@EditWindow0]
-Create=1
-Visible=0
-State=0
-Left=-288
-Top=-16
-Width=140
-Height=305
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=140
-ClientHeight=305
-TBDockHeight=305
-LRDockWidth=140
-Dockable=1
-
-[MessageView@EditWindow0]
-Create=1
-Visible=0
-State=0
-Left=-294
-Top=-714
-Width=443
-Height=85
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=443
-ClientHeight=85
-TBDockHeight=85
-LRDockWidth=443
 Dockable=1
 
 [DockHosts]

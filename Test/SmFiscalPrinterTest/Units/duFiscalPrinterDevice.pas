@@ -4,10 +4,11 @@ interface
 
 uses
   // VCL
-  Windows, SysUtils, Classes,
+  Windows, SysUtils, Classes, Graphics,
   // DUnit
   TestFramework, FiscalPrinterDevice, Opos, OPOSException, OposFptr,
-  DriverError, StringUtils, PrinterTypes, MockPrinterConnection2;
+  DriverError, StringUtils, PrinterTypes, MockPrinterConnection2,
+  DirectIOAPI;
 
 type
   { TFiscalPrinterDeviceTest }
@@ -22,6 +23,10 @@ type
     procedure TearDown; override;
 
     procedure TestUpdateInfo; // !!!
+    procedure TestDatamatrixBarcode;
+    procedure TestDatamatrixBarcode2;
+    procedure TestDatamatrixBarcode3;
+    procedure TestQRCodeBarcode;
   published
     procedure TestCheck;
     procedure TestSTLV;
@@ -228,6 +233,134 @@ end;
 procedure TFiscalPrinterDeviceTest.TestUpdateInfo;
 begin
 
+end;
+
+procedure TFiscalPrinterDeviceTest.TestDatamatrixBarcode;
+const
+  BarcodeData    = '6b98b7074c38ff84WM4o/Ud6+LOoIuSJgupIMPrE8MaTZH+Ce1xiGl2OJtg=';
+var
+  Bitmap: TBitmap;
+  Barcode: TBarcodeRec;
+begin
+  Barcode.BarcodeType := DIO_BARCODE_DATAMATRIX; // 51
+  Barcode.Data := BarcodeData;
+  Barcode.Text := BarcodeData;
+  Barcode.Height :=   Device.Parameters.BarcodeHeight;
+  Barcode.ModuleWidth := Device.Parameters.BarcodeModuleWidth;
+  Barcode.Alignment := Device.Parameters.BarcodeAlignment;
+  Barcode.Parameter1 := Device.Parameters.BarcodeParameter1;
+  Barcode.Parameter2 := Device.Parameters.BarcodeParameter2;
+  Barcode.Parameter3 := Device.Parameters.BarcodeParameter3;
+  Barcode.Parameter4 := Device.Parameters.BarcodeParameter4;
+  Barcode.Parameter5 := Device.Parameters.BarcodeParameter5;
+
+  Bitmap := TBitmap.Create;
+  try
+    Device.BarcodeToBitmap(Barcode, Bitmap);
+    Bitmap.SaveToFile('DATAMATRIX.bmp');
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TFiscalPrinterDeviceTest.TestDatamatrixBarcode2;
+var
+  i: Integer;
+  Bitmap: TBitmap;
+  Barcode: TBarcodeRec;
+  BarcodeData: string;
+const
+  RecognizedData = ' !"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+begin
+  BarcodeData := '';
+  for i := $20 to $7F do
+    BarcodeData := BarcodeData + Chr(i);
+
+  CheckEquals(StrToHex(BarcodeData), StrToHex(RecognizedData),
+    'RecognizedData <> BarcodeData');
+
+  Barcode.BarcodeType := DIO_BARCODE_DATAMATRIX; // 51
+  Barcode.Data := BarcodeData;
+  Barcode.Text := BarcodeData;
+  Barcode.Height :=   Device.Parameters.BarcodeHeight;
+  Barcode.ModuleWidth := Device.Parameters.BarcodeModuleWidth;
+  Barcode.Alignment := Device.Parameters.BarcodeAlignment;
+  Barcode.Parameter1 := Device.Parameters.BarcodeParameter1;
+  Barcode.Parameter2 := Device.Parameters.BarcodeParameter2;
+  Barcode.Parameter3 := Device.Parameters.BarcodeParameter3;
+  Barcode.Parameter4 := Device.Parameters.BarcodeParameter4;
+  Barcode.Parameter5 := Device.Parameters.BarcodeParameter5;
+
+  Bitmap := TBitmap.Create;
+  try
+    Device.BarcodeToBitmap(Barcode, Bitmap);
+    Bitmap.SaveToFile('DATAMATRIX2.bmp');
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TFiscalPrinterDeviceTest.TestDatamatrixBarcode3;
+var
+  Bitmap: TBitmap;
+  Barcode: TBarcodeRec;
+  BarcodeData: string;
+begin
+  BarcodeData := '       g=';
+
+  //CheckEquals(StrToHex(BarcodeData), StrToHex(RecognizedData),
+  //  'RecognizedData <> BarcodeData');
+
+  Barcode.BarcodeType := DIO_BARCODE_DATAMATRIX; // 51
+  Barcode.Data := BarcodeData;
+  Barcode.Text := BarcodeData;
+  Barcode.Height :=   Device.Parameters.BarcodeHeight;
+  Barcode.ModuleWidth := Device.Parameters.BarcodeModuleWidth;
+  Barcode.Alignment := Device.Parameters.BarcodeAlignment;
+  Barcode.Parameter1 := Device.Parameters.BarcodeParameter1;
+  Barcode.Parameter2 := Device.Parameters.BarcodeParameter2;
+  Barcode.Parameter3 := Device.Parameters.BarcodeParameter3;
+  Barcode.Parameter4 := Device.Parameters.BarcodeParameter4;
+  Barcode.Parameter5 := Device.Parameters.BarcodeParameter5;
+
+  Bitmap := TBitmap.Create;
+  try
+    Device.BarcodeToBitmap(Barcode, Bitmap);
+    Bitmap.SaveToFile('DATAMATRIX3.bmp');
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TFiscalPrinterDeviceTest.TestQRCodeBarcode;
+const
+  BarcodeData  = '6b98b7074c38ff84WM4o/Ud6+LOoIuSJgupIMPrE8MaTZH+Ce1xiGl2OJtg=';
+  RecognizedData = '6b98b7074c38ff84WM4o/Ud6+LOoIuSJgupIMPrE8MaTZH+Ce1xiGl2OJtg=';
+var
+  Bitmap: TBitmap;
+  Barcode: TBarcodeRec;
+begin
+  CheckEquals(BarcodeData, RecognizedData, 'RecognizedData <> BarcodeData');
+
+  Barcode.BarcodeType := DIO_BARCODE_QRCODE;
+  Barcode.Data := BarcodeData;
+  Barcode.Text := BarcodeData;
+  Barcode.Height :=   Device.Parameters.BarcodeHeight;
+  Barcode.ModuleWidth := Device.Parameters.BarcodeModuleWidth;
+  Barcode.Alignment := Device.Parameters.BarcodeAlignment;
+  Barcode.Parameter1 := Device.Parameters.BarcodeParameter1;
+  Barcode.Parameter2 := Device.Parameters.BarcodeParameter2;
+  Barcode.Parameter3 := Device.Parameters.BarcodeParameter3;
+  Barcode.Parameter4 := Device.Parameters.BarcodeParameter4;
+  Barcode.Parameter5 := Device.Parameters.BarcodeParameter5;
+
+  Bitmap := TBitmap.Create;
+  try
+    Device.BarcodeToBitmap(Barcode, Bitmap);
+    Bitmap.SaveToFile('QRCODE.bmp');
+  finally
+    Bitmap.Free;
+  end;
 end;
 
 initialization

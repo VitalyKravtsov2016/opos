@@ -60,7 +60,7 @@ type
     FAfterCloseItems: TReceiptItems;
     FPrinter: ISharedPrinter;
     FReceiptPrinter: IReceiptPrinter;
-
+  public
     procedure UpdatePrinterDate;
     procedure CheckCapSetVatTable;
     procedure PrintTextFont(Station: Integer; Font: Integer; const Text: WideString);
@@ -3150,7 +3150,6 @@ begin
   end;
   {$ENDIF}
   Result := Parameters.GetVatInfo(Result);
-  if not (Result in [0..6]) then Result := 0;
 end;
 
 
