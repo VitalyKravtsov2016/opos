@@ -1,23 +1,19 @@
 [Closed Files]
-File_0=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinterDevice.pas',0,1,297,35,313,0,0
-File_1=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',0,1,6189,21,6196,0,0
-File_2=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\uZintBarcode.pas',0,1,1,11,17,0,0
-File_3=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\uZintInterface.pas',0,1,1,102,24,0,0
-File_4=SourceModule,'D:\Projects\OposShtrih\Source\Shared\StringUtils.pas',0,1,151,1,169,0,0
-File_5=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\DirectIOAPI.pas',0,1,28,25,39,0,0
-File_6=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,2414,27,2426,0,0
-File_7=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duLogFile.pas',0,1,172,40,179,0,0
-File_8=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,1661,66,1670,0,0
-File_9=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\ReceiptItem.pas',0,1,481,11,491,0,0
+File_0=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinterDevice.pas',0,1,23,9,37,0,0
+File_1=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',0,1,2131,2,2134,0,0
+File_2=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',0,1,25,20,41,0,0
+File_3=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,2409,7,2426,0,0
+File_4=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\DirectIOAPI.pas',0,1,188,25,206,0,0
+File_5=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\PrinterTypes.pas',0,1,1014,16,1036,0,0
+File_6=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,1,1,1,0,0
+File_7=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\ReceiptItem.pas',0,1,482,14,491,0,0
+File_8=SourceModule,'D:\Projects\OposShtrih\Source\Shared\DIOHandlers.pas',0,1,771,1,787,0,0
+File_9=SourceModule,'D:\Projects\OposShtrih\Source\Shared\DriverError.pas',0,1,30,34,45,0,0
 
 [Modules]
 Count=0
 EditWindowCount=0
 TypeLibWindowCount=3
-
-[D:\Projects\OposShtrih\Test\AcceptanceTest\AcceptanceTest.dpr]
-FormState=0
-FormOnTop=0
 
 [D:\Projects\OposShtrih\Source\OposShtrih.bpg]
 FormState=0
@@ -91,6 +87,10 @@ FormOnTop=0
 FormState=0
 FormOnTop=0
 
+[D:\Projects\OposShtrih\Test\AcceptanceTest\AcceptanceTest.dpr]
+FormState=0
+FormOnTop=0
+
 [TypeLibEditWindow0]
 Create=1
 Visible=0
@@ -155,8 +155,7 @@ LRDockWidth=320
 Dockable=1
 
 [Breakpoints]
-Count=1
-Breakpoint0='D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',6584,'',0,1,'',1,0,0,'',1,'','',''
+Count=0
 
 [AddressBreakpoints]
 Count=0

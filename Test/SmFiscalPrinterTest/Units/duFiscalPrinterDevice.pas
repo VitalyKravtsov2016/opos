@@ -35,6 +35,8 @@ type
     procedure TestReadFontInfoList;
     procedure TestReadFontInfo;
     procedure TestReadTaxInfoList;
+  public
+    procedure TestPrintBarcode;
   end;
 
 implementation
@@ -362,6 +364,27 @@ begin
     Bitmap.Free;
   end;
 end;
+
+// DirectIO(7, 51, '66712795c34c4f81nrd1c8EMry6oenva9Mjy1crPccCiBge0T2OSzZp0H4I=;DATAMATRIX;100;8;0;')
+procedure TFiscalPrinterDeviceTest.TestPrintBarcode;
+var
+  Barcode: TBarcodeRec;
+begin
+  Device.FCapGraphics512 := True;
+  Barcode.Data := '66712795c34c4f81nrd1c8EMry6oenva9Mjy1crPccCiBge0T2OSzZp0H4I=';
+  Barcode.Text := 'DATAMATRIX';
+  Barcode.Height := 100;
+  Barcode.ModuleWidth := 8;
+  Barcode.Alignment := 0;
+  Barcode.Parameter1 := 0;
+  Barcode.Parameter2 := 0;
+  Barcode.Parameter3 := 0;
+  Barcode.Parameter4 := 0;
+  Barcode.Parameter5 := 0;
+  Barcode.BarcodeType := DIO_BARCODE_DATAMATRIX;
+  Device.PrintBarcode2(Barcode);
+end;
+
 
 initialization
   RegisterTest('', TFiscalPrinterDeviceTest.Suite);

@@ -28,6 +28,7 @@ type
   TFiscalPrinterDevice = class(TInterfacedObject, IFiscalPrinterDevice)
   private
   protected
+  public
     FFFDVersion: TFFDVersion;
     FContext: TDriverContext;
     FCapSubtotalRound: Boolean;
@@ -6299,8 +6300,14 @@ end;
 function TFiscalPrinterDevice.GetMaxGraphicsWidth: Integer;
 begin
   Result := 0;
-  if ValidFont(1) then
-    Result := FFontInfo[0].PrintWidth;
+  if FCapGraphics512 then
+  begin
+    Result := 512;
+  end else
+  begin
+    if ValidFont(1) then
+      Result := FFontInfo[0].PrintWidth;
+  end;
 end;
 
 function TFiscalPrinterDevice.GetMaxGraphicsWidthInBytes: Integer;
