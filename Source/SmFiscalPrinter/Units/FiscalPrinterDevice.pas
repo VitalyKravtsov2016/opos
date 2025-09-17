@@ -7452,14 +7452,6 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-function GetFSTaxBits(Value: Integer): Integer;
-begin
-  Result := 0;
-  if Value > 0 then
-    Result := 1 shl (Value-1);
-end;
-
-
 (******************************************************************************
 Операция со скидками и надбавками FF0DH
 Код команды FF0Dh . Длина сообщения:  254 байт.
@@ -7502,7 +7494,7 @@ begin
     IntToBin(Abs(P.Discount), 5) +
     IntToBin(Abs(P.Charge), 5) +
     Chr(Abs(P.Department)) +
-    Chr(GetFSTaxBits(Abs(P.Tax))) +
+    Chr(Abs(P.Tax)) +
     IntToBin(P.Barcode, 5) +
     Copy(P.Text, 1, 109) + #0 +
     Copy(P.AdjText, 1, 109) + #0;
@@ -7544,7 +7536,7 @@ begin
     IntToBin(Abs(P.Price), 5) +
     IntToBin(Abs(P.Total), 5) +
     IntToBin(Abs(P.TaxAmount), 5) +
-    Chr(GetFSTaxBits(Abs(P.Tax))) +
+    Chr(Abs(P.Tax)) +
     Chr(P.Department) +
     Chr(P.PaymentType) +
     Chr(P.PaymentItem) +
