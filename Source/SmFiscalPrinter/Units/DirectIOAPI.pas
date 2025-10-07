@@ -377,6 +377,11 @@ const
   DriverParameterLastDocNum               = 101;
   DriverParameterLastDocTotal             = 102;
   DriverParameterLastDocDateTime          = 103;
+  DriverParameterReceiptNumber            = 304;
+  DriverParameterReceiptDateTime          = 305;
+  DriverParameterRegistrationNumber       = 306;
+  DriverParameterReceiptTotal             = 307;
+  DriverParameterReceiptIsOffline         = 308;
 
   /////////////////////////////////////////////////////////////////////////////
   // Separator type

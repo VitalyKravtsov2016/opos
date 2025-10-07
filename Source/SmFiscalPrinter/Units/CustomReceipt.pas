@@ -24,7 +24,6 @@ type
 
   TCustomReceipt = class
   private
-    FRecType: Integer;
     FFilter: TEscFilter;
     FRecMessages: TTextItems;
     FPrinter: IReceiptPrinter;
@@ -36,6 +35,7 @@ type
     function GetDevice: IFiscalPrinterDevice;
     function GetParameters: TPrinterParameters;
   protected
+    FRecType: Integer;
     FQRCodeData: string;
     FPrintEnabled: Boolean;
     property State: TFiscalPrinterState read FState;

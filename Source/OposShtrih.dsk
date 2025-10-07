@@ -1,95 +1,134 @@
 [Closed Files]
-File_0=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinterDevice.pas',0,1,23,9,37,0,0
-File_1=SourceModule,'D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',0,1,2131,2,2134,0,0
-File_2=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',0,1,25,20,41,0,0
-File_3=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,2409,7,2426,0,0
-File_4=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\DirectIOAPI.pas',0,1,188,25,206,0,0
-File_5=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\PrinterTypes.pas',0,1,1014,16,1036,0,0
-File_6=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,1,1,1,0,0
-File_7=SourceModule,'D:\Projects\OposShtrih\Source\SmFiscalPrinter\Units\ReceiptItem.pas',0,1,482,14,491,0,0
-File_8=SourceModule,'D:\Projects\OposShtrih\Source\Shared\DIOHandlers.pas',0,1,771,1,787,0,0
-File_9=SourceModule,'D:\Projects\OposShtrih\Source\Shared\DriverError.pas',0,1,30,34,45,0,0
+File_0=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',0,1,8128,1,8145,0,0
+File_1=SourceModule,'D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',0,1,2179,149,2182,0,0
+File_2=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\oleFiscalPrinter.pas',0,1,350,1,372,0,0
+File_3=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas',0,1,462,1,478,0,0
+File_4=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\EscFilter.pas',0,1,1,1,14,0,0
+File_5=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,1,38,19,0,0
+File_6=SourceModule,'D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\Units\TextFiscalPrinterDevice.pas',0,1,1320,1,1322,0,0
+File_7=SourceModule,'D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\Units\MockPrinterConnection.pas',0,1,1,1,11,0,0
+File_8=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\DirectIOAPI.pas',0,1,368,1,385,0,0
 
 [Modules]
-Count=0
-EditWindowCount=0
+Module0=D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas
+Count=1
+EditWindowCount=1
 TypeLibWindowCount=3
 
-[D:\Projects\OposShtrih\Source\OposShtrih.bpg]
+[D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas]
+ModuleType=SourceModule
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\OposConfig\OposConfig.dpr]
+[D:\projects\IBTS\Opos\Test\AcceptanceTest\AcceptanceTest.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\OposTest\OposTest.dpr]
+[D:\projects\IBTS\Opos\Source\OposShtrih.bpg]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmFiscalPrinter\SmFiscalPrinter.dpr]
+[D:\projects\IBTS\Opos\Source\OposConfig\OposConfig.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmFiscalPrinter\SmFiscalPrinter.todo]
+[D:\projects\IBTS\Opos\Source\OposTest\OposTest.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmFiscalPrinter\SmFiscalPrinter.tlb]
+[D:\projects\IBTS\Opos\Source\SmFiscalPrinter\SmFiscalPrinter.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmScale\SmScale.dpr]
+[D:\projects\IBTS\Opos\Source\SmFiscalPrinter\SmFiscalPrinter.todo]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmScale\SmScale.tlb]
+[D:\projects\IBTS\Opos\Source\SmFiscalPrinter\SmFiscalPrinter.tlb]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\OposConfigTest\OposConfigTest.dpr]
+[D:\projects\IBTS\Opos\Source\SmScale\SmScale.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\OposConfigTest\OposConfigTestLib.dpr]
+[D:\projects\IBTS\Opos\Source\SmScale\SmScale.tlb]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\SmFiscalPrinterTest.dpr]
+[D:\projects\IBTS\Opos\Test\OposConfigTest\OposConfigTest.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\SmFiscalPrinterTest\SmFiscalPrinterTestLib.dpr]
+[D:\projects\IBTS\Opos\Test\OposConfigTest\OposConfigTestLib.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\OposTestTest\OposTestTest.dpr]
+[D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\SmFiscalPrinterTest.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\OposTestTest\OposTestTestLib.dpr]
+[D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\SmFiscalPrinterTestLib.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\SmScaleTest\SmScaleTest.dpr]
+[D:\projects\IBTS\Opos\Test\OposTestTest\OposTestTest.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\SmScaleTest\SmScaleTestLib.dpr]
+[D:\projects\IBTS\Opos\Test\OposTestTest\OposTestTestLib.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmFptrSrv\SmFptrSrv.dpr]
+[D:\projects\IBTS\Opos\Test\SmScaleTest\SmScaleTest.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Source\SmFptrSrv\SmFptrSrv.tlb]
+[D:\projects\IBTS\Opos\Test\SmScaleTest\SmScaleTestLib.dpr]
 FormState=0
 FormOnTop=0
 
-[D:\Projects\OposShtrih\Test\AcceptanceTest\AcceptanceTest.dpr]
+[D:\projects\IBTS\Opos\Source\SmFptrSrv\SmFptrSrv.dpr]
 FormState=0
 FormOnTop=0
+
+[D:\projects\IBTS\Opos\Source\SmFptrSrv\SmFptrSrv.tlb]
+FormState=0
+FormOnTop=0
+
+[EditWindow0]
+ViewCount=1
+CurrentView=0
+View0=0
+CodeExplorer=CodeExplorer@EditWindow0
+MessageView=MessageView@EditWindow0
+Create=1
+Visible=1
+State=2
+Left=368
+Top=188
+Width=912
+Height=646
+MaxLeft=-8
+MaxTop=107
+MaxWidth=1936
+MaxHeight=941
+ClientWidth=1920
+ClientHeight=902
+LeftPanelSize=0
+LeftPanelClients=CodeExplorer@EditWindow0
+LeftPanelData=00000400010000000C000000436F64654578706C6F7265720000000000000000000000000000000000FFFFFFFF
+RightPanelSize=0
+BottomPanelSize=0
+BottomPanelClients=MessageView@EditWindow0
+BottomPanelData=00000400010000000B0000004D657373616765566965770000000000000000000000000000000000FFFFFFFF
+
+[View0]
+Module=D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas
+CursorX=1
+CursorY=1
+TopLine=1
+LeftCol=1
 
 [TypeLibEditWindow0]
 Create=1
@@ -103,7 +142,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=631
 ClientHeight=419
-Module=D:\Projects\OposShtrih\Source\SmFiscalPrinter\SmFiscalPrinter.tlb
+Module=D:\projects\IBTS\Opos\Source\SmFiscalPrinter\SmFiscalPrinter.tlb
 
 [TypeLibEditWindow1]
 Create=1
@@ -117,7 +156,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=631
 ClientHeight=419
-Module=D:\Projects\OposShtrih\Source\SmScale\SmScale.tlb
+Module=D:\projects\IBTS\Opos\Source\SmScale\SmScale.tlb
 
 [TypeLibEditWindow2]
 Create=1
@@ -131,7 +170,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=631
 ClientHeight=419
-Module=D:\Projects\OposShtrih\Source\SmFptrSrv\SmFptrSrv.tlb
+Module=D:\projects\IBTS\Opos\Source\SmFptrSrv\SmFptrSrv.tlb
 
 [Watches]
 Count=0
@@ -164,9 +203,9 @@ Count=0
 Create=1
 Visible=1
 State=2
-Left=651
-Top=0
-Width=1269
+Left=571
+Top=27
+Width=1349
 Height=123
 MaxLeft=-1
 MaxTop=-1
@@ -181,12 +220,12 @@ Visible=1
 State=0
 Left=0
 Top=117
-Width=530
-Height=683
+Width=633
+Height=754
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=514
-ClientHeight=644
+ClientWidth=617
+ClientHeight=715
 TBDockHeight=681
 LRDockWidth=445
 Dockable=0
@@ -225,8 +264,8 @@ ClientHeight=60
 Create=1
 Visible=0
 State=0
-Left=-13
-Top=174
+Left=-4
+Top=120
 Width=487
 Height=831
 MaxLeft=-1
@@ -424,6 +463,38 @@ TBDockHeight=151
 LRDockWidth=383
 Dockable=1
 
+[CodeExplorer@EditWindow0]
+Create=1
+Visible=0
+State=0
+Left=-172
+Top=-57
+Width=140
+Height=305
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=140
+ClientHeight=305
+TBDockHeight=305
+LRDockWidth=140
+Dockable=1
+
+[MessageView@EditWindow0]
+Create=1
+Visible=0
+State=0
+Left=-178
+Top=-719
+Width=443
+Height=85
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=443
+ClientHeight=85
+TBDockHeight=85
+LRDockWidth=443
+Dockable=1
+
 [DockHosts]
 DockHostCount=1
 
@@ -432,8 +503,8 @@ DockSiteType=0
 Create=1
 Visible=0
 State=0
-Left=633
-Top=190
+Left=763
+Top=363
 Width=872
 Height=535
 MaxLeft=-1

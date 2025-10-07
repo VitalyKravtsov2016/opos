@@ -35,6 +35,9 @@ type
 
     function GetParameters: TPrinterParameters;
     property Parameters: TPrinterParameters read GetParameters;
+    function GetParameter(ParamID: Integer): WideString;
+    function SetParameter(ParamID: Integer;
+      const Value: WideString): Integer;
   protected
     procedure Setup; override;
     procedure TearDown; override;
@@ -251,6 +254,7 @@ type
 
     procedure CheckNonFiscal;
     procedure CheckGetTax;
+    procedure CheckRefundReceipt;
 
 
     property Driver: ToleFiscalPrinter read FDriver;
@@ -367,6 +371,27 @@ begin
   begin
     CheckEquals(0, ResultCode, EOPOSException.GetResultCodeText(ResultCode));
   end;
+end;
+
+function TFiscalPrinterTest.GetParameter(ParamID: Integer): WideString;
+var
+  pData: Integer;
+  pString: WideString;
+begin
+  pData := ParamID;
+  pString := '';
+  CheckResult(Driver.DirectIO(DIO_GET_DRIVER_PARAMETER, pData, pString));
+  Result := pString;
+end;
+
+function TFiscalPrinterTest.SetParameter(ParamID: Integer; const Value: WideString): Integer;
+var
+  pData: Integer;
+  pString: WideString;
+begin
+  pData := ParamID;
+  pString := Value;
+  Result := Driver.DirectIO(DIO_SET_DRIVER_PARAMETER, pData, pString);
 end;
 
 procedure TFiscalPrinterTest.CheckClaimed;
@@ -2137,6 +2162,46 @@ begin
   CheckEquals(1, Printer.getTax('', 1), 'Printer.getTax(1)');
   CheckEquals(6, Printer.getTax('', 6), 'Printer.getTax(6)');
   CheckEquals(100, Printer.getTax('', 100), 'Printer.getTax(100)');
+end;
+
+procedure TFiscalPrinterTest.CheckRefundReceipt;
+const
+  Line0 = 'NUM:[DriverParameterReceiptNumber]';
+  Line1 = 'RNM:[DriverParameterRegistrationNumber]';
+  Line2 = 'DATETIME:[DriverParameterReceiptDateTime]';
+  Line3 = 'TOTAL:[DriverParameterReceiptTotal]';
+  Line4 = 'ISOFF:[DriverParameterReceiptIsOffline]';
+  Line5 = 'CutPaper(1)';
+begin
+  OpenClaimEnable;
+  // set refund parameters
+  SetParameter(DriverParameterReceiptNumber, 'DriverParameterReceiptNumber');
+  SetParameter(DriverParameterReceiptDateTime, 'DriverParameterReceiptDateTime');
+  SetParameter(DriverParameterRegistrationNumber, 'DriverParameterRegistrationNumber');
+  SetParameter(DriverParameterReceiptTotal, 'DriverParameterReceiptTotal');
+  SetParameter(DriverParameterReceiptIsOffline, 'DriverParameterReceiptIsOffline');
+  // check refund parameters
+  CheckEquals('DriverParameterReceiptNumber', GetParameter(DriverParameterReceiptNumber));
+  CheckEquals('DriverParameterReceiptDateTime', GetParameter(DriverParameterReceiptDateTime));
+  CheckEquals('DriverParameterRegistrationNumber', GetParameter(DriverParameterRegistrationNumber));
+  CheckEquals('DriverParameterReceiptTotal', GetParameter(DriverParameterReceiptTotal));
+  CheckEquals('DriverParameterReceiptIsOffline', GetParameter(DriverParameterReceiptIsOffline));
+  // receipt
+  Driver.SetPropertyNumber(PIDXFptr_FiscalReceiptType, FPTR_RT_REFUND);
+  CheckResult(Driver.BeginFiscalReceipt(False));
+  CheckResult(Driver.PrintRecItem('Receipt item 1', 100, 1, 1, 0, ''));
+  CheckResult(Driver.PrintRecTotal(100, 100, '0'));
+  CheckResult(Driver.EndFiscalReceipt(False));
+  //
+  Driver.Close;
+
+  CheckEquals(6, Device.RecStation.Count, 'Device.RecStation.Count');
+  CheckEquals(Line0, Device.RecStation[0], 'Device.RecStation.Count');
+  CheckEquals(Line1, Device.RecStation[1], 'Device.RecStation.Count');
+  CheckEquals(Line2, Device.RecStation[2], 'Device.RecStation.Count');
+  CheckEquals(Line3, Device.RecStation[3], 'Device.RecStation.Count');
+  CheckEquals(Line4, Device.RecStation[4], 'Device.RecStation.Count');
+  CheckEquals(Line5, Device.RecStation[5], 'Device.RecStation.Count');
 end;
 
 initialization

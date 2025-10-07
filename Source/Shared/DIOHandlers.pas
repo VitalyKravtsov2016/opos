@@ -1381,6 +1381,11 @@ begin
     DriverParameterLastDocTotal: pString := IntToStr(Printer.Device.LastDocTotal);
     DriverParameterLastDocDateTime: pString := EncodeOposDate(
       Printer.Device.LastDocDate, Printer.Device.LastDocTime);
+    DriverParameterReceiptNumber: pString := Printer.ReceiptNumber;
+    DriverParameterReceiptDateTime: pString := Printer.ReceiptDateTime;
+    DriverParameterRegistrationNumber: pString := Printer.RegistrationNumber;
+    DriverParameterReceiptTotal: pString := Printer.ReceiptTotal;
+    DriverParameterReceiptIsOffline: pString := Printer.ReceiptIsOffline;
   end;
 end;
 
@@ -1488,6 +1493,11 @@ begin
     DriverParameterTaxType: Parameters.TaxType := StrToInt(pString);
     DriverParameterDiscountMode: ;
     DriverParameterCapFiscalStorage: FPrinter.Device.CapFiscalStorage := StrToBool(pString);
+    DriverParameterReceiptNumber: Printer.ReceiptNumber := pString;
+    DriverParameterReceiptDateTime: Printer.ReceiptDateTime := pString;
+    DriverParameterRegistrationNumber: Printer.RegistrationNumber := pString;
+    DriverParameterReceiptTotal: Printer.ReceiptTotal := pString;
+    DriverParameterReceiptIsOffline: Printer.ReceiptIsOffline := pString;
   end;
 end;
 

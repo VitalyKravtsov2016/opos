@@ -60,7 +60,14 @@ type
     FAfterCloseItems: TReceiptItems;
     FPrinter: ISharedPrinter;
     FReceiptPrinter: IReceiptPrinter;
+    FFiscalResult: TFSFiscalResult;
   public
+    ReceiptNumber: string;
+    ReceiptDateTime: string;
+    RegistrationNumber: string;
+    ReceiptTotal: string;
+    ReceiptIsOffline: string;
+
     procedure UpdatePrinterDate;
     procedure CheckCapSetVatTable;
     procedure PrintTextFont(Station: Integer; Font: Integer; const Text: WideString);
@@ -1098,8 +1105,10 @@ begin
   Statistics.InstallationDate := '';
 
   FDocumentNumber := GetLongStatus.DocumentNumber;
-
   WriteDeviceTables;
+
+  if Device.FSReadFiscalResult(FFiscalResult) = 0 then
+    RegistrationNumber := FFiscalResult.EcrRegNum;
 end;
 
 function TFiscalPrinterImpl.GetCapRecNearEnd(Value: Boolean): Boolean;
@@ -2037,12 +2046,15 @@ function TFiscalPrinterImpl.CreateNormalSalesReceipt(RecType: Integer): TCustomR
 var
   Context: TReceiptContext;
 begin
+  Context.RecType := RecType;
   Context.State := FPrinterState;
   Context.Printer := FReceiptPrinter;
   Context.FiscalReceiptStation := FFiscalReceiptStation;
+  Context.Filter := nil;
+
   if Device.CapFiscalStorage then
   begin
-    Result := TFSSalesReceipt.CreateReceipt(Context, RecType);
+    Result := TFSSalesReceipt.CreateReceipt(Context);
   end else
   begin
     {$IFDEF MALINA}
@@ -2430,6 +2442,33 @@ begin
 end;
 
 function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
+
+  procedure PrintRefundReceiptDetails;
+  begin
+    if Receipt.RecType = RecTypeRetSale then
+    begin
+      if ReceiptNumber <> '' then
+        Receipt.PrintRecMessage(Format('NUM:[%s]', [ReceiptNumber]));
+      if RegistrationNumber <> '' then
+        Receipt.PrintRecMessage(Format('RNM:[%s]', [RegistrationNumber]));
+      if ReceiptDateTime <> '' then
+        Receipt.PrintRecMessage(Format('DATETIME:[%s]', [ReceiptDateTime]));
+      if ReceiptTotal <> '' then
+        Receipt.PrintRecMessage(Format('TOTAL:[%s]', [ReceiptTotal]));
+      if ReceiptIsOffline <> '' then
+        Receipt.PrintRecMessage(Format('ISOFF:[%s]', [ReceiptIsOffline]));
+    end;
+  end;
+
+  procedure ClearRefundReceiptDetails;
+  begin
+    ReceiptNumber := '';
+    ReceiptDateTime := '';
+    RegistrationNumber := '';
+    ReceiptTotal := '';
+    ReceiptIsOffline := '';
+  end;
+
 begin
   try
     Filters.BeforeCloseReceipt;
@@ -2438,6 +2477,7 @@ begin
     if Parameters.PrintRecMessageMode = PrintRecMessageModeBefore then
       PrintRecMessages;
 
+    PrintRefundReceiptDetails;
     Receipt.EndFiscalReceipt;
     try
       QRCodeData := Receipt.QRCodeData;
@@ -2466,6 +2506,11 @@ begin
         PrintDocumentEnd;
       end;
       Device.ResetPrinter;
+
+
+      ReceiptDateTime := FormatDateTime('dd.mm.yyyy hh:nn:ss', Now);
+      ReceiptTotal := Format('%.2d', [Receipt.GetTotal/100]);
+      ReceiptIsOffline := 'FALSE';
     except
       on E: Exception do
       begin

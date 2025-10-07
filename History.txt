@@ -6,6 +6,23 @@
 
 *******************************************************************
 
+  OposShtrih_1.13_604.exe
+  07 октября 2025 22:00
+
+  [+] Добавлена возможность указать параметры чека для формирования 
+      чека возврата. Дополнительные параметры читаются и записываются
+	  через directIO.
+	  DIO_GET_DRIVER_PARAMETER = 29; // read internal driver parameter
+      DIO_SET_DRIVER_PARAMETER = 30; // write internal driver parameter
+	  DriverParameterReceiptNumber            = 304;
+	  DriverParameterReceiptDateTime          = 305;
+	  DriverParameterRegistrationNumber       = 306;
+	  DriverParameterReceiptTotal             = 307;
+	  DriverParameterReceiptIsOffline         = 308;
+	  Параметры нужно записать перед формированием чека возврата. 
+	  
+*******************************************************************
+
   OposShtrih_1.13_603.exe
   17 сентября 2025 22:28
   

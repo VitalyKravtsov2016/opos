@@ -39,6 +39,8 @@ type
     property Driver: TSMFiscalPrinter read FDriver;
   published
     procedure ExecuteLogFiles;
+    procedure TestPrintSalesReceipt;
+    //procedure TestPrintRefundReceipt;
   end;
 
 implementation
@@ -431,6 +433,11 @@ begin
     Commands1.Free;
     Commands2.Free;
   end;
+end;
+
+procedure TFiscalPrinterTest.TestPrintSalesReceipt;
+begin
+
 end;
 
 initialization

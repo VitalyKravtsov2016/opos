@@ -19,7 +19,6 @@ type
   TFSSalesReceipt = class(TCustomReceipt)
   private
     FOpened: Boolean;
-    FRecType: Integer;
     FIsVoided: Boolean;
     FRetalix: TRetalix;
     FPayments: TPayments;
@@ -74,7 +73,7 @@ type
     property Template: TReceiptTemplate read FTemplate;
     property Device: IFiscalPrinterDevice read GetDevice;
   public
-    constructor CreateReceipt(AContext: TReceiptContext; ARecType: Integer);
+    constructor CreateReceipt(AContext: TReceiptContext);
     destructor Destroy; override;
 
     procedure CorrectPayments;
@@ -210,12 +209,11 @@ end;
 
 { TFSSalesReceipt }
 
-constructor TFSSalesReceipt.CreateReceipt(AContext: TReceiptContext; ARecType: Integer);
+constructor TFSSalesReceipt.CreateReceipt(AContext: TReceiptContext);
 var
   FTemplateData: TReceiptTemplateRec;
 begin
   inherited Create(AContext);
-  FRecType := ARecType;
   FDiscounts := TReceiptItems.Create;
   FReceiptItems := TReceiptItems.Create;
   FItemBarcodes := TStringList.Create;
@@ -448,7 +446,7 @@ begin
   Operation.Tax := VatInfo;
   Operation.Text := Description;
   Operation.UnitName := UnitName;
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Department := Parameters.Department;
   Operation.Charge := 0;
   Operation.Discount := 0;
@@ -572,7 +570,7 @@ begin
   Operation.Tax := VatInfo;
   Operation.Text := Description;
   Operation.Department := Parameters.Department;
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Charge := 0;
   Operation.Discount := 0;
   Operation.Barcode := 0;
@@ -600,7 +598,7 @@ begin
   Operation.Tax := VatInfo;
   Operation.Text := Description;
   Operation.Department := Parameters.Department;
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Charge := 0;
   Operation.Discount := 0;
   Operation.Barcode := 0;
@@ -899,7 +897,7 @@ begin
   ClearReceipt;
   if Parameters.OpenReceiptEnabled then
   begin
-    OpenReceipt(FRecType);
+    OpenReceipt(RecType);
   end;
 end;
 
@@ -1030,7 +1028,7 @@ begin
     end;
 
     FSSale2.UnitName := FSRegistration.UnitName;
-    FSSale2.RecType := REcTypeToOperation(FRecType);
+    FSSale2.RecType := REcTypeToOperation(RecType);
     FSSale2.Quantity := Abs(FSRegistration.Quantity);
     FSSale2.Price := Item.PriceWithDiscount;
     if FSRegistration.Parameter1 <> '' then
@@ -1049,7 +1047,7 @@ begin
     Device.Check(Device.FSSale2(FSSale2));
   end else
   begin
-    if FRecType = RecTypeSale then
+    if RecType = RecTypeSale then
       Printer.Sale(Operation)
     else
       Printer.RetSale(Operation);
@@ -1217,7 +1215,7 @@ begin
     State.CheckState(FPTR_PS_FISCAL_RECEIPT_ENDING);
     if not FIsVoided then
     begin
-      OpenReceipt(FRecType);
+      OpenReceipt(RecType);
 
       CorrectPayments;
       PrintRecMessages(0);
@@ -1277,7 +1275,7 @@ begin
           FCloseResult2.DocDate.Day, FCloseResult2.DocTime.Hour,
           FCloseResult2.DocTime.Min, ReceiptTotal/100, FSState.FSNumber,
           FCloseResult2.DocNumber, FCloseResult2.MacValue,
-          RecTypeToOperation(FRecType)]);
+          RecTypeToOperation(RecType)]);
       end else
       begin
         CloseParams.CashAmount := FPayments[0];
@@ -1414,7 +1412,7 @@ begin
 
   DiscountAmount := GetAdjustmentAmount(AdjustmentType, Adjustment);
 
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Price := Printer.CurrencyToInt(Amount);
   Operation.Amount := Operation.Price;
   Operation.Quantity := -Abs(GetDoubleQuantity(Quantity));
@@ -1466,7 +1464,7 @@ begin
   Operation.Text := Description;
   Operation.UnitName := UnitName;
   Operation.Department := Parameters.Department;
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Charge := 0;
   Operation.Discount := 0;
   Operation.Barcode := 0;
@@ -1511,7 +1509,7 @@ begin
   Operation.Text := ADescription;
   Operation.UnitName := AUnitName;
   Operation.Department := Parameters.Department;
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Charge := 0;
   Operation.Discount := 0;
   Operation.Barcode := 0;
@@ -1552,7 +1550,7 @@ begin
   Operation.Text := ADescription;
   Operation.UnitName := AUnitName;
   Operation.Department := Parameters.Department;
-  Operation.RecType := FRecType;
+  Operation.RecType := RecType;
   Operation.Charge := 0;
   Operation.Discount := 0;
   Operation.Barcode := 0;
