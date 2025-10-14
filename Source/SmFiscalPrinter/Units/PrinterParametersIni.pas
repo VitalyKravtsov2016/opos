@@ -345,6 +345,7 @@ begin
       FParameters.SingleQuantityOnZeroUnitPrice := IniFile.ReadBool(Section, 'SingleQuantityOnZeroUnitPrice', True);
       FParameters.ValidTimeDiffInSecs := IniFile.ReadInteger(Section, 'ValidTimeDiffInSecs', DefValidTimeDiffInSecs);
       FParameters.UsePrintHeaderParameter := IniFile.ReadBool(Section, 'UsePrintHeaderParameter', DefUsePrintHeaderParameter);
+      FParameters.WebKassaEnabled := IniFile.ReadBool(Section, 'WebKassaEnabled', DefWebKassaEnabled);
     end;
     // VatCodes
     Section := GetSectionName(DeviceName) + '_VatCodes';
@@ -514,6 +515,8 @@ begin
     IniFile.WriteBool(Section, 'SingleQuantityOnZeroUnitPrice', FParameters.SingleQuantityOnZeroUnitPrice);
     IniFile.WriteInteger(Section, 'ValidTimeDiffInSecs', FParameters.ValidTimeDiffInSecs);
     IniFile.WriteBool(Section, 'UsePrintHeaderParameter', FParameters.UsePrintHeaderParameter);
+    IniFile.WriteBool(Section, 'WebKassaEnabled', FParameters.WebKassaEnabled);
+
     // PayTypes
     Section := GetSectionName(DeviceName) + '_PaymentTypes';
     IniFile.EraseSection(Section);

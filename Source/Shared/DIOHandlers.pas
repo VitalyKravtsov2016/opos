@@ -1381,6 +1381,7 @@ begin
     DriverParameterLastDocTotal: pString := IntToStr(Printer.Device.LastDocTotal);
     DriverParameterLastDocDateTime: pString := EncodeOposDate(
       Printer.Device.LastDocDate, Printer.Device.LastDocTime);
+
     DriverParameterReceiptNumber: pString := Printer.ReceiptNumber;
     DriverParameterReceiptDateTime: pString := Printer.ReceiptDateTime;
     DriverParameterRegistrationNumber: pString := Printer.RegistrationNumber;

@@ -2445,18 +2445,21 @@ function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
 
   procedure PrintRefundReceiptDetails;
   begin
-    if Receipt.RecType = RecTypeRetSale then
+    if Parameters.WebKassaEnabled then
     begin
-      if ReceiptNumber <> '' then
-        Receipt.PrintRecMessage(Format('NUM:[%s]', [ReceiptNumber]));
-      if RegistrationNumber <> '' then
-        Receipt.PrintRecMessage(Format('RNM:[%s]', [RegistrationNumber]));
-      if ReceiptDateTime <> '' then
-        Receipt.PrintRecMessage(Format('DATETIME:[%s]', [ReceiptDateTime]));
-      if ReceiptTotal <> '' then
-        Receipt.PrintRecMessage(Format('TOTAL:[%s]', [ReceiptTotal]));
-      if ReceiptIsOffline <> '' then
-        Receipt.PrintRecMessage(Format('ISOFF:[%s]', [ReceiptIsOffline]));
+      if Receipt.RecType = RecTypeRetSale then
+      begin
+        if ReceiptNumber <> '' then
+          Receipt.PrintRecMessage(Format('NUM:[%s]', [ReceiptNumber]));
+        if RegistrationNumber <> '' then
+          Receipt.PrintRecMessage(Format('RNM:[%s]', [RegistrationNumber]));
+        if ReceiptDateTime <> '' then
+          Receipt.PrintRecMessage(Format('DATETIME:[%s]', [ReceiptDateTime]));
+        if ReceiptTotal <> '' then
+          Receipt.PrintRecMessage(Format('TOTAL:[%s]', [ReceiptTotal]));
+        if ReceiptIsOffline <> '' then
+          Receipt.PrintRecMessage(Format('ISOFF:[%s]', [ReceiptIsOffline]));
+      end;
     end;
   end;
 
@@ -2467,6 +2470,33 @@ function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
     RegistrationNumber := '';
     ReceiptTotal := '';
     ReceiptIsOffline := '';
+  end;
+
+  (*
+  Таблица 2:
+  20 строка - фискальный признак (ФП)
+  21 строка - дата и время фискализации
+  22 строка - РНК
+  23 строка - ЗНК
+  24 строка - признак автономности чека
+  25 строка - общая сумма
+  *)
+
+  function ReadReceiptParam(Row: Integer): WideString;
+  begin
+    Result := Printer.Device.ReadTableStr(2, Row, 2);
+  end;
+
+  procedure UpdateReceiptDetails;
+  begin
+    if Parameters.WebKassaEnabled then
+    begin
+      ReceiptNumber := ReadReceiptParam(20);
+      ReceiptDateTime := ReadReceiptParam(21);
+      RegistrationNumber := ReadReceiptParam(22);
+      ReceiptTotal := ReadReceiptParam(25);
+      ReceiptIsOffline := ReadReceiptParam(24);
+    end;
   end;
 
 begin
@@ -2505,12 +2535,8 @@ begin
       begin
         PrintDocumentEnd;
       end;
+      UpdateReceiptDetails;
       Device.ResetPrinter;
-
-
-      ReceiptDateTime := FormatDateTime('dd.mm.yyyy hh:nn:ss', Now);
-      ReceiptTotal := Format('%.2d', [Receipt.GetTotal/100]);
-      ReceiptIsOffline := 'FALSE';
     except
       on E: Exception do
       begin

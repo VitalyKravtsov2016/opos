@@ -64,7 +64,7 @@ uses
   fmuFptrMalina, fmuFptrUnipos, fmuFptrFuel, fmuFptrReplace, fmuCashInProcessing,
   fmuFptrPawnTicket, fmuRosneftDiscountCard, fmuRosneftAddText, fmuFptrRetalix,
   {$ENDIF}
-  fmuFptrJournal;
+  fmuFptrJournal, fmuWebKassa;
 
 { TFiscalPrinterDevice }
 
@@ -150,6 +150,7 @@ begin
     AddPage(fm, TfmFptrRetalix);
     {$ENDIF MALINA}
     AddPage(fm, TfmFptrDate);
+    AddPage(fm, TfmWebKassa);
 
     fm.Init;
     fm.UpdatePage;

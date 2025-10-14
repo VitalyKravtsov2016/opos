@@ -95,6 +95,7 @@ uses
   XmlUtils in '..\..\Source\SmFiscalPrinter\Units\XmlUtils.pas',
   DefaultModel in '..\..\Source\SmFiscalPrinter\Units\DefaultModel.pas',
   RegExpr in '..\..\Source\Shared\RegExpr.pas',
+  fmuWebKassa in '..\..\Source\OposConfig\Fmu\fmuWebKassa.pas' {fmWebKassa},
   fmuFiscalStorage in '..\..\Source\OposConfig\Fmu\fmuFiscalStorage.pas' {fmFiscalStorage};
 
 {$R *.RES}

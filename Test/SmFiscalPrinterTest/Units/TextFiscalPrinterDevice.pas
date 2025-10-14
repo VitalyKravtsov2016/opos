@@ -34,6 +34,7 @@ type
     function GetCapSubtotalRound: Boolean;
     procedure SetCapFiscalStorage(const Value: Boolean);
   public
+    TableValues: array [Byte, Byte, Byte] of string;
     FCapFiscalStorage: Boolean;
     FSCloseReceiptResult2: TFSCloseReceiptResult2;
 
@@ -916,7 +917,7 @@ end;
 function TTextFiscalPrinterDevice.ReadTableStr(Table, Row,
   Field: Integer): WideString;
 begin
-  Result := '';
+  Result := TableValues[Table, Row, Field];
 end;
 
 function TTextFiscalPrinterDevice.ReceiptCancel: Integer;

@@ -559,6 +559,9 @@ begin
       if Reg.ValueExists('UsePrintHeaderParameter') then
         FParameters.UsePrintHeaderParameter := Reg.ReadBool('UsePrintHeaderParameter');
 
+      if Reg.ValueExists('WebKassaEnabled') then
+        FParameters.WebKassaEnabled := Reg.ReadBool('WebKassaEnabled');
+
       Reg.CloseKey;
     end;
     // VatCodes
@@ -734,6 +737,7 @@ begin
     Reg.WriteBool('SingleQuantityOnZeroUnitPrice', FParameters.SingleQuantityOnZeroUnitPrice);
     Reg.WriteInteger('ValidTimeDiffInSecs', FParameters.ValidTimeDiffInSecs);
     Reg.WriteBool('UsePrintHeaderParameter', FParameters.UsePrintHeaderParameter);
+    Reg.WriteBool('WebKassaEnabled', FParameters.WebKassaEnabled);
     Reg.CloseKey;
 
     // VatCodes

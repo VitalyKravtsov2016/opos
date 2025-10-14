@@ -373,6 +373,8 @@ const
   DefCorrectCashlessAmount = false;
   DefValidTimeDiffInSecs = 0;
   DefUsePrintHeaderParameter = False;
+  DefWebKassaEnabled = False;
+
 type
   { TPrinterParameters }
 
@@ -570,6 +572,7 @@ type
     ReceiptField: array [MinReceiptField..MaxReceiptField] of string;
     ValidTimeDiffInSecs: Integer;
     UsePrintHeaderParameter: Boolean;
+    WebKassaEnabled: Boolean;
   public
     constructor Create(ALogger: ILogFile);
     destructor Destroy; override;
@@ -919,6 +922,7 @@ begin
   CorrectCashlessAmount := DefCorrectCashlessAmount;
   SingleQuantityOnZeroUnitPrice := True;
   UsePrintHeaderParameter := DefUsePrintHeaderParameter;
+  WebKassaEnabled := DefWebKassaEnabled;
 end;
 
 procedure TPrinterParameters.LogText(const Caption, Text: WideString);
@@ -1065,6 +1069,8 @@ begin
   Logger.Debug('SingleQuantityOnZeroUnitPrice: ' + BoolToStr(SingleQuantityOnZeroUnitPrice));
   Logger.Debug('ValidTimeDiffInSecs: ' + IntToStr(ValidTimeDiffInSecs));
   Logger.Debug('UsePrintHeaderParameter: ' + BoolToStr(UsePrintHeaderParameter));
+  Logger.Debug('WebKassaEnabled: ' + BoolToStr(WebKassaEnabled));
+
   // PayTypes
   for i := 0 to PayTypes.Count-1 do
   begin
