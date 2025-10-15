@@ -254,7 +254,10 @@ type
     procedure CheckGetTax;
     procedure CheckNonFiscal;
     procedure CheckRefundReceipt;
-    procedure CheckWebKassa;
+    procedure CheckRefundReceipt2;
+    procedure CheckCorrectReceiptDateTime;
+    procedure CheckIsDigits;
+
 
     property Driver: ToleFiscalPrinter read FDriver;
     property Printer: TFiscalPrinterImpl read FPrinter;
@@ -2174,7 +2177,6 @@ const
 begin
   OpenClaimEnable;
   Parameters.WebKassaEnabled := True;
-  //
   (*
   Таблица 2:
   20 строка - фискальный признак (ФП)
@@ -2184,6 +2186,13 @@ begin
   24 строка - признак автономности чека
   25 строка - общая сумма
   *)
+
+  // check sales parameters
+  CheckEquals('', GetParameter(DriverParameterReceiptNumber));
+  CheckEquals('', GetParameter(DriverParameterReceiptDateTime));
+  CheckEquals('', GetParameter(DriverParameterRegistrationNumber));
+  CheckEquals('', GetParameter(DriverParameterReceiptTotal));
+  CheckEquals('', GetParameter(DriverParameterReceiptIsOffline));
 
   Device.TableValues[2,20,2] := 'DriverParameterReceiptNumber';
   Device.TableValues[2,21,2] := 'DriverParameterReceiptDateTime';
@@ -2239,9 +2248,31 @@ begin
   CheckEquals(Line5, Device.RecStation[5], 'Device.RecStation[5]');
 end;
 
-procedure TFiscalPrinterTest.CheckWebKassa;
+procedure TFiscalPrinterTest.CheckRefundReceipt2;
 begin
+  Parameters.CompatLevel := CompatLevelNone;
+  CheckRefundReceipt;
 
+  Parameters.CompatLevel := CompatLevel1;
+  CheckRefundReceipt;
+
+  Parameters.CompatLevel := CompatLevel2;
+  CheckRefundReceipt;
+end;
+
+procedure TFiscalPrinterTest.CheckCorrectReceiptDateTime;
+begin
+  CheckEquals('', CorrectReceiptDateTime(''));
+  CheckEquals('123t', CorrectReceiptDateTime('123t'));
+  CheckEquals('15.10.2025 21:10:', CorrectReceiptDateTime('151020252110'));
+  CheckEquals('15.10.2025 21:10:09', CorrectReceiptDateTime('15102025211009'));
+  CheckEquals('15.10.2025 21:10:09', CorrectReceiptDateTime('15.10.2025 21:10:09'));
+end;
+
+procedure TFiscalPrinterTest.CheckIsDigits;
+begin
+  Check(IsDigits('765765765765'));
+  Check(not IsDigits('7657657.65765'));
 end;
 
 initialization

@@ -493,11 +493,42 @@ type
     property MalinaParams: TMalinaParams read GetMalinaParams;
   end;
 
+function IsDigits(const S: string): Boolean;
+function CorrectReceiptDateTime(const S: string): string;
+
 implementation
 
 uses
   // VCL
   DIOHandlers, MalinaPlugin;
+
+function IsDigits(const S: string): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := 1 to Length(S) do
+  begin
+    Result := Pos(S[i], '0123456789') <> 0;
+    if not Result then Exit;
+  end;
+end;
+
+// 15102025211009 -> 15.10.2025 21:10:09
+function CorrectReceiptDateTime(const S: string): string;
+begin
+  Result := S;
+  if IsDigits(S) and (Length(S) in [12, 14]) then
+  begin
+    Result := Format('%s.%s.%s %s:%s:%s', [
+      Copy(S, 1, 2),
+      Copy(S, 3, 2),
+      Copy(S, 5, 4),
+      Copy(S, 9, 2),
+      Copy(S, 11, 2),
+      Copy(S, 13, 2)]);
+  end;
+end;
 
 { TFiscalPrinter }
 
@@ -1627,6 +1658,11 @@ begin
   FChangeDue := '';
   FHeaderEnabled := True;
   SetFreezeEvents(False);
+  ReceiptNumber := '';
+  ReceiptDateTime := '';
+  RegistrationNumber := '';
+  ReceiptTotal := '';
+  ReceiptIsOffline := '';
 end;
 
 procedure TFiscalPrinterImpl.CheckEndDay;
@@ -2450,26 +2486,19 @@ function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
       if Receipt.RecType = RecTypeRetSale then
       begin
         if ReceiptNumber <> '' then
-          Receipt.PrintRecMessage(Format('NUM:[%s]', [ReceiptNumber]));
+          Printer.PrintText(Format('NUM:[%s]', [ReceiptNumber]));
         if RegistrationNumber <> '' then
-          Receipt.PrintRecMessage(Format('RNM:[%s]', [RegistrationNumber]));
+          Printer.PrintText(Format('RNM:[%s]', [RegistrationNumber]));
         if ReceiptDateTime <> '' then
-          Receipt.PrintRecMessage(Format('DATETIME:[%s]', [ReceiptDateTime]));
+        begin
+          Printer.PrintText(Format('DATETIME:[%s]', [CorrectReceiptDateTime(ReceiptDateTime)]));
+        end;
         if ReceiptTotal <> '' then
-          Receipt.PrintRecMessage(Format('TOTAL:[%s]', [ReceiptTotal]));
+          Printer.PrintText(Format('TOTAL:[%s]', [ReceiptTotal]));
         if ReceiptIsOffline <> '' then
-          Receipt.PrintRecMessage(Format('ISOFF:[%s]', [ReceiptIsOffline]));
+          Printer.PrintText(Format('ISOFF:[%s]', [ReceiptIsOffline]));
       end;
     end;
-  end;
-
-  procedure ClearRefundReceiptDetails;
-  begin
-    ReceiptNumber := '';
-    ReceiptDateTime := '';
-    RegistrationNumber := '';
-    ReceiptTotal := '';
-    ReceiptIsOffline := '';
   end;
 
   (*

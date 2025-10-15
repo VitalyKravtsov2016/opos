@@ -11,9 +11,11 @@ uses
   TestFramework,
   // Tnt
   TntClasses, TntSysUtils,
+  // Opos
+  Opos, OposFptr, OposFptrUtils, OposFiscalPrinter_1_11_Lib_TLB, OPOSException,
   // This
-  Opos, OposFptrUtils, OposFiscalPrinter_1_11_Lib_TLB, DirectIOAPI,
-  SMFiscalPrinter, FileUtils, SmFiscalPrinterLib_TLB;
+  PrinterParameters, PrinterParametersX, DirectIOAPI, SMFiscalPrinter, FileUtils,
+  SmFiscalPrinterLib_TLB;
 
 type
   { TFiscalPrinterTest }
@@ -33,17 +35,26 @@ type
     function GetDeviceName: WideString;
     procedure OpenFiscalDay(const DeviceName: WideString);
     procedure ExecuteLogFileDir(const DirName: WideString);
+    procedure OpenClaimEnable;
+    procedure CheckResult(ResultCode: Integer);
+    function GetParameter(ParamID: Integer): WideString;
+    function SetParameter(ParamID: Integer;
+      const Value: WideString): Integer;
+    procedure SetParameters;
   protected
     procedure Setup; override;
     procedure TearDown; override;
     property Driver: TSMFiscalPrinter read FDriver;
   published
     procedure ExecuteLogFiles;
-    procedure TestPrintSalesReceipt;
-    //procedure TestPrintRefundReceipt;
+    procedure CheckRefundReceipt;
   end;
 
 implementation
+
+const
+  //DeviceName = 'TestDeviceName';
+  DeviceName = 'SHTRIH-M-OPOS-1';
 
 { TFiscalPrinterTest }
 
@@ -435,10 +446,128 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterTest.TestPrintSalesReceipt;
+procedure TFiscalPrinterTest.CheckResult(ResultCode: Integer);
+var
+  Text: string;
+  ResultCodeExtended: Integer;
 begin
-
+  if ResultCode = OPOS_E_EXTENDED then
+  begin
+    ResultCodeExtended := Driver.ResultCodeExtended;
+    Text := 'OPOS_E_EXTENDED, ' + GetResultCodeExtendedText(ResultCodeExtended);
+   Check(False, Text);
+  end else
+  begin
+    CheckEquals(0, ResultCode, EOPOSException.GetResultCodeText(ResultCode));
+  end;
 end;
+
+procedure TFiscalPrinterTest.OpenClaimEnable;
+begin
+  CheckResult(Driver.Open(DeviceName));
+  CheckResult(Driver.ClaimDevice(0));
+  Driver.DeviceEnabled := True;
+  CheckResult(Driver.ResultCode);
+end;
+
+function TFiscalPrinterTest.GetParameter(ParamID: Integer): WideString;
+var
+  pData: Integer;
+  pString: WideString;
+begin
+  pData := ParamID;
+  pString := '';
+  CheckResult(Driver.DirectIO(DIO_GET_DRIVER_PARAMETER, pData, pString));
+  Result := pString;
+end;
+
+function TFiscalPrinterTest.SetParameter(ParamID: Integer; const Value: WideString): Integer;
+var
+  pData: Integer;
+  pString: WideString;
+begin
+  pData := ParamID;
+  pString := Value;
+  Result := Driver.DirectIO(DIO_SET_DRIVER_PARAMETER, pData, pString);
+end;
+
+procedure TFiscalPrinterTest.SetParameters;
+var
+  Params: TPrinterParameters;
+begin
+  Params := TPrinterParameters.Create(Driver.Logger);
+  try
+    LoadParameters(Params, DeviceName, Driver.Logger);
+    Params.PortNumber := 4;
+    Params.BaudRate := 115200;
+    SaveParameters(Params, DeviceName, Driver.Logger);
+  finally
+    Params.Free;
+  end;
+end;
+
+procedure TFiscalPrinterTest.CheckRefundReceipt;
+
+  procedure PrintSalesReceipt(Total: Currency);
+  begin
+    Driver.FiscalReceiptType := FPTR_RT_SALES;
+    CheckResult(Driver.BeginFiscalReceipt(False));
+    CheckResult(Driver.PrintRecItem('Receipt item 1', Total, 1000, 1, 0, ''));
+    CheckResult(Driver.PrintRecTotal(Total, Total, '0'));
+    CheckResult(Driver.EndFiscalReceipt(False));
+  end;
+
+  procedure PrintRefundReceipt(Total: Currency);
+  begin
+    Driver.FiscalReceiptType := FPTR_RT_REFUND;
+    CheckResult(Driver.BeginFiscalReceipt(False));
+    CheckResult(Driver.PrintRecItem('Receipt item 1', Total, 1000, 1, 0, ''));
+    CheckResult(Driver.PrintRecTotal(Total, Total, '0'));
+    CheckResult(Driver.EndFiscalReceipt(False));
+  end;
+
+  procedure PrintRefundReceipt2(Total: Currency);
+  begin
+    Driver.FiscalReceiptType := FPTR_RT_SALES;
+    CheckResult(Driver.BeginFiscalReceipt(False));
+    CheckResult(Driver.PrintRecItemRefund('Receipt item 1', Total, 1000, 1, 0, ''));
+    CheckResult(Driver.PrintRecTotal(Total, Total, '0'));
+    CheckResult(Driver.EndFiscalReceipt(False));
+  end;
+
+  var
+    ReceiptDetails: array [0..4] of string;
+
+  procedure ReadReceiptDetails;
+  begin
+    ReceiptDetails[0] := GetParameter(DriverParameterReceiptNumber);
+    ReceiptDetails[1] := GetParameter(DriverParameterReceiptDateTime);
+    ReceiptDetails[2] := GetParameter(DriverParameterRegistrationNumber);
+    ReceiptDetails[3] := GetParameter(DriverParameterReceiptTotal);
+    ReceiptDetails[4] := GetParameter(DriverParameterReceiptIsOffline);
+  end;
+
+  procedure WriteReceiptDetails;
+  begin
+    SetParameter(DriverParameterReceiptNumber, ReceiptDetails[0]);
+    SetParameter(DriverParameterReceiptDateTime, ReceiptDetails[1]);
+    SetParameter(DriverParameterRegistrationNumber, ReceiptDetails[2]);
+    SetParameter(DriverParameterReceiptTotal, ReceiptDetails[3]);
+    SetParameter(DriverParameterReceiptIsOffline, ReceiptDetails[4]);
+  end;
+
+begin
+  //SetParameters;
+  OpenClaimEnable;
+  PrintSalesReceipt(10); // Receipt 1
+  PrintSalesReceipt(20); // Receipt 2
+  ReadReceiptDetails;
+  PrintSalesReceipt(30); // Receipt 3
+
+  WriteReceiptDetails;
+  PrintRefundReceipt(20); // Refund receipt
+end;
+
 
 initialization
   RegisterTest('', TFiscalPrinterTest.Suite);
