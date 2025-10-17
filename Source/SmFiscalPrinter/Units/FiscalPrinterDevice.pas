@@ -7004,7 +7004,7 @@ begin
   FCapBarcode2D := True;
   //FCapBarcode2D := TestCommand($DE);
 
-  FCapFiscalStorage := False;
+  FCapFiscalStorage := True;
   if Parameters.ModelId <> MODEL_ID_WEB_CASSA then
     FCapFiscalStorage := ReadCapFiscalStorage;
 

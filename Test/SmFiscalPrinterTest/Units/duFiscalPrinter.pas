@@ -2175,8 +2175,10 @@ const
   Line4 = 'ISOFF:[DriverParameterReceiptIsOffline2]';
   Line5 = 'CutPaper(1)';
 begin
-  OpenClaimEnable;
   Parameters.WebKassaEnabled := True;
+  Parameters.ModelId := MODEL_ID_WEB_CASSA;
+
+  OpenClaimEnable;
   (*
   Таблица 2:
   20 строка - фискальный признак (ФП)

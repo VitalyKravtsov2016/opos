@@ -956,6 +956,7 @@ var
 begin
   Logger.Debug('TPrinterParameters.WriteLogParameters');
 
+  Logger.Debug('ModelId: ' + IntToStr(ModelId));
   Logger.Debug('Storage: ' + IntToStr(Storage));
   LogText('Header', Header);
   LogText('Trailer', Trailer);
