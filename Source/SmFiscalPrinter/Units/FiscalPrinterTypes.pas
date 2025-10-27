@@ -328,6 +328,7 @@ type
     function Storno(Operation: TPriceReg): Integer;
     function ReceiptClose(const P: TCloseReceiptParams; var R: TCloseReceiptResult): Integer;
     function ReceiptClose2(const P: TFSCloseReceiptParams2; var R: TFSCloseReceiptResult2): Integer;
+    function ReceiptClose3(const P: TFSCloseReceiptParams2; var R: TFSCloseReceiptResult2): Integer;
     function ReceiptDiscount(Operation: TAmountOperation): Integer;
     function ReceiptDiscount2(Operation: TReceiptDiscount2): Integer;
     function ReceiptCharge(Operation: TAmountOperation): Integer;

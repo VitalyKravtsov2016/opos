@@ -1356,6 +1356,11 @@ begin
     DriverParameterParam8: pString := Printer.Parameters.Parameter8;
     DriverParameterParam9: pString := Printer.Parameters.Parameter9;
     DriverParameterParam10: pString := Printer.Parameters.Parameter10;
+    DriverParameterParam11: pString := Printer.Parameters.Parameter11;
+    DriverParameterParam12: pString := Printer.Parameters.Parameter12;
+    DriverParameterParam13: pString := Printer.Parameters.Parameter13;
+    DriverParameterParam14: pString := Printer.Parameters.Parameter14;
+
     DriverParameterBarcode: pString := Printer.Parameters.Barcode;
     DriverParameterMarkType: pString := IntToStr(Printer.Parameters.MarkType);
     DriverParameterCorrectionType: pString := IntToStr(Printer.Parameters.CorrectionType);
@@ -1476,6 +1481,11 @@ begin
     DriverParameterParam8: Parameters.Parameter8 := pString;
     DriverParameterParam9: Parameters.Parameter9 := pString;
     DriverParameterParam10: Parameters.Parameter10 := pString;
+    DriverParameterParam11: Parameters.Parameter11 := pString;
+    DriverParameterParam12: Parameters.Parameter12 := pString;
+    DriverParameterParam13: Parameters.Parameter13 := pString;
+    DriverParameterParam14: Parameters.Parameter14 := pString;
+
     DriverParameterBarcode: Parameters.Barcode := pString;
     DriverParameterMarkType: Parameters.MarkType := StrToInt(pString);
     DriverParameterCorrectionType: Parameters.CorrectionType := StrToInt(pString);

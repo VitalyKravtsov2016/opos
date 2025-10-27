@@ -357,6 +357,8 @@ type
       var R: TCloseReceiptResult): Integer;
     function ReceiptClose2(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
+    function ReceiptClose3(const P: TFSCloseReceiptParams2;
+      var R: TFSCloseReceiptResult2): Integer;
 
     function ReceiptDiscount(Operation: TAmountOperation): Integer;
     function ReceiptDiscount2(Operation: TReceiptDiscount2): Integer;
@@ -8885,6 +8887,83 @@ begin
     IntToBin(P.TaxAmount[10], 5);
   end;
   *)
+
+  Result := ExecuteData(Command, Answer);
+  if Result = 0 then
+  begin
+    CheckMinLength(Answer, 13);
+    R.Change := BinToInt(Answer, 1, 5);
+    R.DocNumber := BinToInt(Answer, 6, 4);
+    R.MacValue := BinToInt(Answer, 10, 4);
+    if (Length(Answer) >= 18) then
+    begin
+      R.DocDate := BinToPrinterDate(Copy(Answer, 14, 3));
+      R.DocTime := BinToPrinterTime2(Copy(Answer, 17, 2));
+    end else
+    begin
+      try
+        Status := ReadLongStatus;
+        R.DocDate := Status.Date;
+        R.DocTime := Status.Time;
+      except
+        R.DocDate := GetCurrentPrinterDate;
+        R.DocTime := GetCurrentPrinterTime;
+      end;
+    end;
+
+    FLastDocNumber := R.DocNumber;
+    FLastDocMac := R.MacValue;
+    FLastDocDate := R.DocDate;
+    FLastDocTime := R.DocTime;
+  end;
+end;
+
+function TFiscalPrinterDevice.ReceiptClose3(
+  const P: TFSCloseReceiptParams2;
+  var R: TFSCloseReceiptResult2): Integer;
+var
+  Command: AnsiString;
+  Answer: AnsiString;
+  Status: TLongPrinterStatus;
+const
+  SInvalidDiscountValue =  'Invalid discount value, %d. Valid discount value is [0..99].';
+begin
+  WriteTLVItems;
+
+  if not ((P.Discount) in [0..99]) then
+    RaiseIllegalError(Format(SInvalidDiscountValue, [P.Discount]));
+
+  FLastDocTotal := GetSubtotal;
+  Command := #$FF#$76 + IntToBin(GetUsrPassword, 4) +
+    IntToBin(P.Payments[0], 5) +
+    IntToBin(P.Payments[1], 5) +
+    IntToBin(P.Payments[2], 5) +
+    IntToBin(P.Payments[3], 5) +
+    IntToBin(P.Payments[4], 5) +
+    IntToBin(P.Payments[5], 5) +
+    IntToBin(P.Payments[6], 5) +
+    IntToBin(P.Payments[7], 5) +
+    IntToBin(P.Payments[8], 5) +
+    IntToBin(P.Payments[9], 5) +
+    IntToBin(P.Payments[10], 5) +
+    IntToBin(P.Payments[11], 5) +
+    IntToBin(P.Payments[12], 5) +
+    IntToBin(P.Payments[13], 5) +
+    IntToBin(P.Payments[14], 5) +
+    IntToBin(P.Payments[15], 5) +
+    Chr(P.Discount) +
+    IntToBin(P.TaxAmount[1], 5) +
+    IntToBin(P.TaxAmount[2], 5) +
+    IntToBin(P.TaxAmount[3], 5) +
+    IntToBin(P.TaxAmount[4], 5) +
+    IntToBin(P.TaxAmount[5], 5) +
+    IntToBin(P.TaxAmount[6], 5) +
+    IntToBin(P.TaxAmount[7], 5) +
+    IntToBin(P.TaxAmount[8], 5) +
+    IntToBin(P.TaxAmount[9], 5) +
+    IntToBin(P.TaxAmount[10], 5) +
+    Chr(P.TaxSystem) +
+    P.Text;
 
   Result := ExecuteData(Command, Answer);
   if Result = 0 then

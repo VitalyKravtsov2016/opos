@@ -535,6 +535,10 @@ type
     Parameter8: WideString;
     Parameter9: WideString;
     Parameter10: WideString;
+    Parameter11: WideString;
+    Parameter12: WideString;
+    Parameter13: WideString;
+    Parameter14: WideString;
     PrintUnitName: Boolean;
     OpenReceiptEnabled: Boolean;
     PingEnabled: Boolean;

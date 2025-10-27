@@ -168,6 +168,8 @@ type
       var R: TCloseReceiptResult): Integer;
     function ReceiptClose2(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
+    function ReceiptClose3(const P: TFSCloseReceiptParams2;
+      var R: TFSCloseReceiptResult2): Integer;
     function ReceiptDiscount(Operation: TAmountOperation): Integer;
     function ReceiptDiscount2(Operation: TReceiptDiscount2): Integer;
     function ReceiptCharge(Operation: TAmountOperation): Integer;
@@ -1700,6 +1702,12 @@ begin
 end;
 
 function TTextFiscalPrinterDevice.ReceiptClose2(
+  const P: TFSCloseReceiptParams2; var R: TFSCloseReceiptResult2): Integer;
+begin
+  Result := 0;
+end;
+
+function TTextFiscalPrinterDevice.ReceiptClose3(
   const P: TFSCloseReceiptParams2; var R: TFSCloseReceiptResult2): Integer;
 begin
   Result := 0;

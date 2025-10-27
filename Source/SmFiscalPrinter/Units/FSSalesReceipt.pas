@@ -1266,9 +1266,13 @@ begin
         CloseParams2.TaxAmount[4] := StrToInt64Def(Parameters.Parameter4, 0);
         CloseParams2.TaxAmount[5] := StrToInt64Def(Parameters.Parameter5, 0);
         CloseParams2.TaxAmount[6] := StrToInt64Def(Parameters.Parameter6, 0);
+        CloseParams2.TaxAmount[7] := StrToInt64Def(Parameters.Parameter8, 0);
+        CloseParams2.TaxAmount[8] := StrToInt64Def(Parameters.Parameter9, 0);
+        CloseParams2.TaxAmount[9] := StrToInt64Def(Parameters.Parameter10, 0);
+        CloseParams2.TaxAmount[10] := StrToInt64Def(Parameters.Parameter11, 0);
         CloseParams2.TaxSystem := StrToInt64Def(Parameters.Parameter7, 0);
         CloseParams2.Text := Parameters.CloseRecText;
-        Device.Check(Device.ReceiptClose2(CloseParams2, FCloseResult2));
+        Device.Check(Device.ReceiptClose3(CloseParams2, FCloseResult2));
 
         FQRCodeData := Format('t=%.4d%.2d%.2dT%.2d%.2d&s=%.2f&fn=%s&i=%d&fp=%d&n=%d', [
           FCloseResult2.DocDate.Year + 2000, FCloseResult2.DocDate.Month,

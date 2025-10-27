@@ -288,6 +288,8 @@ type
     function ReadLoaderVersion(var Version: WideString): Integer;
     function ReceiptClose2(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
+    function ReceiptClose3(const P: TFSCloseReceiptParams2;
+      var R: TFSCloseReceiptResult2): Integer;
     function FSSale2(P: TFSSale2): Integer;
     function GetCapFSCloseReceipt2: Boolean;
     procedure CancelReceipt;
@@ -1707,6 +1709,12 @@ function TMockFiscalPrinterDevice.ReceiptClose2(
 begin
   Result := 0;
 
+end;
+
+function TMockFiscalPrinterDevice.ReceiptClose3(
+  const P: TFSCloseReceiptParams2; var R: TFSCloseReceiptResult2): Integer;
+begin
+  Result := 0;
 end;
 
 function TMockFiscalPrinterDevice.FSFiscalization(
