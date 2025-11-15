@@ -86,6 +86,7 @@ type
     function EJHandleError(FPCode, ResultCodeExtended: Integer): Integer;
     function FSHandleError(FPCode, ResultCodeExtended: Integer): Integer;
     function GetTax(const ItemName: WideString; Tax: Integer): Integer;
+    function ReadReceiptParam(Row: Integer): WideString;
 
     procedure PrintFiscalEnd;
     procedure PrintDocumentEnd;
@@ -2477,6 +2478,23 @@ begin
   Items.Clear;
 end;
 
+(******************************************************************************
+
+  Таблица 2:
+  20 строка - фискальный признак (ФП)
+  21 строка - дата и время фискализации
+  22 строка - РНК
+  23 строка - ЗНК
+  24 строка - признак автономности чека
+  25 строка - общая сумма
+
+******************************************************************************)
+
+function TFiscalPrinterImpl.ReadReceiptParam(Row: Integer): WideString;
+begin
+  Result := Printer.Device.ReadTableStr(2, Row, 2);
+end;
+
 function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
 
   procedure PrintRefundReceiptDetails;
@@ -2499,21 +2517,6 @@ function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
           Printer.PrintText(Format('ISOFF:[%s]', [ReceiptIsOffline]));
       end;
     end;
-  end;
-
-  (*
-  Таблица 2:
-  20 строка - фискальный признак (ФП)
-  21 строка - дата и время фискализации
-  22 строка - РНК
-  23 строка - ЗНК
-  24 строка - признак автономности чека
-  25 строка - общая сумма
-  *)
-
-  function ReadReceiptParam(Row: Integer): WideString;
-  begin
-    Result := Printer.Device.ReadTableStr(2, Row, 2);
   end;
 
   procedure UpdateReceiptDetails;
@@ -2564,7 +2567,6 @@ begin
       begin
         PrintDocumentEnd;
       end;
-      UpdateReceiptDetails;
       Device.ResetPrinter;
     except
       on E: Exception do

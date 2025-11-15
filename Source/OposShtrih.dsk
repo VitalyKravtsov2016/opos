@@ -1,28 +1,21 @@
 [Closed Files]
-File_0=SourceModule,'D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',0,1,2158,3,2179,0,0
-File_1=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,2077,15,2093,0,0
-File_2=SourceModule,'D:\projects\IBTS\Opos\Test\AcceptanceTest\Units\duFiscalPrinter.pas',0,1,527,51,541,0,0
-File_3=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,362,26,372,0,0
-File_4=SourceModule,'D:\projects\IBTS\Opos\Source\OposConfig\Fmu\fmuFptrConnection.pas',0,1,165,36,174,1,1
-File_5=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\PrinterParameters.pas',0,1,951,3,959,0,0
-File_6=SourceModule,'D:\projects\IBTS\Opos\Source\Shared\StringUtils.pas',0,1,25,29,39,0,0
-File_7=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas',0,1,226,28,234,0,0
-File_8=SourceModule,'c:\program files (x86)\borland\delphi7\source\rtl\Sys\sysutils.pas',0,1,7539,1,7557,0,0
+File_0=SourceModule,'D:\projects\IBTS\Opos\Source\SmFptrSrv\Units\oleMain.pas',0,1,1,1,1,0,0
+File_1=SourceModule,'D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\Units\TextFiscalPrinterDevice.pas',0,1,1703,3,1713,0,0
+File_2=SourceModule,'D:\projects\IBTS\Opos\Test\SmFiscalPrinterTest\Units\MockFiscalPrinterDevice.pas',0,1,1691,99,1707,0,0
+File_3=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',0,1,7517,108,7533,0,0
+File_4=SourceModule,'D:\projects\TorgBalance\TBDrvFR\DrvFR\Units\FiscalPrinter.pas',0,1,1,34,20,0,0
+File_5=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas',0,1,1259,73,1268,0,0
+File_6=SourceModule,'D:\projects\IBTS\Opos\Source\Shared\DIOHandlers.pas',0,1,1350,15,1359,0,0
+File_7=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\DirectIOAPI.pas',0,1,1,35,9,0,0
+File_8=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterTypes.pas',0,1,314,52,323,0,0
+File_9=SourceModule,'D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\PrinterTypes.pas',0,1,1,1,1,0,0
 
 [Modules]
-Module0=D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas
-Module1=D:\projects\TorgBalance\TBDrvFR\DrvFR\Units\FiscalPrinter.pas
-Count=2
-EditWindowCount=1
+Count=0
+EditWindowCount=0
 TypeLibWindowCount=3
 
-[D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas]
-ModuleType=SourceModule
-FormState=0
-FormOnTop=0
-
-[D:\projects\TorgBalance\TBDrvFR\DrvFR\Units\FiscalPrinter.pas]
-ModuleType=SourceModule
+[D:\projects\IBTS\Opos\Test\AcceptanceTest\AcceptanceTest.dpr]
 FormState=0
 FormOnTop=0
 
@@ -97,52 +90,6 @@ FormOnTop=0
 [D:\projects\IBTS\Opos\Source\SmFptrSrv\SmFptrSrv.tlb]
 FormState=0
 FormOnTop=0
-
-[D:\projects\IBTS\Opos\Test\AcceptanceTest\AcceptanceTest.dpr]
-FormState=0
-FormOnTop=0
-
-[EditWindow0]
-ViewCount=2
-CurrentView=0
-View0=0
-View1=1
-CodeExplorer=CodeExplorer@EditWindow0
-MessageView=MessageView@EditWindow0
-Create=1
-Visible=1
-State=2
-Left=493
-Top=140
-Width=1302
-Height=682
-MaxLeft=0
-MaxTop=99
-MaxWidth=1920
-MaxHeight=941
-ClientWidth=1904
-ClientHeight=902
-LeftPanelSize=0
-LeftPanelClients=CodeExplorer@EditWindow0
-LeftPanelData=00000400010000000C000000436F64654578706C6F7265720000000000000000000000000000000000FFFFFFFF
-RightPanelSize=0
-BottomPanelSize=0
-BottomPanelClients=MessageView@EditWindow0
-BottomPanelData=00000400010000000B0000004D657373616765566965770000000000000000000000000000000000FFFFFFFF
-
-[View0]
-Module=D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas
-CursorX=14
-CursorY=8935
-TopLine=8915
-LeftCol=1
-
-[View1]
-Module=D:\projects\TorgBalance\TBDrvFR\DrvFR\Units\FiscalPrinter.pas
-CursorX=1
-CursorY=15751
-TopLine=15662
-LeftCol=1
 
 [TypeLibEditWindow0]
 Create=1
@@ -221,11 +168,11 @@ Left=571
 Top=27
 Width=1349
 Height=123
-MaxLeft=0
-MaxTop=0
-MaxWidth=1920
+MaxLeft=-1
+MaxTop=-1
+MaxWidth=1936
 MaxHeight=123
-ClientWidth=1904
+ClientWidth=1920
 ClientHeight=84
 
 [ProjectManager]
@@ -477,38 +424,6 @@ TBDockHeight=151
 LRDockWidth=383
 Dockable=1
 
-[CodeExplorer@EditWindow0]
-Create=1
-Visible=0
-State=0
-Left=-297
-Top=-9
-Width=140
-Height=305
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=140
-ClientHeight=305
-TBDockHeight=305
-LRDockWidth=140
-Dockable=1
-
-[MessageView@EditWindow0]
-Create=1
-Visible=0
-State=0
-Left=-303
-Top=-707
-Width=443
-Height=85
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=443
-ClientHeight=85
-TBDockHeight=85
-LRDockWidth=443
-Dockable=1
-
 [DockHosts]
 DockHostCount=1
 
@@ -532,5 +447,5 @@ DockClients=CallStackWindow
 DockSiteData=0000040000000000F001000000000000015803000000000000010000000087000000000000000100000002F0010000000000000200000000580300000F00000043616C6C537461636B57696E646F770200000000F7010000000000000100000000080100000000000001000000008C010000000000000100000000100200000000000001000000009802000000000000FFFFFFFF
 
 [ActiveProject]
-ActiveProject=3
+ActiveProject=1
 

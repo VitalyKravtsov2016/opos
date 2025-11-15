@@ -1387,11 +1387,11 @@ begin
     DriverParameterLastDocDateTime: pString := EncodeOposDate(
       Printer.Device.LastDocDate, Printer.Device.LastDocTime);
 
-    DriverParameterReceiptNumber: pString := Printer.ReceiptNumber;
-    DriverParameterReceiptDateTime: pString := Printer.ReceiptDateTime;
-    DriverParameterRegistrationNumber: pString := Printer.RegistrationNumber;
-    DriverParameterReceiptTotal: pString := Printer.ReceiptTotal;
-    DriverParameterReceiptIsOffline: pString := Printer.ReceiptIsOffline;
+    DriverParameterReceiptNumber: pString := Printer.ReadReceiptParam(20);
+    DriverParameterReceiptDateTime: pString := Printer.ReadReceiptParam(21);
+    DriverParameterRegistrationNumber: pString := Printer.ReadReceiptParam(22);
+    DriverParameterReceiptIsOffline: pString := Printer.ReadReceiptParam(24);
+    DriverParameterReceiptTotal: pString := Printer.ReadReceiptParam(25);
   end;
 end;
 

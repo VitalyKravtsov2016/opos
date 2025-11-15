@@ -6,6 +6,18 @@
 
 *******************************************************************
 
+  OposShtrih_1.13_609.exe
+  15 ноября 2025 13:30
+
+  [+] Сделано чтение параметров из таблиц ФР для казахского ФР
+	  DriverParameterReceiptNumber            = 304;
+	  DriverParameterReceiptDateTime          = 305;
+	  DriverParameterRegistrationNumber       = 306;
+	  DriverParameterReceiptTotal             = 307;
+	  DriverParameterReceiptIsOffline         = 308;
+  
+*******************************************************************
+
   OposShtrih_1.13_608.exe
   27 октября 2025 10:00
 
