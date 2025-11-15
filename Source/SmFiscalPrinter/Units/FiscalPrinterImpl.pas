@@ -2089,17 +2089,19 @@ begin
   Context.FiscalReceiptStation := FFiscalReceiptStation;
   Context.Filter := nil;
 
-  if Device.CapFiscalStorage then
+  if Device.CapFiscalStorage and (not Parameters.WebKassaEnabled) then
   begin
     Result := TFSSalesReceipt.CreateReceipt(Context);
   end else
   begin
+    (*
     {$IFDEF MALINA}
     if GetMalinaParams.RosneftDiscountCards then
       Result := TRosneftSalesReceipt.CreateReceipt(Context, RecType)
     else
     {$ENDIF}
-      Result := TSalesReceipt.CreateReceipt(Context, RecType);
+    *)
+    Result := TSalesReceipt.CreateReceipt(Context, RecType);
   end;
 end;
 
