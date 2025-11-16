@@ -52,6 +52,7 @@ type
     property Driver: TSMFiscalPrinter read FDriver;
   published
     procedure ExecuteLogFiles;
+    procedure CheckSalesReceipt;
     procedure CheckRefundReceipt;
     procedure CheckRefundReceipt2;
   end;
@@ -561,6 +562,12 @@ begin
   SetParameter(DriverParameterRegistrationNumber, ReceiptDetails[2]);
   SetParameter(DriverParameterReceiptTotal, ReceiptDetails[3]);
   SetParameter(DriverParameterReceiptIsOffline, ReceiptDetails[4]);
+end;
+
+procedure TFiscalPrinterTest.CheckSalesReceipt;
+begin
+  OpenClaimEnable;
+  PrintSalesReceipt(10); // Receipt 1
 end;
 
 procedure TFiscalPrinterTest.CheckRefundReceipt;

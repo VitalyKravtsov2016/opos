@@ -16,7 +16,6 @@ type
   TSalesReceipt = class(TCustomReceipt)
   private
     FOpened: Boolean;
-    FRecType: Integer;
     FIsVoided: Boolean;
     FLastItemSumm: Int64;
     FPayments: TPayments;
@@ -573,7 +572,10 @@ begin
     if Device.CapFiscalStorage then
     begin
       if not Device.IsRecOpened then
+      begin
+        FRecType := ARecType;
         Printer.OpenReceipt(ARecType);
+      end;
     end;
     FOpened := True;
   end;
