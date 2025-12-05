@@ -27,6 +27,8 @@ type
 
   TFiscalPrinterDevice = class(TInterfacedObject, IFiscalPrinterDevice)
   private
+    function ReceiptClose22(const P: TFSCloseReceiptParams2;
+      var R: TFSCloseReceiptResult2): Integer;
   protected
   public
     FFFDVersion: TFFDVersion;
@@ -46,6 +48,7 @@ type
     FDocPrintMode: Integer;
     FIsFiscalized: Boolean;
     FCapParameters2: Boolean;
+    FCapCloseReceipt3: Boolean;
     FParameters2: TPrinterParameters2;
     FIsOnline: Boolean;
     FResultCode: Integer;
@@ -6976,6 +6979,7 @@ end;
 procedure TFiscalPrinterDevice.UpdateInfo;
 begin
   GetPrinterModel;
+  FCapCloseReceipt3 := TestCommand($FF76);
   FCapParameters2 := ReadParameters2(FParameters2) = 0;
   if FCapParameters2 then
   begin
@@ -8834,6 +8838,16 @@ _______________________________________________________
 function TFiscalPrinterDevice.ReceiptClose2(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
+begin
+  if FCapCloseReceipt3 then
+    Result := ReceiptClose3(P, R)
+  else
+    Result := ReceiptClose22(P, R);
+end;
+
+function TFiscalPrinterDevice.ReceiptClose22(
+  const P: TFSCloseReceiptParams2;
+  var R: TFSCloseReceiptResult2): Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -8934,7 +8948,8 @@ begin
     RaiseIllegalError(Format(SInvalidDiscountValue, [P.Discount]));
 
   FLastDocTotal := GetSubtotal;
-  Command := #$FF#$76 + IntToBin(GetUsrPassword, 4) +
+  Command := #$FF#$76 +
+    IntToBin(GetUsrPassword, 4) +
     IntToBin(P.Payments[0], 5) +
     IntToBin(P.Payments[1], 5) +
     IntToBin(P.Payments[2], 5) +
