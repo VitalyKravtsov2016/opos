@@ -387,6 +387,8 @@ const
   DriverParameterRegistrationNumber       = 306;
   DriverParameterReceiptTotal             = 307;
   DriverParameterReceiptIsOffline         = 308;
+  DriverParameterGTIN                     = 309;
+  DriverParameterNTIN                     = 310;
 
 
   /////////////////////////////////////////////////////////////////////////////

@@ -36,6 +36,8 @@ type
     function GetIsCashPayment: Boolean;
     procedure SendItemBarcode;
   public
+    GTIN: WideString;   // GTIN
+    NTIN: WideString;   // NTIN
     constructor CreateReceipt(AContext: TReceiptContext; ARecType: Integer);
     destructor Destroy; override;
 
@@ -221,12 +223,21 @@ begin
   Operation.Tax4 := 0;
   Operation.Text := Description;
   Operation.Department := Parameters.Department;
+  Operation.GTIN := GTIN;
+  Operation.NTIN := NTIN;
+  GTIN := '';
+  NTIN := '';
   case FRecType of
     RecTypeSale: Printer.Sale(Operation);
     RecTypeBuy: Printer.Buy(Operation);
     RecTypeRetSale: Printer.RetSale(Operation);
     RecTypeRetBuy: Printer.RetBuy(Operation);
   end;
+  if Operation.GTIN <> '' then
+    Printer.PrintTextLine(Format('GTIN:[%s]', [Operation.GTIN]));
+  if Operation.NTIN <> '' then
+    Printer.PrintTextLine(Format('NTIN:[%s]', [Operation.NTIN]));
+
   FItems.Add(Operation);
   FLastItemSumm := Round2(Operation.Price*Operation.Quantity/1000);
   SendItemBarcode;
@@ -373,6 +384,8 @@ begin
   Operation.Tax4 := 0;
   Operation.Text := Description;
   Operation.Department := Parameters.Department;
+  Operation.GTIN := GTIN;
+  Operation.NTIN := NTIN;
   Printer.RetSale(Operation);
   FItems.Add(Operation);
   PrintPostLine;
@@ -730,6 +743,8 @@ begin
   Operation.Tax4 := 0;
   Operation.Text := ADescription;
   Operation.Department := Parameters.Department;
+  Operation.GTIN := GTIN;
+  Operation.NTIN := NTIN;
   Printer.RetSale(Operation);
   FItems.Add(Operation);
   PrintPostLine;

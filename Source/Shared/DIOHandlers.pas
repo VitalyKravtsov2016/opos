@@ -12,7 +12,7 @@ uses
   FiscalPrinterDevice, CommandDef, CommandParam, XmlParser, BinStream,
   OposException, PrinterTypes, Opos, StringUtils, FiscalPrinterImpl,
   fmuLogo, FiscalPrinterTypes, ZReport, LogFile, PrinterParameters,
-  OposUtils, OposFptrUtils, WException, gnugettext;
+  OposUtils, OposFptrUtils, WException, gnugettext, SalesReceipt;
 
 const
   ValueDelimiters = [';'];
@@ -1392,6 +1392,16 @@ begin
     DriverParameterRegistrationNumber: pString := Printer.ReadReceiptParam(22);
     DriverParameterReceiptIsOffline: pString := Printer.ReadReceiptParam(24);
     DriverParameterReceiptTotal: pString := Printer.ReadReceiptParam(25);
+    DriverParameterGTIN:
+    begin
+      if Printer.Receipt is TSalesReceipt then
+        pString := (Printer.Receipt as TSalesReceipt).GTIN;
+    end;
+    DriverParameterNTIN:
+    begin
+      if Printer.Receipt is TSalesReceipt then
+        pString := (Printer.Receipt as TSalesReceipt).NTIN;
+    end;
   end;
 end;
 
@@ -1509,6 +1519,16 @@ begin
     DriverParameterRegistrationNumber: Printer.RegistrationNumber := pString;
     DriverParameterReceiptTotal: Printer.ReceiptTotal := pString;
     DriverParameterReceiptIsOffline: Printer.ReceiptIsOffline := pString;
+    DriverParameterGTIN:
+    begin
+      if Printer.Receipt is TSalesReceipt then
+        (Printer.Receipt as TSalesReceipt).GTIN := pString;
+    end;
+    DriverParameterNTIN:
+    begin
+      if Printer.Receipt is TSalesReceipt then
+        (Printer.Receipt as TSalesReceipt).NTIN := pString;
+    end;
   end;
 end;
 

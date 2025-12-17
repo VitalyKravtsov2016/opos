@@ -6,6 +6,20 @@
 
 *******************************************************************
 
+  OposShtrih_1.13_614.exe
+  17 декабря 2025 09:50
+
+  [+] Добавлены поля NTIN и GTIN. Для установки можно использовать
+      команды:
+      directIO(DIO_SET_DRIVER_PARAMETER, DriverParameterGTIN, value);
+      directIO(DIO_SET_DRIVER_PARAMETER, DriverParameterNTIN, value);
+      DIO_GET_DRIVER_PARAMETER   = 29; // read internal driver parameter
+      DIO_SET_DRIVER_PARAMETER   = 30; // write internal driver parameter
+      DriverParameterGTIN        = 309;
+      DriverParameterNTIN        = 310;
+
+*******************************************************************
+
   OposShtrih_1.13_613.exe
   5 декабря 2025 21:10
 
