@@ -35,6 +35,7 @@ type
     procedure PrintDiscount(Operation: TAmountOperation);
     function GetIsCashPayment: Boolean;
     procedure SendItemBarcode;
+    function GetOperationText(const Text: WideString): WideString;
   public
     GTIN: WideString;   // GTIN
     NTIN: WideString;   // NTIN
@@ -135,6 +136,18 @@ begin
   inherited Destroy;
 end;
 
+function TSalesReceipt.GetOperationText(const Text: WideString): WideString;
+begin
+  Result := Text;
+  if GTIN <> '' then
+    Result := Result + Format(' :G[%s]', [GTIN]);
+  if NTIN <> '' then
+    Result := Result + Format(' :N[%s]', [NTIN]);
+
+  GTIN := '';
+  NTIN := '';
+end;
+
 function TSalesReceipt.GetPaymentTotal: Int64;
 begin
   Result := FPayments[0] + FPayments[1] + FPayments[2] + FPayments[3];
@@ -221,22 +234,14 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := Description;
+  Operation.Text := GetOperationText(Description);
   Operation.Department := Parameters.Department;
-  Operation.GTIN := GTIN;
-  Operation.NTIN := NTIN;
-  GTIN := '';
-  NTIN := '';
   case FRecType of
     RecTypeSale: Printer.Sale(Operation);
     RecTypeBuy: Printer.Buy(Operation);
     RecTypeRetSale: Printer.RetSale(Operation);
     RecTypeRetBuy: Printer.RetBuy(Operation);
   end;
-  if Operation.GTIN <> '' then
-    Printer.PrintTextLine(Format('GTIN:[%s]', [Operation.GTIN]));
-  if Operation.NTIN <> '' then
-    Printer.PrintTextLine(Format('NTIN:[%s]', [Operation.NTIN]));
 
   FItems.Add(Operation);
   FLastItemSumm := Round2(Operation.Price*Operation.Quantity/1000);
@@ -382,10 +387,8 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := Description;
+  Operation.Text := GetOperationText(Description);
   Operation.Department := Parameters.Department;
-  Operation.GTIN := GTIN;
-  Operation.NTIN := NTIN;
   Printer.RetSale(Operation);
   FItems.Add(Operation);
   PrintPostLine;
@@ -407,7 +410,7 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := Description;
+  Operation.Text := GetOperationText(Description);
   Operation.Department := Parameters.Department;
   Printer.Storno(Operation);
   PrintPostLine;
@@ -670,7 +673,7 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := Description;
+  Operation.Text := GetOperationText(Description);
   Operation.Department := Parameters.Department;
   Printer.Storno(Operation);
   PrintPostLine;
@@ -706,7 +709,7 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := Description;
+  Operation.Text := GetOperationText(Description);
   Operation.Department := Parameters.Department;
   Printer.Storno(Operation);
   FLastItemSumm := -Round2(Operation.Price*Operation.Quantity/1000);
@@ -741,10 +744,8 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := ADescription;
   Operation.Department := Parameters.Department;
-  Operation.GTIN := GTIN;
-  Operation.NTIN := NTIN;
+  Operation.Text := GetOperationText(ADescription);
   Printer.RetSale(Operation);
   FItems.Add(Operation);
   PrintPostLine;
@@ -776,7 +777,7 @@ begin
   Operation.Tax2 := 0;
   Operation.Tax3 := 0;
   Operation.Tax4 := 0;
-  Operation.Text := ADescription;
+  Operation.Text := GetOperationText(ADescription);
   Operation.Department := Parameters.Department;
   Printer.Storno(Operation);
   FLastItemSumm := -Round2(Operation.Price * Operation.Quantity/1000);

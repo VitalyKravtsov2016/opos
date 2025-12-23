@@ -812,8 +812,6 @@ type
     Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax group
     Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax group
     Text: WideString;   // Text (40 byte)
-    GTIN: WideString;   // GTIN
-    NTIN: WideString;   // NTIN
   end;
 
   { TSlipDiscountParams }
