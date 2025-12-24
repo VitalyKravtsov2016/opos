@@ -1523,11 +1523,15 @@ begin
     begin
       if Printer.Receipt is TSalesReceipt then
         (Printer.Receipt as TSalesReceipt).GTIN := pString;
+      if pString <> '' then
+        Printer.PrintRecMessage(pString);
     end;
     DriverParameterNTIN:
     begin
       if Printer.Receipt is TSalesReceipt then
         (Printer.Receipt as TSalesReceipt).NTIN := pString;
+      if pString <> '' then
+        Printer.PrintRecMessage(pString);
     end;
   end;
 end;

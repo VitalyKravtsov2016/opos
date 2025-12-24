@@ -139,10 +139,11 @@ end;
 function TSalesReceipt.GetOperationText(const Text: WideString): WideString;
 begin
   Result := Text;
-  if GTIN <> '' then
+  if Parameters.WebKassaEnabled then
+  begin
     Result := Result + Format(' :G[%s]', [GTIN]);
-  if NTIN <> '' then
     Result := Result + Format(' :N[%s]', [NTIN]);
+  end;
 
   GTIN := '';
   NTIN := '';
