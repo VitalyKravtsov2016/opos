@@ -53,7 +53,7 @@ uses
   OposStat in '..\Opos\OposStat.pas',
   OposStatistics in '..\Opos\OposStatistics.pas',
   StatisticItem in '..\SmFiscalPrinter\Units\StatisticItem.pas',
-  FiscalPrinterDevice in '..\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',
+  FiscalPrinterDriver in '..\SmFiscalPrinter\Units\FiscalPrinterDriver.pas',
   SerialPort in '..\Shared\SerialPort.pas',
   StringUtils in '..\Shared\StringUtils.pas',
   FiscalPrinterStatistics in '..\SmFiscalPrinter\Units\FiscalPrinterStatistics.pas',

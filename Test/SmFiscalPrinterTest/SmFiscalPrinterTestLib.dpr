@@ -89,7 +89,7 @@ uses
   SharedPrinterInterface in '..\..\Source\SmFiscalPrinter\Units\SharedPrinterInterface.pas',
   PrinterProtocol2 in '..\..\Source\SmFiscalPrinter\Units\PrinterProtocol2.pas',
   TextFiscalPrinterDevice in 'Units\TextFiscalPrinterDevice.pas',
-  FiscalPrinterDevice in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',
+  FiscalPrinterDriver in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDriver.pas',
   OposEventsRCS in '..\..\Source\Opos\OposEventsRCS.pas',
   OposEventsNull in '..\..\Source\Opos\OposEventsNull.pas',
   AsBarcode in '..\..\Source\SmFiscalPrinter\Units\AsBarcode.pas',

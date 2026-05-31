@@ -89,7 +89,7 @@ uses
   ClassLogger in '..\Shared\ClassLogger.pas',
   PrinterParametersX in 'Units\PrinterParametersX.pas',
   PrinterParametersRegIBT in 'Units\PrinterParametersRegIBT.pas',
-  FiscalPrinterDevice in 'Units\FiscalPrinterDevice.pas',
+  FiscalPrinterDriver in 'Units\FiscalPrinterDriver.pas',
   PrinterParametersReg in 'Units\PrinterParametersReg.pas',
   DriverError in '..\Shared\DriverError.pas',
   StringUtils in '..\Shared\StringUtils.pas',
@@ -173,7 +173,11 @@ uses
   LangUtils in '..\Shared\LangUtils.pas',
   BaseForm in '..\Shared\BaseForm.pas',
   RegExpr in '..\Shared\RegExpr.pas',
-  CommandDef in '..\Shared\CommandDef.pas';
+  CommandDef in '..\Shared\CommandDef.pas',
+  FiscalPrinterDevice in 'Units\FiscalPrinterDevice.pas',
+  untDriver in '..\Shared\untDriver.pas',
+  DrvFRLib_TLB in '..\Shared\DrvFRLib_TLB.pas',
+  BinUtils in '..\Shared\BinUtils.pas';
 
 exports
   DllGetClassObject,

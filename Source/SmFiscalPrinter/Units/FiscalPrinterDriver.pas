@@ -1,4 +1,4 @@
-unit FiscalPrinterDevice;
+unit FiscalPrinterDriver;
 
 interface
 
@@ -11,6 +11,8 @@ uses
   // Opos
   Opos, OposException, OposFptr, OposFptrHi, OposUtils, OposFptrUtils,
   // This
+  untDriver,
+
   PrinterCommand, PrinterTypes, BinStream, StringUtils,
   SerialPort, PrinterTable, LogFile, ByteUtils, FiscalPrinterTypes,
   DeviceTables, PrinterModel, XmlModelReader, PrinterConnection,
@@ -23,13 +25,16 @@ uses
   TntSysUtils, gnugettext, RegExpr;
 
 type
-  { TFiscalPrinterDevice }
+  { TFiscalPrinterDriver }
 
-  TFiscalPrinterDevice = class(TInterfacedObject, IFiscalPrinterDevice)
+  TFiscalPrinterDriver = class(TInterfacedObject, IFiscalPrinterDevice)
   private
+    FDriver: TDriver;
+    property Driver: TDriver read FDriver;
+    procedure SetPrintFlags(Flags: Byte);
+  protected
     function ReceiptClose22(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
-  protected
   public
     FFFDVersion: TFFDVersion;
     FContext: TDriverContext;
@@ -834,16 +839,16 @@ begin
     raise ECommunicationError.Create(_('Answer data length is too short'));
 end;
 
-{ TFiscalPrinterDevice }
+{ TFiscalPrinterDriver }
 
-constructor TFiscalPrinterDevice.Create;
+constructor TFiscalPrinterDriver.Create;
 begin
   inherited Create;
   SetLength(FTaxInfo, 4);
   FTLVItems := TStringList.Create;
   FSTLVTag := TTLV.Create(nil);
   FContext := TDriverContext.Create;
-  FLogger := TClassLogger.Create('TFiscalPrinterDevice', FContext.Logger);
+  FLogger := TClassLogger.Create('TFiscalPrinterDriver', FContext.Logger);
   FLock := TCriticalSection.Create;
   FFields := TPrinterFields.Create;
   FTables := TPrinterTables.Create;
@@ -857,7 +862,7 @@ begin
   Initialize;
 end;
 
-destructor TFiscalPrinterDevice.Destroy;
+destructor TFiscalPrinterDriver.Destroy;
 begin
   FLock.Free;
   FFields.Free;
@@ -873,12 +878,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TFiscalPrinterDevice.Disconnect;
+procedure TFiscalPrinterDriver.Disconnect;
 begin
   Initialize;
 end;
 
-procedure TFiscalPrinterDevice.Initialize;
+procedure TFiscalPrinterDriver.Initialize;
 begin
   Tables.Clear;
   Fields.Clear;
@@ -903,78 +908,78 @@ begin
   FFFDVersion := TFFDVersion(-1);
 end;
 
-function TFiscalPrinterDevice.GetCapSubtotalRound: Boolean;
+function TFiscalPrinterDriver.GetCapSubtotalRound: Boolean;
 begin
   Result := FCapSubtotalRound;
 end;
 
-function TFiscalPrinterDevice.GetCapDiscount: Boolean;
+function TFiscalPrinterDriver.GetCapDiscount: Boolean;
 begin
   Result := FCapDiscount;
 end;
 
-function TFiscalPrinterDevice.GetParameters: TPrinterParameters;
+function TFiscalPrinterDriver.GetParameters: TPrinterParameters;
 begin
   Result := FContext.Parameters;
 end;
 
-function TFiscalPrinterDevice.GetLogger: ILogFile;
+function TFiscalPrinterDriver.GetLogger: ILogFile;
 begin
   Result := FContext.Logger;
 end;
 
-function TFiscalPrinterDevice.GetMalinaParams: TMalinaParams;
+function TFiscalPrinterDriver.GetMalinaParams: TMalinaParams;
 begin
   Result := FContext.MalinaParams;
 end;
 
-function TFiscalPrinterDevice.GetCapReceiptDiscount: Boolean;
+function TFiscalPrinterDriver.GetCapReceiptDiscount: Boolean;
 begin
   Result := FCapReceiptDiscount;
 end;
 
-procedure TFiscalPrinterDevice.AddFilter(AFilter: IFiscalPrinterFilter);
+procedure TFiscalPrinterDriver.AddFilter(AFilter: IFiscalPrinterFilter);
 begin
   FFilter.AddFilter(AFilter);
 end;
 
-procedure TFiscalPrinterDevice.RemoveFilter(AFilter: IFiscalPrinterFilter);
+procedure TFiscalPrinterDriver.RemoveFilter(AFilter: IFiscalPrinterFilter);
 begin
   FFilter.RemoveFilter(AFilter);
 end;
 
-function TFiscalPrinterDevice.GetResultCode: Integer;
+function TFiscalPrinterDriver.GetResultCode: Integer;
 begin
   Result := FResultCode;
 end;
 
-function TFiscalPrinterDevice.GetResultText: WideString;
+function TFiscalPrinterDriver.GetResultText: WideString;
 begin
   Result := FResultText;
 end;
 
-function TFiscalPrinterDevice.GetStatistics: TFiscalPrinterStatistics;
+function TFiscalPrinterDriver.GetStatistics: TFiscalPrinterStatistics;
 begin
   Result := FStatistics;
 end;
 
-procedure TFiscalPrinterDevice.Lock;
+procedure TFiscalPrinterDriver.Lock;
 begin
   FLock.Enter;
 end;
 
-procedure TFiscalPrinterDevice.Unlock;
+procedure TFiscalPrinterDriver.Unlock;
 begin
   FLock.Leave;
 end;
 
-function TFiscalPrinterDevice.GetModelsFileName: WideString;
+function TFiscalPrinterDriver.GetModelsFileName: WideString;
 begin
   Result := IncludeTrailingBackSlash(ExtractFilePath(GetDllFileName)) +
       ModelsFileName;
 end;
 
-procedure TFiscalPrinterDevice.LoadModels;
+procedure TFiscalPrinterDriver.LoadModels;
 var
   Reader: TXmlModelReader;
 begin
@@ -983,18 +988,18 @@ begin
     Reader.Load(GetModelsFileName);
   except
     on E: Exception do
-      Logger.Error('TFiscalPrinterDevice.LoadModels', E);
+      Logger.Error('TFiscalPrinterDriver.LoadModels', E);
   end;
   Reader.Free;
 end;
 
-procedure TFiscalPrinterDevice.ReadModelData;
+procedure TFiscalPrinterDriver.ReadModelData;
 begin
   ReadModelTables;
   ReadModelParameters;
 end;
 
-procedure TFiscalPrinterDevice.ReadModelTables;
+procedure TFiscalPrinterDriver.ReadModelTables;
 var
   FieldValue: AnsiString;
   RowNumber: Integer;
@@ -1030,7 +1035,7 @@ begin
   until ResultCode <> 0;
 end;
 
-procedure TFiscalPrinterDevice.ReadModelParameters;
+procedure TFiscalPrinterDriver.ReadModelParameters;
 var
   Text: AnsiString;
   ParameterID: Integer;
@@ -1089,7 +1094,7 @@ begin
   until ResultCode <> 0;
 end;
 
-procedure TFiscalPrinterDevice.SaveModels;
+procedure TFiscalPrinterDriver.SaveModels;
 var
   Reader: TXmlModelReader;
 begin
@@ -1103,19 +1108,19 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetLine(const Text: WideString): WideString;
+function TFiscalPrinterDriver.GetLine(const Text: WideString): WideString;
 begin
   Result := GetLine(Text, MinLineWidth, GetPrintWidth);
 end;
 
-function TFiscalPrinterDevice.GetLine(const Text: WideString;
+function TFiscalPrinterDriver.GetLine(const Text: WideString;
   MinLength, MaxLength: Integer): WideString;
 begin
   Result := Copy(Text, 1, MaxLength);
   Result := Result + StringOfChar(#0, MinLength - Length(Result));
 end;
 
-function TFiscalPrinterDevice.GetText(const Text: WideString;
+function TFiscalPrinterDriver.GetText(const Text: WideString;
   MinLength: Integer): WideString;
 begin
   Result := Text;
@@ -1131,17 +1136,17 @@ begin
     Result := Result + StringOfChar(#0, MinLength - Length(Result));
 end;
 
-function TFiscalPrinterDevice.GetPrintWidth: Integer;
+function TFiscalPrinterDriver.GetPrintWidth: Integer;
 begin
   Result := GetPrintWidth(Parameters.FontNumber);
 end;
 
-function TFiscalPrinterDevice.ValidFont(Font: Integer): Boolean;
+function TFiscalPrinterDriver.ValidFont(Font: Integer): Boolean;
 begin
   Result := (Font >= 1) and (Font <= Length(FFontInfo));
 end;
 
-function TFiscalPrinterDevice.GetPrintWidth(Font: Integer): Integer;
+function TFiscalPrinterDriver.GetPrintWidth(Font: Integer): Integer;
 begin
   Result := 0;
   if ValidFont(Font) then
@@ -1152,37 +1157,37 @@ begin
   if Result = 0 then Result := 40;
 end;
 
-function TFiscalPrinterDevice.GetSysPassword: DWORD;
+function TFiscalPrinterDriver.GetSysPassword: DWORD;
 begin
   Result := FSysPassword;
 end;
 
-function TFiscalPrinterDevice.GetTaxPassword: DWORD;
+function TFiscalPrinterDriver.GetTaxPassword: DWORD;
 begin
   Result := FTaxPassword;
 end;
 
-function TFiscalPrinterDevice.GetUsrPassword: DWORD;
+function TFiscalPrinterDriver.GetUsrPassword: DWORD;
 begin
   Result := FUsrPassword;
 end;
 
-procedure TFiscalPrinterDevice.SetSysPassword(const Value: DWORD);
+procedure TFiscalPrinterDriver.SetSysPassword(const Value: DWORD);
 begin
   FSysPassword := Value;
 end;
 
-procedure TFiscalPrinterDevice.SetTaxPassword(const Value: DWORD);
+procedure TFiscalPrinterDriver.SetTaxPassword(const Value: DWORD);
 begin
   FTaxPassword := Value;
 end;
 
-procedure TFiscalPrinterDevice.SetUsrPassword(const Value: DWORD);
+procedure TFiscalPrinterDriver.SetUsrPassword(const Value: DWORD);
 begin
   FUsrPassword := Value;
 end;
 
-function TFiscalPrinterDevice.ReadFieldStructure(Table, Field: Byte): TPrinterFieldRec;
+function TFiscalPrinterDriver.ReadFieldStructure(Table, Field: Byte): TPrinterFieldRec;
 var
   AField: TPrinterField;
 begin
@@ -1197,7 +1202,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ValidFieldValue(
+function TFiscalPrinterDriver.ValidFieldValue(
   const FieldInfo: TPrinterFieldRec;
   const FieldValue: WideString): Boolean;
 var
@@ -1212,7 +1217,7 @@ begin
 end;
 
 
-function TFiscalPrinterDevice.ReadTableStructure(Table: Byte;
+function TFiscalPrinterDriver.ReadTableStructure(Table: Byte;
   var R: TPrinterTableRec): Integer;
 var
   ATable: TPrinterTable;
@@ -1230,7 +1235,7 @@ begin
   end;
 end;
 
-class function TFiscalPrinterDevice.BaudRateToCode(BaudRate: Integer): Integer;
+class function TFiscalPrinterDriver.BaudRateToCode(BaudRate: Integer): Integer;
 begin
   case BaudRate of
     CBR_2400    : Result := 0;
@@ -1245,7 +1250,7 @@ begin
   end;
 end;
 
-class function TFiscalPrinterDevice.CodeToBaudRate(BaudRate: Integer): Integer;
+class function TFiscalPrinterDriver.CodeToBaudRate(BaudRate: Integer): Integer;
 begin
   case BaudRate of
     0: Result := CBR_2400;
@@ -1260,7 +1265,7 @@ begin
   end;
 end;
 
-class function TFiscalPrinterDevice.ByteToTimeout(Value: Byte): DWORD;
+class function TFiscalPrinterDriver.ByteToTimeout(Value: Byte): DWORD;
 begin
   case Value of
     0..150   : Result := Value;
@@ -1270,7 +1275,7 @@ begin
   end;
 end;
 
-class function TFiscalPrinterDevice.TimeoutToByte(Value: Integer): Byte;
+class function TFiscalPrinterDriver.TimeoutToByte(Value: Integer): Byte;
 begin
   case Value of
     0..150        : Result := Value;
@@ -1281,7 +1286,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.SetIsOnline(Value: Boolean);
+procedure TFiscalPrinterDriver.SetIsOnline(Value: Boolean);
 begin
   if Value <> IsOnline then
   begin
@@ -1457,7 +1462,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.SendCommand(var Command: TCommandRec): Integer;
+function TFiscalPrinterDriver.SendCommand(var Command: TCommandRec): Integer;
 var
   i: Integer;
   Index: Integer;
@@ -1524,12 +1529,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetErrorText(Code: Integer): WideString;
+function TFiscalPrinterDriver.GetErrorText(Code: Integer): WideString;
 begin
   Result := PrinterTypes.GetErrorText(Code, FCapFiscalStorage);
 end;
 
-function TFiscalPrinterDevice.ExecuteCommand(var Command: TCommandRec): Integer;
+function TFiscalPrinterDriver.ExecuteCommand(var Command: TCommandRec): Integer;
 begin
   Lock;
   try
@@ -1562,14 +1567,14 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ExecuteData(const TxData: AnsiString): Integer;
+function TFiscalPrinterDriver.ExecuteData(const TxData: AnsiString): Integer;
 var
   RxData: AnsiString;
 begin
   Result := ExecuteData(TxData, RxData);
 end;
 
-function TFiscalPrinterDevice.ExecuteData(const TxData: AnsiString;
+function TFiscalPrinterDriver.ExecuteData(const TxData: AnsiString;
   var RxData: AnsiString): Integer;
 
 function GetCommandCode(const TxData: AnsiString): Integer;
@@ -1591,7 +1596,7 @@ begin
   RxData := Command.RxData;
 end;
 
-function TFiscalPrinterDevice.ExecuteStream(Stream: TBinStream): Integer;
+function TFiscalPrinterDriver.ExecuteStream(Stream: TBinStream): Integer;
 var
   RxData: AnsiString;
   TxData: AnsiString;
@@ -1602,7 +1607,7 @@ begin
   Stream.Data := RxData;
 end;
 
-function TFiscalPrinterDevice.ExecuteStream2(Stream: TBinStream): Integer;
+function TFiscalPrinterDriver.ExecuteStream2(Stream: TBinStream): Integer;
 var
   RxData: AnsiString;
   TxData: AnsiString;
@@ -1613,7 +1618,7 @@ begin
   Stream.Data := Chr(Result) + RxData;
 end;
 
-function TFiscalPrinterDevice.ExecutePrinterCommand(Command: TPrinterCommand): Integer;
+function TFiscalPrinterDriver.ExecutePrinterCommand(Command: TPrinterCommand): Integer;
 var
   RxData: AnsiString;
   TxData: AnsiString;
@@ -1633,7 +1638,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.CashIn(Amount: Int64);
+procedure TFiscalPrinterDriver.CashIn(Amount: Int64);
 var
   Command: TCashInCommand;
 begin
@@ -1652,7 +1657,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.CashOut(Amount: Int64);
+procedure TFiscalPrinterDriver.CashOut(Amount: Int64);
 var
   Command: TCashOutCommand;
 begin
@@ -1670,7 +1675,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.StartDump(DeviceCode: Integer): Integer;
+function TFiscalPrinterDriver.StartDump(DeviceCode: Integer): Integer;
 var
   Stream: TBinStream;
 begin
@@ -1687,7 +1692,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetDumpBlock: TDumpBlock;
+function TFiscalPrinterDriver.GetDumpBlock: TDumpBlock;
 var
   Command: TGetDumpBlockCommand;
 begin
@@ -1701,7 +1706,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.StopDump;
+procedure TFiscalPrinterDriver.StopDump;
 var
   Command: TStopDumpCommand;
 begin
@@ -1714,7 +1719,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.LongFisc(NewPassword: DWORD;
+function TFiscalPrinterDriver.LongFisc(NewPassword: DWORD;
   PrinterID, FiscalID: Int64): TLongFiscResult;
 var
   Command: TLongFiscalizationCommand;
@@ -1735,7 +1740,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.SetLongSerial(Serial: Int64);
+procedure TFiscalPrinterDriver.SetLongSerial(Serial: Int64);
 var
   Command: TSetLongSerialCommand;
 begin
@@ -1751,139 +1756,43 @@ begin
   end;
 end;
 
-(******************************************************************************
-
-  Get Short FP Status
-
-  Command:	10H. Length: 5 bytes.
-  Ј	Operator password (4 bytes)
-
-  Answer:		10H. Length: 16 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-  Ј	FP flags (2 bytes)
-  Ј	FP mode (1 byte)
-  Ј	FP submode (1 byte)
-  Ј	Quantity of operations on the current receipt (1 byte) lower byte of a two-byte digit (see below)
-  Ј	Battery voltage (1 byte)
-  Ј	Power source voltage (1 byte)
-  Ј	Fiscal Memory error code (1 byte)
-  Ј	EKLZ error code (1 byte) EKLZ=Electronic Cryptographic Journal
-  Ј	Quantity of operations on the current receipt (1 byte) upper byte of a two-byte digit (see below)
-  Ј	Reserved (3 bytes)
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.ReadOperatorNumber(Password: Integer): Integer;
+function TFiscalPrinterDriver.ReadOperatorNumber(Password: Integer): Integer;
 begin
   Result := ReadShortStatus2(Password).OperatorNumber;
 end;
 
-function TFiscalPrinterDevice.ReadUsrOperatorNumber: Integer;
+function TFiscalPrinterDriver.ReadUsrOperatorNumber: Integer;
 begin
   Result := ReadShortStatus2(GetUsrPassword).OperatorNumber;
 end;
 
-function TFiscalPrinterDevice.ReadSysOperatorNumber: Integer;
+function TFiscalPrinterDriver.ReadSysOperatorNumber: Integer;
 begin
   Result := ReadShortStatus2(GetSysPassword).OperatorNumber;
 end;
 
-function TFiscalPrinterDevice.ReadShortStatus2(Password: Integer): TShortPrinterStatus;
-var
-  Stream: TBinStream;
+function TFiscalPrinterDriver.ReadShortStatus2(Password: Integer): TShortPrinterStatus;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_GET_SHORT_STATUS);
-    Stream.WriteDWORD(Password);
-    Check(ExecuteStream(Stream));
-    Stream.Read(Result, Sizeof(Result));
-    FShortStatus := Result;
-  finally
-    Stream.Free;
-  end;
+  Driver.Check(Driver.GetShortECRStatus);
+  Result.OperatorNumber := Driver.OperatorNumber;
+  { !!! }
 end;
 
-function TFiscalPrinterDevice.ReadShortStatus: TShortPrinterStatus;
-var
-  Stream: TBinStream;
-  Status: TPrinterStatus;
+function TFiscalPrinterDriver.ReadShortStatus: TShortPrinterStatus;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_GET_SHORT_STATUS);
-    Stream.WriteDWORD(GetUsrPassword);
-
-    Check(ExecuteStream(Stream));
-    Stream.Read(Result, Sizeof(Result));
-
-    FShortStatus := Result;
-    Status.Mode := Result.Mode;
-    Status.AdvancedMode := Result.AdvancedMode;
-    Status.OperatorNumber := Result.OperatorNumber;
-    Status.Flags := DecodePrinterFlags(Result.Flags);
-    SetPrinterStatus(Status);
-  finally
-    Stream.Free;
-  end;
+  Driver.Check(Driver.GetShortECRStatus);
+  Result.OperatorNumber := Driver.OperatorNumber;
+  { !!! }
 end;
 
-(******************************************************************************
-
-  Get FP Status
-  Command:	11H. Length: 5 bytes.
-  Ј	Operator password (4 bytes)
-  Answer:		11H. Length: 48 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-  Ј	FP firmware version (2 bytes)
-  Ј	FP firmware build (2 bytes)
-  Ј	FP firmware date (3 bytes) DD-MM-YY
-  Ј	Number of FP in checkout line (1 byte)
-  Ј	Current receipt number (2 bytes)
-  Ј	FP flags (2 bytes)
-  Ј	FP mode (1 byte)
-  Ј	FP submode (1 byte)
-  Ј	FP port (1 byte)
-  Ј	FM firmware version (2 bytes)
-  Ј	FM firmware build (2 bytes)
-  Ј	FM firmware date (3 bytes) DD-MM-YY
-  Ј	Current date (3 bytes) DD-MM-YY
-  Ј	Current time (3 bytes) HH-MM-SS
-  Ј	FM flags (1 byte)
-  Ј	Serial number (4 bytes)
-  Ј	Number of last daily totals record in FM (2 bytes) 0000Е2100
-  Ј	Quantity of free daily totals records left in FM (2 bytes)
-  Ј	Last fiscalization/refiscalization record number in FM (1 byte) 1Е16
-  Ј	Quantity of free fiscalization/refiscalization records left in FM (1 byte) 0Е15
-  Ј	Taxpayer ID (6 bytes)
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.ReadLongStatus: TLongPrinterStatus;
-var
-  Status: TPrinterStatus;
-  Command: TLongStatusCommand;
+function TFiscalPrinterDriver.ReadLongStatus: TLongPrinterStatus;
 begin
-  Command := TLongStatusCommand.Create;
-  try
-    Command.Password := GetUsrPassword;
-    Check(ExecutePrinterCommand(Command));
-    Result := Command.Status;
-
-    FLongStatus := Command.Status;
-    Status.Mode := FLongStatus.Mode;
-    Status.AdvancedMode := FLongStatus.AdvancedMode;
-    Status.OperatorNumber := FLongStatus.OperatorNumber;
-    Status.Flags := DecodePrinterFlags(FLongStatus.Flags);
-    SetPrinterStatus(Status);
-  finally
-    Command.Free;
-  end;
+  Driver.Check(Driver.GetECRStatus);
+  Result.OperatorNumber := Driver.OperatorNumber;
+  { !!! }
 end;
 
-function TFiscalPrinterDevice.GetFMFlags(Flags: Byte): TFMFlags;
+function TFiscalPrinterDriver.GetFMFlags(Flags: Byte): TFMFlags;
 begin
   Result.FM1Present := TestBit(Flags, 0);
   Result.FM2Present := TestBit(Flags, 1);
@@ -1895,81 +1804,22 @@ begin
   Result.Is24HoursLeft := TestBit(Flags, 7);
 end;
 
-(******************************************************************************
-
-  Print String In Bold Type
-
-  Command:	12H. Length: 26 bytes.
-  Ј	Operator password (4 bytes)
-  Ј	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt
-    station.
-  Ј	String of characters (20 bytes)
-  Answer:		12H. Length: 3 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.PrintBoldString(Flags: Byte; const Text: WideString): Integer;
-var
-  Stream: TBinStream;
+function TFiscalPrinterDriver.PrintBoldString(Flags: Byte; const Text: WideString): Integer;
 begin
   FLogger.Debug(Format('PrintBoldString(%d,''%s'')',
     [Flags, Text]));
 
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_PRINT_BOLD_LINE);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteByte(Flags);
-    Stream.WriteString(GetLine(Text, 20, GetPrintWidth(2)));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  SetPrintFlags(Flags);
+  Driver.StringForPrinting := Text;
+  Result := Driver.PrintWideString;
 end;
 
-(******************************************************************************
-
-  Beep
-  
-  Command:	13H. Length: 5 bytes.
-  Ј	Operator password (4 bytes)
-  Answer:		13H. Length: 3 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.Beep: Integer;
-var
-  Stream: TBinStream;
+function TFiscalPrinterDriver.Beep: Integer;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_BEEP);
-    Stream.WriteDWORD(GetUsrPassword);
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  Result := Driver.Beep;
 end;
 
-(******************************************************************************
-
-  Set Communication Parameters
-  
-  Command:	14H. Length: 8 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Ј	Port number (1 byte) 0Е255
-  Ј	Baud rate (1 byte) 0Е6
-  Ј	Inter-character time out (1 byte) 0Е255
-  Answer:		14H. Length: 2 bytes.
-  Ј	Result Code (1 byte)
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.SetPortParams(Port: Byte;
+function TFiscalPrinterDriver.SetPortParams(Port: Byte;
   const PortParams: TPortParams): Integer;
 var
   Stream: TBinStream;
@@ -1977,83 +1827,26 @@ begin
   FLogger.Debug(Format('SetPortParams(%d,%d,%d)',
     [Port, PortParams.BaudRate, PortParams.Timeout]));
 
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_SET_PORT_PARAMS);
-    Stream.WriteDWORD(GetSysPassword);
-    Stream.WriteByte(Port);
-    Stream.WriteByte(BaudRateToCode(PortParams.BaudRate));
-    Stream.WriteByte(TimeoutToByte(PortParams.Timeout));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  Driver.PortNumber := Port;
+  Driver.Timeout := PortParams.Timeout;
+  Driver.BaudRate := PortParams.BaudRate;
+  Result := Driver.SetExchangeParam;
 end;
 
-(******************************************************************************
-
-  Get Communication Parameters
-
-  Command:	15H. Length: 6 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Ј	Port number (1 byte) 0Е255
-  Answer:		15H. Length: 4 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Baud rate (1 byte) 0Е6
-  Ј	Inter-character time out (1 byte) 0Е255
-
-******************************************************************************)
-                       
-function TFiscalPrinterDevice.GetPortParams(Port: Byte): TPortParams;
-var
-  Stream: TBinStream;
+function TFiscalPrinterDriver.GetPortParams(Port: Byte): TPortParams;
 begin
-  FLogger.Debug(Format('GetPortParams(%d)',  [Port]));
-
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_GET_PORT_PARAMS);
-    Stream.WriteDWORD(GetSysPassword);
-    Stream.WriteByte(Port);
-    Check(ExecuteStream(Stream));
-    Result.BaudRate := CodeToBaudRate(Stream.ReadByte);
-    Result.Timeout := ByteToTimeout(Stream.ReadByte);
-  finally
-    Stream.Free;
-  end;
+  Driver.PortNumber := Port;
+  Driver.Check(Driver.GetExchangeParam);
+  Result.BaudRate := Driver.BaudRate;
+  Result.Timeout := Driver.Timeout;
 end;
 
-(******************************************************************************
-
-  Reset FM
-
-  Command:	16H. Length: 1 byte.
-  Answer:		16H. Length: 2 bytes.
-  Ј	Result Code (1 byte)
-
-
-******************************************************************************)
-
-procedure TFiscalPrinterDevice.ResetFiscalMemory;
+procedure TFiscalPrinterDriver.ResetFiscalMemory;
 begin
-  Execute(Chr(SMFP_COMMAND_RESETFM));
+  Driver.Check(Driver.ResetSettings);
 end;
 
-(******************************************************************************
-
-  Print String
-
-  Command:	17H. Length: 46 bytes.
-  Ј	Operator password (4 bytes)
-  Ј	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt station.
-  Ј	String of characters to print (40 bytes)
-  Answer:		17H. Length: 3 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.GetPrintFlags(Flags: Integer): Integer;
+function TFiscalPrinterDriver.GetPrintFlags(Flags: Integer): Integer;
 begin
   Result := Flags;
   if FCapFooterFlag and FFooterFlag then
@@ -2062,160 +1855,75 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.PrintString(Flags: Byte;
+procedure TFiscalPrinterDriver.SetPrintFlags(Flags: Byte);
+begin
+  Driver.UseJournalRibbon := TestBit(Flags, 0);
+  Driver.UseReceiptRibbon := TestBit(Flags, 1);
+  Driver.UseSlipDocument := TestBit(Flags, 2);
+  Driver.UseSlipCheck := TestBit(Flags, 3);
+  Driver.CarryStrings := TestBit(Flags, 6);
+  Driver.DelayedPrint := TestBit(Flags, 7);
+end;
+
+procedure TFiscalPrinterDriver.PrintString(Flags: Byte;
   const Line: WideString);
-var
-  Text: AnsiString;
 begin
   FLogger.Debug(Format('PrintString(%d,''%s'')', [Flags, Line]));
 
-  Text := Line;
-  if Text = '' then Text := ' ';
-  Text := Copy(Text, 1, GetPrintWidth);
-
-  Flags := GetPrintFlags(Flags);
-  Execute(#$17 + IntToBin(GetUsrPassword, 4) + Chr(Flags) +
-    GetLine(Text, 40, GetPrintWidth(1)));
+  SetPrintFlags(Flags);
+  Driver.StringForPrinting := Line;
+  Driver.Check(Driver.PrintString);
 end;
 
-(******************************************************************************
-
-  ќткрыть смену
-
- оманда: E0H. ƒлина сообщени€: 5байт.
-ѕароль оператора (4 байта)
-ќтвет: E0H. ƒлина сообщени€: 2 байта.
-ѕор€дковый номер оператора (1 байт) 1Е30
-ѕримечание:  оманда открывает смену в ‘ѕ и переводит ‘– в режим Ђќткрытой
-сменыї.
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.OpenFiscalDay: Boolean;
-var
-  Status: TPrinterStatus;
+function TFiscalPrinterDriver.OpenFiscalDay: Boolean;
 begin
-  Result := False;
-  if CapFiscalStorage then
-  begin
-    Status := WaitForPrinting;
-    if not IsDayOpened(Status.Mode) then
-    begin
-      if FTLVItems.Count > 0 then
-      begin
-        Check(FSStartOpenDay);
-        WriteTLVItems;
-      end;
-
-      OpenDay;
-      WaitForPrinting;
-      Result := True;
-    end;
-  end;
 end;
 
-procedure TFiscalPrinterDevice.OpenDay;
+procedure TFiscalPrinterDriver.OpenDay;
 begin
-  Execute(#$E0 + IntToBin(GetUsrPassword, 4));
+  Driver.Check(Driver.OpenSession);
   FFilter.OpenDay;
 end;
 
 
-(******************************************************************************
-
-  Print Receipt Header
-
-  Command:	18H. Length: 37 bytes.
-  Ј	Operator password (4 bytes)
-  Ј	Receipt title (30 bytes)
-  Ј	Receipt number (2 bytes)
-  Answer:		18H. Length: 5 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-  Ј	Current receipt number (2 bytes)
-
-******************************************************************************)
-
-procedure TFiscalPrinterDevice.PrintDocHeader(const DocName: WideString; DocNumber: Word);
-var
-  Stream: TBinStream;
+procedure TFiscalPrinterDriver.PrintDocHeader(const DocName: WideString; DocNumber: Word);
 begin
   FLogger.Debug(Format('PrintDocHeader(''%s'', %d)',
     [DocName, DocNumber]));
 
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_PRINT_DOC_HEADER);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteString(GetLine(DocName, 30, 30));
-    Stream.WriteInt(DocNumber, 2);
-
-    Check(ExecuteStream(Stream));
-  finally
-    Stream.Free;
-  end;
+  Driver.DocumentName := DocName;
+  Driver.DocumentNumber := DocNumber;
+  Driver.Check(Driver.PrintDocumentTitle);
 end;
 
-(******************************************************************************
-
-  Start Test
-
-  Command:	19H. Length: 6 bytes.
-  Ј	Operator password (4 bytes)
-  Ј	Test time out (1 byte) 1Е99
-  Answer:		19H. Length: 3 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-
-******************************************************************************)
-
-procedure TFiscalPrinterDevice.StartTest(Interval: Byte);
+procedure TFiscalPrinterDriver.StartTest(Interval: Byte);
 begin
   FLogger.Debug(Format('StartTest(%d)', [Interval]));
 
-  Execute(#$19 + IntToBin(GetUsrPassword, 4) + Chr(Interval));
+  Driver.RunningPeriod := Interval;
+  Driver.Check(Driver.Test);
 end;
 
-(******************************************************************************
-
-  Get Cash Totalizer Value
-
-  Command:	1AH. Length: 6 bytes.
-  Ј	Operator password (4 bytes)
-  Ј	Cash totalizer number (1 byte) 0Е255
-  Answer:		1AH. Length: 9 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-  Ј	Cash totalizer value (6 bytes)
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.ReadCashReg(ID: Integer; var R: TCashRegisterRec): Integer;
-var
-  Stream: TBinStream;
+function TFiscalPrinterDriver.ReadCashReg(ID: Integer; var R: TCashRegisterRec): Integer;
 begin
   FLogger.Debug(Format('ReadCashRegister(%d)', [ID]));
 
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_READ_CASH_TOTALIZER);
-    Stream.WriteDWORD(GetUsrPassword);
-    if (ID <= $FF) then
-      Stream.WriteByte(ID)
-    else
-      Stream.WriteWord(ID);
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-    begin
-      R.Operator := Stream.ReadByte; // Operator number
-      R.Value := Stream.ReadInt(6); // Register value
-    end;
-  finally
-    Stream.Free;
+  Driver.RegisterNumber := ID;
+  if ID <= $FF then
+  begin
+    Result := Driver.GetCashReg;
+  end else
+  begin
+    Result := Driver.GetCashRegEx;
+  end;
+  if Result = 0 then
+  begin
+    R.Operator := Driver.OperatorNumber;
+    R.Value := Round(Driver.ContentsOfCashRegister*100);
   end;
 end;
 
-function TFiscalPrinterDevice.ReadCashReg2(RegID: Integer): Int64;
+function TFiscalPrinterDriver.ReadCashReg2(RegID: Integer): Int64;
 
   function ReadDayTotals(RecType: Integer): Int64;
   var
@@ -2308,7 +2016,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadCashRegister(ID: Integer): Int64;
+function TFiscalPrinterDriver.ReadCashRegister(ID: Integer): Int64;
 var
   R: TCashRegisterRec;
 begin
@@ -2316,21 +2024,7 @@ begin
   Result := R.Value;
 end;
 
-(******************************************************************************
-
-  Get Operation Totalizer Value
-
-  Command:	1BH. Length: 6 bytes.
-  Ј	Operator password (4 bytes)
-  Ј	Operation totalizer number (1 byte) 0Е255
-  Answer:		1BH. Length: 5 bytes.
-  Ј	Result Code (1 byte)
-  Ј	Operator index number (1 byte) 1Е30
-  Ј	Operation totalizer value (2 bytes)
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.ReadOperatingReg(ID: Byte;
+function TFiscalPrinterDriver.ReadOperatingReg(ID: Byte;
   var R: TOperRegisterRec): Integer;
 var
   Data: AnsiString;
@@ -2338,17 +2032,16 @@ var
 begin
   FLogger.Debug(Format('ReadOperatingRegister(%d)', [ID]));
 
-  Command := #$1B + IntToBin(GetUsrPassword, 4) + Chr(ID);
-  Result := ExecuteData(Command, Data);
+  Driver.RegisterNumber := ID;
+  Result := Driver.GetOperationReg;
   if Result = 0 then
   begin
-    CheckMinLength(Data, 3);
-    R.Operator := Ord(Data[1]);
-    R.Value := BinToInt(Data, 2, 2);
+    R.Operator := Driver.OperatorNumber;
+    R.Value := Driver.ContentsOfOperationRegister;
   end;
 end;
 
-function TFiscalPrinterDevice.ReadOperatingRegister(ID: Byte): Word;
+function TFiscalPrinterDriver.ReadOperatingRegister(ID: Byte): Word;
 var
   R: TOperRegisterRec;
 begin
@@ -2356,64 +2049,18 @@ begin
   Result := R.Value;
 end;
 
-(******************************************************************************
-
-  Set License
-
-  Command:	1CH. Length: 10 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Ј	License (5 bytes) 0000000000Е9999999999
-  Answer:		1CH. Length: 2 bytes.
-  Ј	Result Code (1 byte)
-
-******************************************************************************)
-
-procedure TFiscalPrinterDevice.WriteLicense(License: Int64);
-var
-  Command: TWriteLicenseCommand;
+procedure TFiscalPrinterDriver.WriteLicense(License: Int64);
 begin
   FLogger.Debug(Format('WriteLicense(%d)', [License]));
-
-  Command := TWriteLicenseCommand.Create;
-  try
-    Command.SysPassword := GetSysPassword;
-    Command.License := License;
-    Check(ExecutePrinterCommand(Command));
-  finally
-    Command.Free;
-  end;
+  { !!! }
 end;
 
-(******************************************************************************
-
-  Get License
-
-  Command:	1DH. Length: 5 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Answer:		1DH. Length: 7 bytes.
-  Ј	Result Code (1 byte)
-  Ј	License (5 bytes) 0000000000Е9999999999
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.ReadLicense: Int64;
-var
-  Command: TReadLicenseCommand;
+function TFiscalPrinterDriver.ReadLicense: Int64;
 begin
-  Command := TReadLicenseCommand.Create;
-  try
-    Command.SysPassword := GetSysPassword;
-    Check(ExecutePrinterCommand(Command));
-    Result := Command.License;
-  finally
-    Command.Free;
-  end;
+  { !!! }
 end;
 
-(******************************************************************************
-******************************************************************************)
-
-function TFiscalPrinterDevice.DoWriteTable(
+function TFiscalPrinterDriver.DoWriteTable(
   Table, Row, Field: Integer;
   const FieldValue: WideString): Integer;
 var
@@ -2422,35 +2069,19 @@ begin
   FLogger.Debug(Format('DoWriteTable(%d,%d,%d,%s)',
     [Table, Row, Field, StrToHexText(FieldValue)]));
 
-  Command := TWriteTableCommand.Create;
-  try
-    Command.SysPassword := GetSysPassword;
-    Command.Table := Table;
-    Command.Row := Row;
-    Command.Field := Field;
-    Command.FieldValue := FieldValue;
-    Result := ExecutePrinterCommand(Command);
-  finally
-    Command.Free;
-  end;
+
+  Driver.TableNumber := Table;
+  Driver.RowNumber := Row;
+  Driver.FieldNumber := Field;
+  Driver.Check(Driver.GetFieldStruct);
+  if Driver.FieldType then
+    Driver.ValueOfFieldString := FieldValue
+  else
+    Driver.ValueOfFieldInteger := StrToInt(FieldValue);
+  Result := Driver.WriteTable;
 end;
 
-(******************************************************************************
-
-  Get Table Field Value
-
-  Command:	1FH. Length: 9 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Ј	Table (1 byte)
-  Ј	Row (2 bytes)
-  Ј	Field (1 byte)
-  Answer:		1FH. Length: (2+X) bytes.
-  Ј	Result Code (1 byte)
-  Ј	Value (X bytes) up to 40 bytes
-
-******************************************************************************)
-
-function TFiscalPrinterDevice.ReadTableBin(Table, Row,
+function TFiscalPrinterDriver.ReadTableBin(Table, Row,
   Field: Integer): WideString;
 var
   Command: TReadTableCommand;
@@ -2458,52 +2089,26 @@ begin
   FLogger.Debug(Format('ReadTableBin(%d,%d,%d)',
     [Table, Row, Field]));
 
-  Command := TReadTableCommand.Create;
-  try
-    Command.SysPassword := GetSysPassword;
-    Command.Table := Table;
-    Command.Row := Row;
-    Command.Field := Field;
-    Check(ExecutePrinterCommand(Command));
-    Result := Command.FieldValue;
-  finally
-    Command.Free;
-  end;
+
+  Driver.TableNumber := Table;
+  Driver.RowNumber := Row;
+  Driver.FieldNumber := Field;
+  Driver.Check(Driver.GetFieldStruct);
+  Driver.Check(Driver.ReadTable);
+  if Driver.FieldType then
+    Result := Driver.ValueOfFieldString
+  else
+    Result := IntToStr(Driver.ValueOfFieldInteger);
 end;
 
-(******************************************************************************
-
-  Set Decimal Dot Position
-  
-  Command:	20H. Length: 6 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Ј	Decimal dot position (1 byte) '0' - 0 digits after the dot, '1' - 2 digits after the dot
-  Answer:		20H. Length: 2 bytes.
-  Ј	Result Code (1 byte)
-
-******************************************************************************)
-
-procedure TFiscalPrinterDevice.SetPointPosition(PointPosition: Byte);
+procedure TFiscalPrinterDriver.SetPointPosition(PointPosition: Byte);
 begin
   FLogger.Debug(Format('SetPointPosition(%d)',
     [PointPosition]));
-
-  Execute(#$20 + IntToBin(GetSysPassword, 4) + Chr(PointPosition));
+  { !!! }
 end;
 
-(******************************************************************************
-
-  Set Clock Time
-
-  Command:	21H. Length: 8 bytes.
-  Ј	System Administrator password (4 bytes) 30
-  Ј	Time (3 bytes) HH-MM-SS
-  Answer:		21H. Length: 2 bytes.
-  Ј	Result Code (1 byte)
-
-******************************************************************************)
-
-procedure TFiscalPrinterDevice.SetTime(const Time: TPrinterTime);
+procedure TFiscalPrinterDriver.SetTime(const Time: TPrinterTime);
 begin
   FLogger.Debug(Format('SetTime(%s)',
     [PrinterTimeToStr(Time)]));
@@ -2524,7 +2129,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.WriteDate(const Date: TPrinterDate);
+procedure TFiscalPrinterDriver.WriteDate(const Date: TPrinterDate);
 begin
   FLogger.Debug(Format('WriteDate(%s)',
     [PrinterDateToStr(Date)]));
@@ -2545,7 +2150,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.ConfirmDate(const Date: TPrinterDate);
+procedure TFiscalPrinterDriver.ConfirmDate(const Date: TPrinterDate);
 begin
   FLogger.Debug(Format('ConfirmDate(%.2d.%.2d.%.4d)',
     [Date.Day, Date.Month, Date.Year + 2000]));
@@ -2565,7 +2170,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.InitializeTables;
+procedure TFiscalPrinterDriver.InitializeTables;
 begin
   Execute(#$24 + IntToBin(GetSysPassword, 4));
 end;
@@ -2583,7 +2188,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.CutPaper(CutType: Byte);
+procedure TFiscalPrinterDriver.CutPaper(CutType: Byte);
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -2595,12 +2200,12 @@ begin
   ExecuteData(Command, Answer);
 end;
 
-procedure TFiscalPrinterDevice.FullCut;
+procedure TFiscalPrinterDriver.FullCut;
 begin
   CutPaper(PRINTER_CUTTYPE_FULL);
 end;
 
-procedure TFiscalPrinterDevice.PartialCut;
+procedure TFiscalPrinterDriver.PartialCut;
 begin
   CutPaper(PRINTER_CUTTYPE_PARTIAL);
 end;
@@ -2621,7 +2226,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadFontInfo(FontNumber: Byte): TFontInfo;
+function TFiscalPrinterDriver.ReadFontInfo(FontNumber: Byte): TFontInfo;
 var
   Data: AnsiString;
 begin
@@ -2641,7 +2246,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.ResetTotalizers;
+procedure TFiscalPrinterDriver.ResetTotalizers;
 begin
   Execute(#$27 + IntToBin(GetSysPassword, 4));
 end;
@@ -2659,7 +2264,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.OpenDrawer(DrawerNumber: Byte);
+procedure TFiscalPrinterDriver.OpenDrawer(DrawerNumber: Byte);
 begin
   FLogger.Debug(Format('OpenDrawer(%d)', [DrawerNumber]));
   Execute(#$28 + IntToBin(GetUsrPassword, 4) + Chr(DrawerNumber));
@@ -2679,7 +2284,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.FeedPaper(Station: Byte; Lines: Byte);
+procedure TFiscalPrinterDriver.FeedPaper(Station: Byte; Lines: Byte);
 begin
   FLogger.Debug(Format('FeedPaper(%d,%d)',
     [Station, Lines]));
@@ -2700,7 +2305,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.EjectSlip(Direction: Byte);
+procedure TFiscalPrinterDriver.EjectSlip(Direction: Byte);
 begin
   FLogger.Debug(Format('EjectSlip(%d)',
     [Direction]));
@@ -2720,7 +2325,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.StopTest;
+procedure TFiscalPrinterDriver.StopTest;
 begin
   Execute(#$2B + IntToBin(GetUsrPassword, 4));
 end;
@@ -2737,7 +2342,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintActnTotalizers;
+procedure TFiscalPrinterDriver.PrintActnTotalizers;
 begin
   Execute(#$2C + IntToBin(GetSysPassword, 4));
 end;
@@ -2757,7 +2362,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadTableInfo(Table: Byte;
+function TFiscalPrinterDriver.ReadTableInfo(Table: Byte;
   var R: TPrinterTableRec): Integer;
 var
   Data: AnsiString;
@@ -2795,7 +2400,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadFieldInfo(Table, Field: Byte;
+function TFiscalPrinterDriver.ReadFieldInfo(Table, Field: Byte;
   var R: TPrinterFieldRec): Integer;
 var
   Data: AnsiString;
@@ -2837,7 +2442,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintStringFont(Flags, Font: Byte;
+procedure TFiscalPrinterDriver.PrintStringFont(Flags, Font: Byte;
   const Line: WideString);
 var
   Text: AnsiString;
@@ -2865,7 +2470,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintXReport;
+procedure TFiscalPrinterDriver.PrintXReport;
 begin
   Execute(#$40 + IntToBin(GetSysPassword, 4));
   try
@@ -2878,13 +2483,13 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.PrintLines(const Line1, Line2: WideString);
+procedure TFiscalPrinterDriver.PrintLines(const Line1, Line2: WideString);
 begin
   PrintStringFont(PRINTER_STATION_REC, Parameters.FontNumber,
     FormatLines(Line1, Line2));
 end;
 
-procedure TFiscalPrinterDevice.PrintCommStatus;
+procedure TFiscalPrinterDriver.PrintCommStatus;
 var
   i: Integer;
   R: TFSCommStatus;
@@ -2916,7 +2521,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.BeginZReport: Integer;
+function TFiscalPrinterDriver.BeginZReport: Integer;
 var
   Answer: string;
 begin
@@ -2935,7 +2540,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintZReport;
+procedure TFiscalPrinterDriver.PrintZReport;
 var
   FSState: TFSState;
 begin
@@ -2979,7 +2584,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintDepartmentsReport;
+procedure TFiscalPrinterDriver.PrintDepartmentsReport;
 begin
   Execute(#$42 + IntToBin(GetSysPassword, 4));
 end;
@@ -2996,7 +2601,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintTaxReport;
+procedure TFiscalPrinterDriver.PrintTaxReport;
 begin
   Execute(#$43 + IntToBin(GetSysPassword, 4));
 end;
@@ -3013,7 +2618,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintHeader;
+procedure TFiscalPrinterDriver.PrintHeader;
 begin
   Execute(#$52 + IntToBin(GetUsrPassword, 4));
 end;
@@ -3033,7 +2638,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintDocTrailer(Flags: Byte);
+procedure TFiscalPrinterDriver.PrintDocTrailer(Flags: Byte);
 begin
   FLogger.Debug(Format('PrintDocTrailer(%d)', [Flags]));
   Execute(#$53 + IntToBin(GetUsrPassword, 4) + Chr(Flags));
@@ -3050,7 +2655,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintTrailer;
+procedure TFiscalPrinterDriver.PrintTrailer;
 begin
   Execute(#$54 + IntToBin(GetUsrPassword, 4));
 end;
@@ -3067,7 +2672,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.WriteSerial(Serial: DWORD);
+procedure TFiscalPrinterDriver.WriteSerial(Serial: DWORD);
 begin
   FLogger.Debug(Format('WriteSerial(%d)', [Serial]));
   Execute(#$60 + IntToBin(0, 4) + IntToBin(Serial, 4));
@@ -3083,7 +2688,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.InitFiscalMemory;
+procedure TFiscalPrinterDriver.InitFiscalMemory;
 begin
   Execute(#$61);
 end;
@@ -3116,7 +2721,7 @@ begin
     Result := BinToInt(Data, Index, Size);
 end;
 
-function TFiscalPrinterDevice.ReadFMTotals(Flags: Byte; var R: TFMTotals): Integer;
+function TFiscalPrinterDriver.ReadFMTotals(Flags: Byte; var R: TFMTotals): Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -3151,7 +2756,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadFMLastRecordDate: TFMRecordDate;
+function TFiscalPrinterDriver.ReadFMLastRecordDate: TFMRecordDate;
 var
   Data: AnsiString;
 begin
@@ -3175,7 +2780,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadDaysRange: TDayRange;
+function TFiscalPrinterDriver.ReadDaysRange: TDayRange;
 var
   Data: AnsiString;
 begin
@@ -3202,7 +2807,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.Fiscalization(Password, PrinterID,
+function TFiscalPrinterDriver.Fiscalization(Password, PrinterID,
   FiscalID: Int64): TFiscalizationResult;
 var
   Data: AnsiString;
@@ -3238,7 +2843,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReportOnDateRange(ReportType: Byte;
+function TFiscalPrinterDriver.ReportOnDateRange(ReportType: Byte;
   Range: TDayDateRange): TDayRange;
 var
   Data: AnsiString;
@@ -3274,7 +2879,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReportOnNumberRange(ReportType: Byte;
+function TFiscalPrinterDriver.ReportOnNumberRange(ReportType: Byte;
   Range: TDayNumberRange): TDayRange;
 var
   Data: AnsiString;
@@ -3303,7 +2908,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.InterruptReport;
+procedure TFiscalPrinterDriver.InterruptReport;
 begin
   Execute(#$68 + IntToBin(GetTaxPassword, 4));
 end;
@@ -3325,7 +2930,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadFiscInfo(FiscNumber: Byte): TFiscInfo;
+function TFiscalPrinterDriver.ReadFiscInfo(FiscNumber: Byte): TFiscInfo;
 var
   Stream: TBinStream;
 begin
@@ -3380,7 +2985,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.OpenSlipDoc(Params: TSlipParams): TDocResult;
+function TFiscalPrinterDriver.OpenSlipDoc(Params: TSlipParams): TDocResult;
 var
   Stream: TBinStream;
 begin
@@ -3417,7 +3022,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.OpenStdSlip(Params: TStdSlipParams): TDocResult;
+function TFiscalPrinterDriver.OpenStdSlip(Params: TStdSlipParams): TDocResult;
 var
   Stream: TBinStream;
 begin
@@ -3475,7 +3080,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.SlipOperation(Params: TSlipOperation;
+function TFiscalPrinterDriver.SlipOperation(Params: TSlipOperation;
   Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
@@ -3520,7 +3125,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.SlipStdOperation(LineNumber: Byte;
+function TFiscalPrinterDriver.SlipStdOperation(LineNumber: Byte;
   Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
@@ -3576,7 +3181,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.SlipDiscount(Params: TSlipDiscountParams;
+function TFiscalPrinterDriver.SlipDiscount(Params: TSlipDiscountParams;
   Discount: TSlipDiscount): Integer;
 var
   Stream: TBinStream;
@@ -3621,7 +3226,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.SlipStdDiscount(Discount: TSlipDiscount): Integer;
+function TFiscalPrinterDriver.SlipStdDiscount(Discount: TSlipDiscount): Integer;
 var
   Stream: TBinStream;
 begin
@@ -3778,7 +3383,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.SlipClose(Params: TCloseReceiptParams): TCloseReceiptResult;
+function TFiscalPrinterDriver.SlipClose(Params: TCloseReceiptParams): TCloseReceiptResult;
 begin
 (*
   Stream := TBinStream.Create;
@@ -3825,7 +3430,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.UpdateDepartment(var P: TPriceReg);
+procedure TFiscalPrinterDriver.UpdateDepartment(var P: TPriceReg);
 var
   S: AnsiString;
   V, Code: Integer;
@@ -3842,7 +3447,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.PrintItemText(const S: WideString): WideString;
+function TFiscalPrinterDriver.PrintItemText(const S: WideString): WideString;
 var
   i: Integer;
   Line: AnsiString;
@@ -3867,7 +3472,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.Sale(Operation: TPriceReg): Integer;
+function TFiscalPrinterDriver.Sale(Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
 begin
@@ -3913,7 +3518,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.Buy(Operation: TPriceReg): Integer;
+function TFiscalPrinterDriver.Buy(Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
 begin
@@ -3958,7 +3563,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.RetSale(Operation: TPriceReg): Integer;
+function TFiscalPrinterDriver.RetSale(Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4003,7 +3608,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.RetBuy(Operation: TPriceReg): Integer;
+function TFiscalPrinterDriver.RetBuy(Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4048,7 +3653,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.Storno(Operation: TPriceReg): Integer;
+function TFiscalPrinterDriver.Storno(Operation: TPriceReg): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4095,7 +3700,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReceiptClose(const P: TCloseReceiptParams;
+function TFiscalPrinterDriver.ReceiptClose(const P: TCloseReceiptParams;
   var R: TCloseReceiptResult): Integer;
 var
   Stream: TBinStream;
@@ -4145,7 +3750,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReceiptDiscount(
+function TFiscalPrinterDriver.ReceiptDiscount(
   Operation: TAmountOperation): Integer;
 var
   Stream: TBinStream;
@@ -4181,7 +3786,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.ReceiptDiscount2(
+function TFiscalPrinterDriver.ReceiptDiscount2(
   Operation: TReceiptDiscount2): Integer;
 var
   Answer: AnsiString;
@@ -4215,7 +3820,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReceiptCharge(
+function TFiscalPrinterDriver.ReceiptCharge(
   Operation: TAmountOperation): Integer;
 var
   Stream: TBinStream;
@@ -4250,7 +3855,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReceiptCancel: Integer;
+function TFiscalPrinterDriver.ReceiptCancel: Integer;
 var
   Stream: TBinStream;
 begin
@@ -4266,7 +3871,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReceiptCancelPassword(Password: Integer): Integer;
+function TFiscalPrinterDriver.ReceiptCancelPassword(Password: Integer): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4282,7 +3887,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.CancelReceipt;
+procedure TFiscalPrinterDriver.CancelReceipt;
 var
   i: Integer;
   Password: Integer;
@@ -4329,7 +3934,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.GetSubtotal: Int64;
+function TFiscalPrinterDriver.GetSubtotal: Int64;
 var
   Stream: TBinStream;
 begin
@@ -4363,7 +3968,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReceiptStornoDiscount(
+function TFiscalPrinterDriver.ReceiptStornoDiscount(
   Operation: TAmountOperation): Integer;
 var
   Stream: TBinStream;
@@ -4402,7 +4007,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReceiptStornoCharge(
+function TFiscalPrinterDriver.ReceiptStornoCharge(
   Operation: TAmountOperation): Integer;
 var
   Stream: TBinStream;
@@ -4435,7 +4040,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.PrintReceiptCopy: Integer;
+function TFiscalPrinterDriver.PrintReceiptCopy: Integer;
 var
   Stream: TBinStream;
 begin
@@ -4465,7 +4070,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.OpenReceipt(ReceiptType: Byte): Integer;
+function TFiscalPrinterDriver.OpenReceipt(ReceiptType: Byte): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4494,7 +4099,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ContinuePrint: Integer;
+function TFiscalPrinterDriver.ContinuePrint: Integer;
 var
   Stream: TBinStream;
 begin
@@ -4522,7 +4127,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.LoadGraphics1(Line: Byte; Data: AnsiString): Integer;
+function TFiscalPrinterDriver.LoadGraphics1(Line: Byte; Data: AnsiString): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4557,7 +4162,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.PrintGraphics1(Line1, Line2: Byte): Integer;
+function TFiscalPrinterDriver.PrintGraphics1(Line1, Line2: Byte): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4588,7 +4193,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.PrintBarcode(const Barcode: WideString): Integer;
+function TFiscalPrinterDriver.PrintBarcode(const Barcode: WideString): Integer;
 var
   IBarcode: Int64;
   Stream: TBinStream;
@@ -4619,7 +4224,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.PrintGraphics2(Line1, Line2: Word): Integer;
+function TFiscalPrinterDriver.PrintGraphics2(Line1, Line2: Word): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4651,7 +4256,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.LoadGraphics2(Line: Word; Data: AnsiString): Integer;
+function TFiscalPrinterDriver.LoadGraphics2(Line: Word; Data: AnsiString): Integer;
 var
   Stream: TBinStream;
 begin
@@ -4687,7 +4292,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.PrintGraphicsLine(Height: Word; Flags: Byte;
+function TFiscalPrinterDriver.PrintGraphicsLine(Height: Word; Flags: Byte;
   Data: WideString): Integer;
 var
   Stream: TBinStream;
@@ -4731,7 +4336,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.ReadDeviceMetrics: TDeviceMetrics;
+function TFiscalPrinterDriver.ReadDeviceMetrics: TDeviceMetrics;
 var
   Stream: TBinStream;
 begin
@@ -4751,7 +4356,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FieldToInt(FieldInfo: TPrinterFieldRec;
+function TFiscalPrinterDriver.FieldToInt(FieldInfo: TPrinterFieldRec;
   const Value: WideString): Integer;
 begin
   Result := 0;
@@ -4763,7 +4368,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FieldToStr(FieldInfo: TPrinterFieldRec;
+function TFiscalPrinterDriver.FieldToStr(FieldInfo: TPrinterFieldRec;
   const Value: WideString): WideString;
 begin
   case FieldInfo.FieldType of
@@ -4774,7 +4379,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.BinToFieldValue(
+function TFiscalPrinterDriver.BinToFieldValue(
   FieldInfo: TPrinterFieldRec;
   const Value: WideString): WideString;
 begin
@@ -4786,7 +4391,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetFieldValue(FieldInfo: TPrinterFieldRec;
+function TFiscalPrinterDriver.GetFieldValue(FieldInfo: TPrinterFieldRec;
   const Value: WideString): AnsiString;
 begin
   case FieldInfo.FieldType of
@@ -4797,7 +4402,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.WriteTable(
+function TFiscalPrinterDriver.WriteTable(
   Table, Row, Field: Integer;
   const FieldValue: WideString): Integer;
 var
@@ -4825,13 +4430,13 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.WriteTableInt(
+function TFiscalPrinterDriver.WriteTableInt(
   Table, Row, Field, Value: Integer): Integer;
 begin
   Result := WriteTable(Table, Row, Field, IntToStr(Value));
 end;
 
-function TFiscalPrinterDevice.ReadTableInt(Table, Row, Field: Integer): Integer;
+function TFiscalPrinterDriver.ReadTableInt(Table, Row, Field: Integer): Integer;
 var
   Data: AnsiString;
   FieldInfo: TPrinterFieldRec;
@@ -4841,7 +4446,7 @@ begin
   Result := FieldToInt(FieldInfo, Data);
 end;
 
-function TFiscalPrinterDevice.ReadTableStr(Table, Row, Field: Integer): WideString;
+function TFiscalPrinterDriver.ReadTableStr(Table, Row, Field: Integer): WideString;
 var
   Data: AnsiString;
   FieldInfo: TPrinterFieldRec;
@@ -4862,7 +4467,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetDayDiscountTotal: Int64;
+function TFiscalPrinterDriver.GetDayDiscountTotal: Int64;
 begin
   Result :=
     ReadCashRegister(185) +
@@ -4882,7 +4487,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetRecDiscountTotal: Int64;
+function TFiscalPrinterDriver.GetRecDiscountTotal: Int64;
 begin
   Result :=
     ReadCashRegister(64) +
@@ -4914,7 +4519,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetDayItemTotal: Int64;
+function TFiscalPrinterDriver.GetDayItemTotal: Int64;
 var
   i: Integer;
 begin
@@ -4946,7 +4551,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetRecItemTotal: Int64;
+function TFiscalPrinterDriver.GetRecItemTotal: Int64;
 var
   i: Integer;
 begin
@@ -4978,7 +4583,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetDayItemVoidTotal: Int64;
+function TFiscalPrinterDriver.GetDayItemVoidTotal: Int64;
 var
   i: Integer;
 begin
@@ -5010,7 +4615,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetRecItemVoidTotal: Int64;
+function TFiscalPrinterDriver.GetRecItemVoidTotal: Int64;
 var
   i: Integer;
 begin
@@ -5032,7 +4637,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetEJSesssionResult(Number: Word;
+function TFiscalPrinterDriver.GetEJSesssionResult(Number: Word;
   var Text: WideString): Integer;
 var
   Command: AnsiString;
@@ -5054,7 +4659,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.ReadEJActivation(var Line: WideString): Integer;
+function TFiscalPrinterDriver.ReadEJActivation(var Line: WideString): Integer;
 var
   Answer: AnsiString;
 begin
@@ -5074,7 +4679,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetEJReportLine(var Line: WideString): Integer;
+function TFiscalPrinterDriver.GetEJReportLine(var Line: WideString): Integer;
 var
   Answer: AnsiString;
 begin
@@ -5093,14 +4698,14 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.EJReportStop: Integer;
+function TFiscalPrinterDriver.EJReportStop: Integer;
 var
   RxData: AnsiString;
 begin
   Result := ExecuteData(#$AC + IntToBin(GetSysPassword, 4), RxData);
 end;
 
-function TFiscalPrinterDevice.DecodeEJFlags(Flags: Byte): TEJFlags;
+function TFiscalPrinterDriver.DecodeEJFlags(Flags: Byte): TEJFlags;
 begin
   Result.DocType := Flags and $03;      // bits 0,1
   Result.ArcOpened := TestBit(Flags, 2);
@@ -5128,7 +4733,7 @@ end;
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.GetEJStatus1(var Status: TEJStatus1): Integer;
+function TFiscalPrinterDriver.GetEJStatus1(var Status: TEJStatus1): Integer;
 var
   Stream: TBinStream;
 begin
@@ -5151,12 +4756,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FormatLines(const Line1, Line2: WideString): WideString;
+function TFiscalPrinterDriver.FormatLines(const Line1, Line2: WideString): WideString;
 begin
   Result := AlignLines(Line1, Line2, GetPrintWidth);
 end;
 
-function TFiscalPrinterDevice.FormatBoldLines(const Line1, Line2: WideString): WideString;
+function TFiscalPrinterDriver.FormatBoldLines(const Line1, Line2: WideString): WideString;
 begin
   Result := AlignLines(Line1, Line2, GetPrintWidth div 2);
 end;
@@ -5175,7 +4780,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.EJTotalsReportDate(
+procedure TFiscalPrinterDriver.EJTotalsReportDate(
   const Parameters: TDateReport);
 begin
   Execute(#$A2 +
@@ -5199,7 +4804,7 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.EJTotalsReportNumber(
+procedure TFiscalPrinterDriver.EJTotalsReportNumber(
   const Parameters: TNumberReport);
 begin
   Execute(#$A3 +
@@ -5209,12 +4814,12 @@ begin
     IntToBin(Parameters.Number2, 2));
 end;
 
-function TFiscalPrinterDevice.GetModel: TPrinterModelRec;
+function TFiscalPrinterDriver.GetModel: TPrinterModelRec;
 begin
   Result := FModelData;
 end;
 
-function TFiscalPrinterDevice.GetPrinterModel: TPrinterModel;
+function TFiscalPrinterDriver.GetPrinterModel: TPrinterModel;
 begin
   if FModel = nil then
   begin
@@ -5223,7 +4828,7 @@ begin
   Result := FModel;
 end;
 
-function TFiscalPrinterDevice.SelectModel: TPrinterModel;
+function TFiscalPrinterDriver.SelectModel: TPrinterModel;
 var
   ModelID: Integer;
 begin
@@ -5250,27 +4855,27 @@ begin
   WriteLogModelParameters(FModelData);
 end;
 
-function TFiscalPrinterDevice.GetOnCommand: TCommandEvent;
+function TFiscalPrinterDriver.GetOnCommand: TCommandEvent;
 begin
   Result := FOnCommand;
 end;
 
-procedure TFiscalPrinterDevice.SetOnCommand(Value: TCommandEvent);
+procedure TFiscalPrinterDriver.SetOnCommand(Value: TCommandEvent);
 begin
   FOnCommand := Value;
 end;
 
-function TFiscalPrinterDevice.GetBeforeCommand: TCommandEvent;
+function TFiscalPrinterDriver.GetBeforeCommand: TCommandEvent;
 begin
   Result := FBeforeCommand;
 end;
 
-procedure TFiscalPrinterDevice.SetBeforeCommand(Value: TCommandEvent);
+procedure TFiscalPrinterDriver.SetBeforeCommand(Value: TCommandEvent);
 begin
   FBeforeCommand := Value;
 end;
 
-function TFiscalPrinterDevice.AlignLine(const Line: WideString;
+function TFiscalPrinterDriver.AlignLine(const Line: WideString;
   PrintWidth: Integer; Alignment: TTextAlignment = taLeft): WideString;
 var
   L: Integer;
@@ -5293,7 +4898,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.CenterLine(const Line: WideString): WideString;
+function TFiscalPrinterDriver.CenterLine(const Line: WideString): WideString;
 var
   L: Integer;
   L1: Integer;
@@ -5307,7 +4912,7 @@ begin
   Result := StringOfChar(' ', L1) + Result + StringOfChar(' ', L2);
 end;
 
-function TFiscalPrinterDevice.ProcessLine(const Line: WideString): Boolean;
+function TFiscalPrinterDriver.ProcessLine(const Line: WideString): Boolean;
 var
   Barcode: TBarcodeRec;
 begin
@@ -5325,7 +4930,7 @@ begin
   PrintBarcode2(Barcode);
 end;
 
-procedure TFiscalPrinterDevice.PrintLineFont(const Data: TTextRec);
+procedure TFiscalPrinterDriver.PrintLineFont(const Data: TTextRec);
 var
   i: Integer;
   Line: AnsiString;
@@ -5359,7 +4964,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.SplitText(const Text: WideString; Font: Integer;
+procedure TFiscalPrinterDriver.SplitText(const Text: WideString; Font: Integer;
   Lines: TTntStrings);
 var
   Line: WideString;
@@ -5378,7 +4983,7 @@ begin
   until Line = '';
 end;
 
-procedure TFiscalPrinterDevice.PrintTextFont(Station: Integer;
+procedure TFiscalPrinterDriver.PrintTextFont(Station: Integer;
   Font: Integer; const Text: WideString);
 var
   Data: TTextRec;
@@ -5391,7 +4996,7 @@ begin
   PrintText(Data);
 end;
 
-procedure TFiscalPrinterDevice.PrintText(Station: Integer; const Text: WideString);
+procedure TFiscalPrinterDriver.PrintText(Station: Integer; const Text: WideString);
 var
   Data: TTextRec;
 begin
@@ -5403,7 +5008,7 @@ begin
   PrintText(Data);
 end;
 
-procedure TFiscalPrinterDevice.PrintText(const Data: TTextRec);
+procedure TFiscalPrinterDriver.PrintText(const Data: TTextRec);
 var
   i: Integer;
   Text: AnsiString;
@@ -5427,51 +5032,51 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetTables: TDeviceTables;
+function TFiscalPrinterDriver.GetTables: TDeviceTables;
 begin
   Result := FDeviceTables;
 end;
 
-procedure TFiscalPrinterDevice.SetTables(const Value: TDeviceTables);
+procedure TFiscalPrinterDriver.SetTables(const Value: TDeviceTables);
 begin
   FDeviceTables := Value;
 end;
 
-procedure TFiscalPrinterDevice.OpenPort(
+procedure TFiscalPrinterDriver.OpenPort(
   PortNumber, BaudRate, ByteTimeout: Integer);
 begin
   Logger.Debug(Format('OpenPort(COM%d, %d, %d)', [PortNumber, BaudRate, ByteTimeout]));
   Connection.OpenPort(PortNumber, BaudRate, ByteTimeout);
 end;
 
-procedure TFiscalPrinterDevice.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TFiscalPrinterDriver.ClaimDevice(PortNumber, Timeout: Integer);
 begin
   Connection.ClaimDevice(PortNumber, Timeout);
 end;
 
-procedure TFiscalPrinterDevice.ReleaseDevice;
+procedure TFiscalPrinterDriver.ReleaseDevice;
 begin
   Connection.ReleaseDevice;
 end;
 
-procedure TFiscalPrinterDevice.Close;
+procedure TFiscalPrinterDriver.Close;
 begin
   FConnection := nil;
   FIsOnline := False;
 end;
 
-procedure TFiscalPrinterDevice.Open(AConnection: IPrinterConnection);
+procedure TFiscalPrinterDriver.Open(AConnection: IPrinterConnection);
 begin
   FConnection := AConnection;
 end;
 
-procedure TFiscalPrinterDevice.ClosePort;
+procedure TFiscalPrinterDriver.ClosePort;
 begin
   Connection.ClosePort;
   FIsOnline := False;
 end;
 
-procedure TFiscalPrinterDevice.WriteLogModelParameters(const Model: TPrinterModelRec);
+procedure TFiscalPrinterDriver.WriteLogModelParameters(const Model: TPrinterModelRec);
 begin
   Logger.Debug(Logger.Separator);
   Logger.LogParam('Model.ID', Model.ID);
@@ -5508,18 +5113,18 @@ begin
   Logger.Debug(Logger.Separator);
 end;
 
-procedure TFiscalPrinterDevice.Check(Code: Integer);
+procedure TFiscalPrinterDriver.Check(Code: Integer);
 begin
   if Code = 0 then Exit;
   RaiseError(Code, GetErrorText(Code));
 end;
 
-function TFiscalPrinterDevice.Execute(const Data: AnsiString): AnsiString;
+function TFiscalPrinterDriver.Execute(const Data: AnsiString): AnsiString;
 begin
   Check(ExecuteData(Data, Result));
 end;
 
-function TFiscalPrinterDevice.GetDeviceMetrics: TDeviceMetrics;
+function TFiscalPrinterDriver.GetDeviceMetrics: TDeviceMetrics;
 begin
   if not FValidDeviceMetrics then
   begin
@@ -5529,7 +5134,7 @@ begin
   Result := FDeviceMetrics;
 end;
 
-function TFiscalPrinterDevice.MinProtocolVersion(V1, V2: Integer): Boolean;
+function TFiscalPrinterDriver.MinProtocolVersion(V1, V2: Integer): Boolean;
 var
   DM: TDeviceMetrics;
 begin
@@ -5538,17 +5143,17 @@ begin
     ((DM.ProtocolVersion = V1) and (DM.ProtocolSubVersion >= V2));
 end;
 
-function TFiscalPrinterDevice.CapShortEcrStatus: Boolean;
+function TFiscalPrinterDriver.CapShortEcrStatus: Boolean;
 begin
   Result := MinProtocolVersion(1, 1);
 end;
 
-function TFiscalPrinterDevice.CapPrintStringFont: Boolean;
+function TFiscalPrinterDriver.CapPrintStringFont: Boolean;
 begin
   Result := MinProtocolVersion(1, 1);
 end;
 
-function TFiscalPrinterDevice.CapGraphics: Boolean;
+function TFiscalPrinterDriver.CapGraphics: Boolean;
 begin
   Result := MinProtocolVersion(1, 3);
 end;
@@ -5566,12 +5171,12 @@ end;
 
 ******************************************************************************)
 
-procedure TFiscalPrinterDevice.PrintJournal(DayNumber: Integer);
+procedure TFiscalPrinterDriver.PrintJournal(DayNumber: Integer);
 begin
   Execute(#$A6 + IntToBin(GetSysPassword, 4) + IntToBin(DayNumber, 2));
 end;
 
-function TFiscalPrinterDevice.ValidRow(Table, Row: Integer): Boolean;
+function TFiscalPrinterDriver.ValidRow(Table, Row: Integer): Boolean;
 var
   TableInfo: TPrinterTableRec;
 begin
@@ -5579,7 +5184,7 @@ begin
   Result := (Row >= 1)and(Row <= TableInfo.RowCount);
 end;
 
-function TFiscalPrinterDevice.ValidField(Table, Field: Integer): Boolean;
+function TFiscalPrinterDriver.ValidField(Table, Field: Integer): Boolean;
 var
   TableInfo: TPrinterTableRec;
 begin
@@ -5587,18 +5192,18 @@ begin
   Result := (Field >= 1)and(Field <= TableInfo.FieldCount);
 end;
 
-function TFiscalPrinterDevice.CapParameter(ParamID: Integer): Boolean;
+function TFiscalPrinterDriver.CapParameter(ParamID: Integer): Boolean;
 begin
   Result := PrinterModel.Parameters.ItemByID(ParamID) <> nil;
 end;
 
-function TFiscalPrinterDevice.ValidParameter(const Parameter: TTableParameter): Boolean;
+function TFiscalPrinterDriver.ValidParameter(const Parameter: TTableParameter): Boolean;
 begin
   Result := ValidRow(Parameter.Table, Parameter.Row) and
     ValidField(Parameter.Table, Parameter.Field);
 end;
 
-procedure TFiscalPrinterDevice.WriteParameter(ParamID, ValueID: Integer);
+procedure TFiscalPrinterDriver.WriteParameter(ParamID, ValueID: Integer);
 var
   Parameter: TTableParameter;
   ParameterValue: TParameterValue;
@@ -5618,7 +5223,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadParameter(ParamID: Integer): Integer;
+function TFiscalPrinterDriver.ReadParameter(ParamID: Integer): Integer;
 var
   Parameter: TTableParameter;
 begin
@@ -5631,7 +5236,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadEJDocument(MACNumber: Integer;
+function TFiscalPrinterDriver.ReadEJDocument(MACNumber: Integer;
   var Line: WideString): Integer;
 var
   Command: AnsiString;
@@ -5643,7 +5248,7 @@ begin
 end;
 
 
-function TFiscalPrinterDevice.ReadEJDocumentText(MACNumber: Integer): WideString;
+function TFiscalPrinterDriver.ReadEJDocumentText(MACNumber: Integer): WideString;
 var
   Line: WideString;
   Lines: TTntStrings;
@@ -5667,7 +5272,7 @@ begin
 end;
 
 // 00000068 #049021
-function TFiscalPrinterDevice.ParseEJDocument(const Text: WideString): TEJDocument;
+function TFiscalPrinterDriver.ParseEJDocument(const Text: WideString): TEJDocument;
 var
   Line: WideString;
   Lines: TTntStrings;
@@ -5690,7 +5295,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadEJActivationText(MaxCount: Integer): WideString;
+function TFiscalPrinterDriver.ReadEJActivationText(MaxCount: Integer): WideString;
 var
   i: Integer;
   Line: WideString;
@@ -5714,37 +5319,37 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.QueryEJActivation: TEJActivation;
+function TFiscalPrinterDriver.QueryEJActivation: TEJActivation;
 begin
   Result := TEJReportParser.ParseActivation(ReadEJActivationText(6));
 end;
 
-function TFiscalPrinterDevice.GetIsOnline: Boolean;
+function TFiscalPrinterDriver.GetIsOnline: Boolean;
 begin
   Result := FIsOnline;
 end;
 
-function TFiscalPrinterDevice.GetOnConnect: TNotifyEvent;
+function TFiscalPrinterDriver.GetOnConnect: TNotifyEvent;
 begin
   Result := FOnConnect;
 end;
 
-function TFiscalPrinterDevice.GetOnDisconnect: TNotifyEvent;
+function TFiscalPrinterDriver.GetOnDisconnect: TNotifyEvent;
 begin
   Result := FOnDisconnect;
 end;
 
-procedure TFiscalPrinterDevice.SetOnConnect(const Value: TNotifyEvent);
+procedure TFiscalPrinterDriver.SetOnConnect(const Value: TNotifyEvent);
 begin
   FOnConnect := Value;
 end;
 
-procedure TFiscalPrinterDevice.SetOnDisconnect(const Value: TNotifyEvent);
+procedure TFiscalPrinterDriver.SetOnDisconnect(const Value: TNotifyEvent);
 begin
   FOnDisconnect := Value;
 end;
 
-function TFiscalPrinterDevice.LoadGraphics(Line: Word;
+function TFiscalPrinterDriver.LoadGraphics(Line: Word;
   Data: AnsiString): Integer;
 begin
   Result := 0;
@@ -5761,7 +5366,7 @@ begin
   raiseException(_('Graphics is not supported'));
 end;
 
-function TFiscalPrinterDevice.PrintGraphics(Line1, Line2: Word): Integer;
+function TFiscalPrinterDriver.PrintGraphics(Line1, Line2: Word): Integer;
 begin
   Result := 0;
   CheckGraphicsSize(Line1);
@@ -5801,24 +5406,24 @@ begin
   raiseException(_('Graphics is not supported'));
 end;
 
-function TFiscalPrinterDevice.IsDayOpened(Mode: Integer): Boolean;
+function TFiscalPrinterDriver.IsDayOpened(Mode: Integer): Boolean;
 begin
   Result := (Mode and $0F) in [MODE_24NOTOVER, MODE_24OVER, MODE_REC, MODE_SLP];
 end;
 
 
-function TFiscalPrinterDevice.GetAmountDecimalPlaces: Integer;
+function TFiscalPrinterDriver.GetAmountDecimalPlaces: Integer;
 begin
   Result := FAmountDecimalPlaces;
 end;
 
-procedure TFiscalPrinterDevice.SetAmountDecimalPlaces(
+procedure TFiscalPrinterDriver.SetAmountDecimalPlaces(
   const Value: Integer);
 begin
   FAmountDecimalPlaces := Value;
 end;
 
-procedure TFiscalPrinterDevice.PrintBarcode2(const Barcode: TBarcodeRec);
+procedure TFiscalPrinterDriver.PrintBarcode2(const Barcode: TBarcodeRec);
 
   procedure PrintBarcodeEAN13Zint(ABarcode: TBarcodeRec);
   var
@@ -5940,7 +5545,7 @@ begin
   WaitForPrinting;
 end;
 
-function TFiscalPrinterDevice.LoadBarcodeData(BlockType: Integer;
+function TFiscalPrinterDriver.LoadBarcodeData(BlockType: Integer;
   const Barcode: WideString): Integer;
 const
   DATA_BLOCK_SIZE = 64;
@@ -5961,7 +5566,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.PrintQRCode2D(Barcode: TBarcodeRec): Integer;
+function TFiscalPrinterDriver.PrintQRCode2D(Barcode: TBarcodeRec): Integer;
 var
   Barcode2D: TBarcode2D;
 begin
@@ -5988,7 +5593,7 @@ begin
   Result := PrintBarcode2D(Barcode2D);
 end;
 
-function TFiscalPrinterDevice.DrawScale(const P: TDrawScale): Integer;
+function TFiscalPrinterDriver.DrawScale(const P: TDrawScale): Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -6009,7 +5614,7 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-function TFiscalPrinterDevice.GetStartLine: Integer;
+function TFiscalPrinterDriver.GetStartLine: Integer;
 begin
   Result := 1;
   if Parameters.IsLogoLoaded and (Parameters.LogoSize > 0) then
@@ -6018,12 +5623,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.Is1DBarcode(Symbology: Integer): Boolean;
+function TFiscalPrinterDriver.Is1DBarcode(Symbology: Integer): Boolean;
 begin
   Result := not Is2DBarcode(Symbology);
 end;
 
-function TFiscalPrinterDevice.Is2DBarcode(Symbology: Integer): Boolean;
+function TFiscalPrinterDriver.Is2DBarcode(Symbology: Integer): Boolean;
 begin
   Result := Symbology in [
     DIO_BARCODE_QRCODE,
@@ -6226,7 +5831,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.AlignBitmap(Bitmap: TBitmap;
+procedure TFiscalPrinterDriver.AlignBitmap(Bitmap: TBitmap;
   const Barcode: TBarcodeRec; HScale: Integer; PrintWidthInDots: Integer);
 var
   Bmp: TBitmap;
@@ -6261,7 +5866,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetMaxGraphicsHeight: Integer;
+function TFiscalPrinterDriver.GetMaxGraphicsHeight: Integer;
 begin
   Result := 0;
   if FCapGraphics1 then
@@ -6272,7 +5877,7 @@ begin
     Result := 600;
 end;
 
-function TFiscalPrinterDevice.GetMaxGraphicsWidth: Integer;
+function TFiscalPrinterDriver.GetMaxGraphicsWidth: Integer;
 begin
   Result := 0;
   if FCapGraphics512 then
@@ -6285,12 +5890,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetMaxGraphicsWidthInBytes: Integer;
+function TFiscalPrinterDriver.GetMaxGraphicsWidthInBytes: Integer;
 begin
   Result := GetMaxGraphicsWidth div 8;
 end;
 
-procedure TFiscalPrinterDevice.PrintQRCode3(Barcode: TBarcodeRec);
+procedure TFiscalPrinterDriver.PrintQRCode3(Barcode: TBarcodeRec);
 
   procedure DrawQRCodeText(URL, Sign: AnsiString; Bitmap: TBitmap;
     BitmapWidth: Integer);
@@ -6423,7 +6028,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.PrintBarcodeZInt(const Barcode: TBarcodeRec);
+procedure TFiscalPrinterDriver.PrintBarcodeZInt(const Barcode: TBarcodeRec);
 var
   P: TDrawScale;
   Bitmap: TBitmap;
@@ -6559,7 +6164,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.BarcodeToBitmap(
+procedure TFiscalPrinterDriver.BarcodeToBitmap(
   const Barcode: TBarcodeRec; Bitmap: TBitmap);
 var
   Render: TZintBarcode;
@@ -6644,7 +6249,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.PrintImage(const FileName: WideString;
+procedure TFiscalPrinterDriver.PrintImage(const FileName: WideString;
   StartLine: Integer);
 var
   ImageHeight: Integer;
@@ -6653,7 +6258,7 @@ begin
   Check(PrintGraphics(StartLine, StartLine + ImageHeight - 1));
 end;
 
-procedure TFiscalPrinterDevice.PrintImageScale(const FileName: WideString;
+procedure TFiscalPrinterDriver.PrintImageScale(const FileName: WideString;
   StartLine, Scale: Integer);
 var
   Bitmap: TBitmap;
@@ -6740,7 +6345,7 @@ begin
     Result := Result + Chr(Ord(S[i]) xor $FF);
 end;
 
-function TFiscalPrinterDevice.GetLineData(Bitmap: TBitmap; Index: Integer): AnsiString;
+function TFiscalPrinterDriver.GetLineData(Bitmap: TBitmap; Index: Integer): AnsiString;
 var
   B: Byte;
   i: Integer;
@@ -6763,13 +6368,13 @@ begin
     Result := Inverse(Result);
 end;
 
-procedure TFiscalPrinterDevice.ProgressEvent(Progress: Integer);
+procedure TFiscalPrinterDriver.ProgressEvent(Progress: Integer);
 begin
   if Assigned(FOnProgress) then
     FOnProgress(Progress);
 end;
 
-procedure TFiscalPrinterDevice.LoadBitmap(StartLine: Integer; Bitmap: TBitmap);
+procedure TFiscalPrinterDriver.LoadBitmap(StartLine: Integer; Bitmap: TBitmap);
 begin
   Bitmap.Monochrome := True;
   Bitmap.PixelFormat := pf1Bit;
@@ -6793,7 +6398,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.LoadBitmap320(StartLine: Integer; Bitmap: TBitmap);
+procedure TFiscalPrinterDriver.LoadBitmap320(StartLine: Integer; Bitmap: TBitmap);
 var
   i: Integer;
   Data: AnsiString;
@@ -6823,7 +6428,7 @@ begin
   ProgressEvent(100);
 end;
 
-procedure TFiscalPrinterDevice.LoadBitmap512(StartLine: Integer;
+procedure TFiscalPrinterDriver.LoadBitmap512(StartLine: Integer;
   Bitmap: TBitmap; Scale: Integer);
 var
   i, j: Integer;
@@ -6879,7 +6484,7 @@ begin
   ProgressEvent(100);
 end;
 
-function TFiscalPrinterDevice.LoadImage(const FileName: WideString;
+function TFiscalPrinterDriver.LoadImage(const FileName: WideString;
   StartLine: Integer): Integer;
 var
   Picture: TPicture;
@@ -6893,7 +6498,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.LoadPicture(Picture: TPicture;
+function TFiscalPrinterDriver.LoadPicture(Picture: TPicture;
   StartLine: Integer): Integer;
 var
   Bitmap: TBitmap;
@@ -6934,19 +6539,19 @@ begin
 end;
 
 // 17,1,17,1,0,4,4,'Rus формат фд','4'
-function TFiscalPrinterDevice.GetFFDVersion: TFFDVersion;
+function TFiscalPrinterDriver.GetFFDVersion: TFFDVersion;
 begin
   if FFFDVersion = TFFDVersion(-1) then
     FFFDVersion := IntToFFDVersion(ReadTableInt(17,1,17));
   Result := FFFDVersion;
 end;
 
-procedure TFiscalPrinterDevice.Connect;
+procedure TFiscalPrinterDriver.Connect;
 begin
   GetDeviceMetrics;
 end;
 
-procedure TFiscalPrinterDevice.UpdateInfo;
+procedure TFiscalPrinterDriver.UpdateInfo;
 begin
   GetPrinterModel;
   FCapCloseReceipt3 := TestCommand($FF76);
@@ -7010,13 +6615,13 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetTaxCount: Integer;
+function TFiscalPrinterDriver.GetTaxCount: Integer;
 begin
   Result := Length(FTaxInfo);
 end;
 
 // Read font info
-function TFiscalPrinterDevice.ReadFontInfoList: TFontInfoList;
+function TFiscalPrinterDriver.ReadFontInfoList: TFontInfoList;
 var
   i: Integer;
   FontInfo: TFontInfo;
@@ -7035,7 +6640,7 @@ begin
 end;
 
 // Read tax Info
-function TFiscalPrinterDevice.ReadTaxInfoList: TTaxInfoList;
+function TFiscalPrinterDriver.ReadTaxInfoList: TTaxInfoList;
 var
   i: Integer;
   Table: TPrinterTableRec;
@@ -7054,12 +6659,12 @@ begin
 end;
 
 // Is fiscal printer firmware 2 (Semenov)
-function TFiscalPrinterDevice.IsMobilePrinter: Boolean;
+function TFiscalPrinterDriver.IsMobilePrinter: Boolean;
 begin
   Result := GetDeviceMetrics.Model = 19;
 end;
 
-function TFiscalPrinterDevice.GetTaxInfo(Tax: Integer): TTaxInfo;
+function TFiscalPrinterDriver.GetTaxInfo(Tax: Integer): TTaxInfo;
 begin
   Result.Rate := 0;
   Result.Name := '';
@@ -7067,7 +6672,7 @@ begin
     Result := FTaxInfo[Tax-1];
 end;
 
-function TFiscalPrinterDevice.ReadCapFiscalStorage: Boolean;
+function TFiscalPrinterDriver.ReadCapFiscalStorage: Boolean;
 var
   R: TFSState;
 begin
@@ -7078,12 +6683,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.IsSupported(ResultCode: Integer): Boolean;
+function TFiscalPrinterDriver.IsSupported(ResultCode: Integer): Boolean;
 begin
   Result := ResultCode <> ERROR_COMMAND_NOT_SUPPORTED;
 end;
 
-function TFiscalPrinterDevice.TestCommand(Code: Integer): Boolean;
+function TFiscalPrinterDriver.TestCommand(Code: Integer): Boolean;
 var
   RxData: AnsiString;
 begin
@@ -7096,7 +6701,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.WaitForPrinting: TPrinterStatus;
+function TFiscalPrinterDriver.WaitForPrinting: TPrinterStatus;
 var
   Mode: Byte;
   TryCount: Integer;
@@ -7159,12 +6764,12 @@ begin
   until False;
 end;
 
-function TFiscalPrinterDevice.GetPrinterStatus: TPrinterStatus;
+function TFiscalPrinterDriver.GetPrinterStatus: TPrinterStatus;
 begin
   Result := FPrinterStatus;
 end;
 
-function TFiscalPrinterDevice.ReadPrinterStatus: TPrinterStatus;
+function TFiscalPrinterDriver.ReadPrinterStatus: TPrinterStatus;
 begin
   Logger.Debug('TSharedPrinter.ReadPrinterStatus');
   case Parameters.StatusCommand of
@@ -7188,7 +6793,7 @@ begin
   Result := FPrinterStatus;
 end;
 
-function TFiscalPrinterDevice.PrintBarLine(Height: Word; Data: AnsiString): Integer;
+function TFiscalPrinterDriver.PrintBarLine(Height: Word; Data: AnsiString): Integer;
 var
   IsSwapBytes: Boolean;
 begin
@@ -7220,7 +6825,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.LoadBarcode2D(const Data: TBarcode2DData): Integer;
+function TFiscalPrinterDriver.LoadBarcode2D(const Data: TBarcode2DData): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7280,7 +6885,7 @@ end;
 2 - дл€ типа штрих-кода (QR код).
 *)
 
-function TFiscalPrinterDevice.PrintBarcode2D(const Barcode: TBarcode2D): Integer;
+function TFiscalPrinterDriver.PrintBarcode2D(const Barcode: TBarcode2D): Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -7313,7 +6918,7 @@ end;
 ѕор€дковый номер оператора (1 байт) 1Е30
 *)
 
-function TFiscalPrinterDevice.LoadGraphics3(Line: Word; Data: AnsiString): Integer;
+function TFiscalPrinterDriver.LoadGraphics3(Line: Word; Data: AnsiString): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7326,7 +6931,7 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-function TFiscalPrinterDevice.LoadGraphics3(const P: TLoadGraphics3): Integer;
+function TFiscalPrinterDriver.LoadGraphics3(const P: TLoadGraphics3): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7356,7 +6961,7 @@ end;
 4 - в зависимости от модели   “ (дл€ параметра модели Ѕит 34, см. команду F7H); если Ѕит 7 установлен и фискальный чек открыт и установлена настройка "ѕ≈„ј“№ „≈ ј ѕќ «ј –џ“»ё" в таблице 1, то графика будет распечатана перед фискальным чеком; если не установлен Ѕит 7, то графика печатаетс€ немедленно; результат печати можно проверить командой 10H;
 *)
 
-function TFiscalPrinterDevice.PrintGraphics3(Line1, Line2: Word): Integer;
+function TFiscalPrinterDriver.PrintGraphics3(Line1, Line2: Word): Integer;
 var
   P: TPrintGraphics3;
 begin
@@ -7368,7 +6973,7 @@ begin
   Result := PrintGraphics3(P);
 end;
 
-function TFiscalPrinterDevice.PrintGraphics3(const P: TPrintGraphics3): Integer;
+function TFiscalPrinterDriver.PrintGraphics3(const P: TPrintGraphics3): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7382,12 +6987,12 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-procedure TFiscalPrinterDevice.CheckGraphicsSize(Line: Word);
+procedure TFiscalPrinterDriver.CheckGraphicsSize(Line: Word);
 begin
 
 end;
 
-function TFiscalPrinterDevice.FilterTLV(Data: AnsiString): AnsiString;
+function TFiscalPrinterDriver.FilterTLV(Data: AnsiString): AnsiString;
 var
   Tag: TTLVTag;
   Item: TTLVItem;
@@ -7414,7 +7019,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FSWriteTLV(const TLVData: AnsiString): Integer;
+function TFiscalPrinterDriver.FSWriteTLV(const TLVData: AnsiString): Integer;
 var
   Data: AnsiString;
   Answer: AnsiString;
@@ -7457,7 +7062,7 @@ end;
    од ошибки: 1 байт
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSSale(P: TFSSale): Integer;
+function TFiscalPrinterDriver.FSSale(P: TFSSale): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7500,7 +7105,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSSale2(P: TFSSale2): Integer;
+function TFiscalPrinterDriver.FSSale2(P: TFSSale2): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7537,7 +7142,7 @@ TLV структура (X1 байт)
 
 *)
 
-function TFiscalPrinterDevice.FSReadRegTag(var R: TFSReadRegTagCommand): Integer;
+function TFiscalPrinterDriver.FSReadRegTag(var R: TFSReadRegTagCommand): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7584,7 +7189,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSReadState(var R: TFSState): Integer;
+function TFiscalPrinterDriver.FSReadState(var R: TFSState): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7618,7 +7223,7 @@ end;
  од ошибки: 1 байт
 *)
 
-function TFiscalPrinterDevice.FSCancelDocument: Integer;
+function TFiscalPrinterDriver.FSCancelDocument: Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7639,7 +7244,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSReadStatus(var R: TFSStatus): Integer;
+function TFiscalPrinterDriver.FSReadStatus(var R: TFSStatus): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7670,7 +7275,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
+function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
   var R: TFSDocument): Integer;
 
   (*
@@ -7816,7 +7421,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FSReadDocMac(var DocMac: Int64): Integer;
+function TFiscalPrinterDriver.FSReadDocMac(var DocMac: Int64): Integer;
 var
   FSState: TFSState;
   FSDocument: TFSDocument;
@@ -7850,7 +7455,7 @@ end;
 ƒанные (N байт)
 *)
 
-function TFiscalPrinterDevice.FSReadBlock(const P: TFSBlockRequest;
+function TFiscalPrinterDriver.FSReadBlock(const P: TFSBlockRequest;
   var Block: AnsiString): Integer;
 var
   Answer: AnsiString;
@@ -7876,7 +7481,7 @@ end;
 ћаксимальный размер блок данных (1 байт)
 *)
 
-function TFiscalPrinterDevice.FSStartWrite(DataSize: Word;
+function TFiscalPrinterDriver.FSStartWrite(DataSize: Word;
   var BlockSize: Byte): Integer;
 var
   Answer: AnsiString;
@@ -7904,7 +7509,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSWriteBlock(const Block: TFSBlock): Integer;
+function TFiscalPrinterDriver.FSWriteBlock(const Block: TFSBlock): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -7916,7 +7521,7 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-function TFiscalPrinterDevice.GetBlockSize(BlockSize: Integer): Integer;
+function TFiscalPrinterDriver.GetBlockSize(BlockSize: Integer): Integer;
 begin
   Result := BlockSize;
   if Result = 0 then
@@ -7926,7 +7531,7 @@ begin
     Result := GetParameters.DocumentBlockSize;
 end;
 
-function TFiscalPrinterDevice.FSReadBlockData: AnsiString;
+function TFiscalPrinterDriver.FSReadBlockData: AnsiString;
 var
   i: Integer;
   Count: Integer;
@@ -7964,7 +7569,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.FSWriteBlockData(const BlockData: AnsiString);
+procedure TFiscalPrinterDriver.FSWriteBlockData(const BlockData: AnsiString);
 var
   i: Integer;
   Count: Integer;
@@ -8003,7 +7608,7 @@ end;
   ƒата первого неподтверждЄнного документа: 3 байта √√,ћћ,ƒƒ
 ******************************************************************************}
 
-function TFiscalPrinterDevice.FSPrintCalcReport(var R: TFSCalcReport): Integer;
+function TFiscalPrinterDriver.FSPrintCalcReport(var R: TFSCalcReport): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -8044,7 +7649,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSReadCommStatus(
+function TFiscalPrinterDriver.FSReadCommStatus(
   var R: TFSCommStatus): Integer;
 
   function DecodeFSWriteStatus(Value: Integer): TFSWriteStatus;
@@ -8084,7 +7689,7 @@ end;
 —рок действи€: 3 байта √√,ћћ,ƒƒ
 *)
 
-function TFiscalPrinterDevice.FSReadExpiration(var R: TCommandFF03): Integer;
+function TFiscalPrinterDriver.FSReadExpiration(var R: TCommandFF03): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -8117,7 +7722,7 @@ end;
     ‘искальный признак: 4 байта
 *)
 
-function TFiscalPrinterDevice.FSReadFiscalResult(var R: TFSFiscalResult): Integer;
+function TFiscalPrinterDriver.FSReadFiscalResult(var R: TFSFiscalResult): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -8148,7 +7753,7 @@ end;
  витанци€: N байт
 *)
 
-function TFiscalPrinterDevice.FSReadTicket(var R: TFSTicket): Integer;
+function TFiscalPrinterDriver.FSReadTicket(var R: TFSTicket): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -8168,22 +7773,22 @@ begin
 end;
 
 
-function TFiscalPrinterDevice.GetCapFiscalStorage: Boolean;
+function TFiscalPrinterDriver.GetCapFiscalStorage: Boolean;
 begin
   Result := FCapFiscalStorage;
 end;
 
-function TFiscalPrinterDevice.WriteCustomerAddress(const Value: WideString): Integer;
+function TFiscalPrinterDriver.WriteCustomerAddress(const Value: WideString): Integer;
 begin
   Result := FSWriteTag(1008, Value);
 end;
 
-function TFiscalPrinterDevice.FSWriteTag(TagID: Integer; const Data: WideString): Integer;
+function TFiscalPrinterDriver.FSWriteTag(TagID: Integer; const Data: WideString): Integer;
 begin
   Result := FSWriteTLV(TagToStr(TagID, Data));
 end;
 
-function TFiscalPrinterDevice.ReadFPParameter(ParamId: Integer): WideString;
+function TFiscalPrinterDriver.ReadFPParameter(ParamId: Integer): WideString;
 begin
   case ParamId of
     DIO_FPTR_PARAMETER_QRCODE_ENABLED:
@@ -8258,7 +7863,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.WriteFPParameter(ParamId: Integer;
+procedure TFiscalPrinterDriver.WriteFPParameter(ParamId: Integer;
   const Value: WideString);
 begin
   case ParamId of
@@ -8295,7 +7900,7 @@ begin
 end;
 
 
-function TFiscalPrinterDevice.ReadDiscountMode: Integer;
+function TFiscalPrinterDriver.ReadDiscountMode: Integer;
 var
   R: TPrinterTableRec;
 begin
@@ -8313,7 +7918,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadDocPrintMode: Integer;
+function TFiscalPrinterDriver.ReadDocPrintMode: Integer;
 var
   R: TPrinterTableRec;
 begin
@@ -8331,12 +7936,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetDiscountMode: Integer;
+function TFiscalPrinterDriver.GetDiscountMode: Integer;
 begin
   Result := FDiscountMode;
 end;
 
-function TFiscalPrinterDevice.GetIsFiscalized: Boolean;
+function TFiscalPrinterDriver.GetIsFiscalized: Boolean;
 begin
   Result := FIsFiscalized;
 end;
@@ -8345,7 +7950,7 @@ end;
 //  ƒобавлен запрос необнул€емых сумм через сервисную команду 1
 // (FE F4 00 00 00 00), возвращает 4 8-ми байтных числа.
 
-function TFiscalPrinterDevice.FSReadTotals(var R: TFMTotals): Integer;
+function TFiscalPrinterDriver.FSReadTotals(var R: TFMTotals): Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -8364,7 +7969,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FSReadCorrectionTotals(var R: TFMTotals): Integer;
+function TFiscalPrinterDriver.FSReadCorrectionTotals(var R: TFMTotals): Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -8398,7 +8003,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSReadTotalsByPayType(RecType: Byte;
+function TFiscalPrinterDriver.FSReadTotalsByPayType(RecType: Byte;
   var R: TFSTotalsByPayType): Integer;
 var
   Command: AnsiString;
@@ -8427,7 +8032,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.ReadDayTotalsByReceiptType(Index: Integer): Int64;
+function TFiscalPrinterDriver.ReadDayTotalsByReceiptType(Index: Integer): Int64;
 begin
   Result := ReadCashRegister(193 + Index) +
     ReadCashRegister(197 + Index) +
@@ -8444,7 +8049,7 @@ end;
 84Е87 Ц видом оплаты 4;
 *)
 
-function TFiscalPrinterDevice.ReadTotalsByReceiptType(Index: Integer): Int64;
+function TFiscalPrinterDriver.ReadTotalsByReceiptType(Index: Integer): Int64;
 begin
   Result :=
     ReadCashRegister(72 + Index) +
@@ -8453,7 +8058,7 @@ begin
     ReadCashRegister(84 + Index);
 end;
 
-function TFiscalPrinterDevice.ReadDayTotals: TFMTotals;
+function TFiscalPrinterDriver.ReadDayTotals: TFMTotals;
 begin
   Result.SaleTotal := 0;
   Result.BuyTotal := 0;
@@ -8474,7 +8079,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadFPTotals(Flags: Integer): TFMTotals;
+function TFiscalPrinterDriver.ReadFPTotals(Flags: Integer): TFMTotals;
 begin
   Result.SaleTotal := 0;
   Result.BuyTotal := 0;
@@ -8495,7 +8100,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReadFPDayTotals(Flags: Integer): TFMTotals;
+function TFiscalPrinterDriver.ReadFPDayTotals(Flags: Integer): TFMTotals;
 var
   FPTotals: TFMTotals;
   DayTotals: TFMTotals;
@@ -8522,7 +8127,7 @@ end;
 ‘искальный признак: 4 байт
 *)
 
-function TFiscalPrinterDevice.FSPrintCorrectionReceipt(
+function TFiscalPrinterDriver.FSPrintCorrectionReceipt(
   var Command: TFSCorrectionReceipt): Integer;
 var
   Cmd: AnsiString;
@@ -8566,7 +8171,7 @@ end;
 ѕримен€ема€ система налогообложени€:1байт
 *)
 
-function TFiscalPrinterDevice.FSPrintCorrectionReceipt2(
+function TFiscalPrinterDriver.FSPrintCorrectionReceipt2(
   var Data: TFSCorrectionReceipt2): Integer;
 var
   Command: AnsiString;
@@ -8603,7 +8208,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.LoadTables(const Path: WideString);
+procedure TFiscalPrinterDriver.LoadTables(const Path: WideString);
 var
   i: Integer;
   j: Integer;
@@ -8661,7 +8266,7 @@ begin
   FileNames.Free;
 end;
 
-procedure TFiscalPrinterDevice.WriteFields(Table: TPrinterTable);
+procedure TFiscalPrinterDriver.WriteFields(Table: TPrinterTable);
 var
   i: Integer;
   Data: AnsiString;
@@ -8680,12 +8285,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetContext: TDriverContext;
+function TFiscalPrinterDriver.GetContext: TDriverContext;
 begin
   Result := FContext;
 end;
 
-function TFiscalPrinterDevice.IsFSDocumentOpened: Boolean;
+function TFiscalPrinterDriver.IsFSDocumentOpened: Boolean;
 var
   FSState: TFSState;
 begin
@@ -8697,12 +8302,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.IsRecOpened: Boolean;
+function TFiscalPrinterDriver.IsRecOpened: Boolean;
 begin
   Result := (ReadPrinterStatus.Mode and $0F) = MODE_REC;
 end;
 
-function TFiscalPrinterDevice.ReadLoaderVersion(var Version: WideString): Integer;
+function TFiscalPrinterDriver.ReadLoaderVersion(var Version: WideString): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -8805,7 +8410,7 @@ _______________________________________________________
 
 *)
 
-function TFiscalPrinterDevice.ReceiptClose2(
+function TFiscalPrinterDriver.ReceiptClose2(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 begin
@@ -8815,7 +8420,7 @@ begin
     Result := ReceiptClose22(P, R);
 end;
 
-function TFiscalPrinterDevice.ReceiptClose22(
+function TFiscalPrinterDriver.ReceiptClose22(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 var
@@ -8902,7 +8507,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.ReceiptClose3(
+function TFiscalPrinterDriver.ReceiptClose3(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 var
@@ -9084,7 +8689,7 @@ C3H и печати графической линии C5H
 
 *******************************************************************************)
 
-function TFiscalPrinterDevice.ReadParameters2(
+function TFiscalPrinterDriver.ReadParameters2(
   var R: TPrinterParameters2): Integer;
 var
   Answer: AnsiString;
@@ -9190,7 +8795,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSFiscalization(const P: TFSFiscalization;
+function TFiscalPrinterDriver.FSFiscalization(const P: TFSFiscalization;
   var R: TFDDocument): Integer;
 var
   Answer: AnsiString;
@@ -9211,7 +8816,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FSReFiscalization(const P: TFSReFiscalization;
+function TFiscalPrinterDriver.FSReFiscalization(const P: TFSReFiscalization;
   var R: TFDDocument): Integer;
 var
   Answer: AnsiString;
@@ -9233,27 +8838,27 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.IsCapFooterFlag: Boolean;
+function TFiscalPrinterDriver.IsCapFooterFlag: Boolean;
 begin
   Result := FCapFooterFlag;
 end;
 
-procedure TFiscalPrinterDevice.SetFooterFlag(Value: Boolean);
+procedure TFiscalPrinterDriver.SetFooterFlag(Value: Boolean);
 begin
   FFooterFlag := Value;
 end;
 
-function TFiscalPrinterDevice.GetOnPrinterStatus: TNotifyEvent;
+function TFiscalPrinterDriver.GetOnPrinterStatus: TNotifyEvent;
 begin
   Result := FOnPrinterStatus;
 end;
 
-procedure TFiscalPrinterDevice.SetOnPrinterStatus(Value: TNotifyEvent);
+procedure TFiscalPrinterDriver.SetOnPrinterStatus(Value: TNotifyEvent);
 begin
   FOnPrinterStatus := Value;
 end;
 
-procedure TFiscalPrinterDevice.SetPrinterStatus(Value: TPrinterStatus);
+procedure TFiscalPrinterDriver.SetPrinterStatus(Value: TPrinterStatus);
 begin
   if not IsEqual(FPrinterStatus, Value) then
   begin
@@ -9267,17 +8872,17 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.IsCapBarcode2D: Boolean;
+function TFiscalPrinterDriver.IsCapBarcode2D: Boolean;
 begin
   Result := FCapBarcode2D;
 end;
 
-function TFiscalPrinterDevice.IsCapEnablePrint: Boolean;
+function TFiscalPrinterDriver.IsCapEnablePrint: Boolean;
 begin
   Result := FCapEnablePrint;
 end;
 
-function TFiscalPrinterDevice.ReadFSDocument(Number: Integer): WideString;
+function TFiscalPrinterDriver.ReadFSDocument(Number: Integer): WideString;
 var
   P: TFSReadDocument;
 begin
@@ -9288,7 +8893,7 @@ begin
   Result := ReadDocData;
 end;
 
-function TFiscalPrinterDevice.ReadDocData: WideString;
+function TFiscalPrinterDriver.ReadDocData: WideString;
 var
   FSDocData: TFSReadDocData;
 begin
@@ -9301,7 +8906,7 @@ begin
   Result := TLVToText(Result);
 end;
 
-procedure TFiscalPrinterDevice.PrintFSDocument(Number: Integer);
+procedure TFiscalPrinterDriver.PrintFSDocument(Number: Integer);
 begin
   PrintText(PRINTER_STATION_REC, ReadFSDocument(Number));
 end;
@@ -9317,7 +8922,7 @@ end;
   ƒлина фискального документа: 2 байта
 *)
 
-function TFiscalPrinterDevice.FSReadDocument(var P: TFSReadDocument): Integer;
+function TFiscalPrinterDriver.FSReadDocument(var P: TFSReadDocument): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -9342,7 +8947,7 @@ end;
 
 *)
 
-function TFiscalPrinterDevice.FSReadDocData(var P: TFSReadDocData): Integer;
+function TFiscalPrinterDriver.FSReadDocData(var P: TFSReadDocData): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -9355,7 +8960,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FSStartOpenDay: Integer;
+function TFiscalPrinterDriver.FSStartOpenDay: Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -9364,7 +8969,7 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-procedure TFiscalPrinterDevice.EkmCheckBarcode(const Barcode: TGS1Barcode);
+procedure TFiscalPrinterDriver.EkmCheckBarcode(const Barcode: TGS1Barcode);
 var
   Client: TEkmClient;
   SaleEnabled: Boolean;
@@ -9382,7 +8987,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.CheckItemCode(const Barcode: WideString): Integer;
+function TFiscalPrinterDriver.CheckItemCode(const Barcode: WideString): Integer;
 var
   CheckItemCode: TFSCheckItemCode;
   CheckItemResult: TFSCheckItemResult;
@@ -9407,7 +9012,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.CheckCorrectItemCode(const P: TFSCheckItemResult);
+procedure TFiscalPrinterDriver.CheckCorrectItemCode(const P: TFSCheckItemResult);
 begin
 
   if P.LocalCheckResult = SMFP_LOCAL_CHECK_FAILED then
@@ -9425,7 +9030,7 @@ begin
 *)
 end;
 
-function TFiscalPrinterDevice.IsCorrectItemCode(const P: TFSCheckItemResult): Boolean;
+function TFiscalPrinterDriver.IsCorrectItemCode(const P: TFSCheckItemResult): Boolean;
 begin
   if P.LocalCheckResult = SMFP_LOCAL_CHECK_FAILED then
   begin
@@ -9451,7 +9056,7 @@ begin
 end;
 
 
-function TFiscalPrinterDevice.SendItemBarcode(const Barcode: WideString;
+function TFiscalPrinterDriver.SendItemBarcode(const Barcode: WideString;
   MarkType: Integer): Integer;
 var
   Data: AnsiString;
@@ -9495,7 +9100,7 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.BarcodeTo1162Value(
+function TFiscalPrinterDriver.BarcodeTo1162Value(
   const Barcode: AnsiString): AnsiString;
 var
   gtin: AnsiString;
@@ -9590,7 +9195,7 @@ begin
   Result := IntToBinBE(BarcodeType, 2) + Data;
 end;
 
-function TFiscalPrinterDevice.FSWriteTLVOperation(const AData: AnsiString): Integer;
+function TFiscalPrinterDriver.FSWriteTLVOperation(const AData: AnsiString): Integer;
 var
   Data: AnsiString;
   Command: AnsiString;
@@ -9615,7 +9220,7 @@ end;
  од ошибки: 1 байт
 *)
 
-function TFiscalPrinterDevice.FSStartCorrectionReceipt: Integer;
+function TFiscalPrinterDriver.FSStartCorrectionReceipt: Integer;
 var
   Command: AnsiString;
   Answer: AnsiString;
@@ -9624,32 +9229,32 @@ begin
   Result := ExecuteData(Command, Answer);
 end;
 
-function TFiscalPrinterDevice.GetLastDocNumber: Int64;
+function TFiscalPrinterDriver.GetLastDocNumber: Int64;
 begin
   Result := FLastDocNumber;
 end;
 
-function TFiscalPrinterDevice.GetLastDocMac: Int64;
+function TFiscalPrinterDriver.GetLastDocMac: Int64;
 begin
   Result := FLastDocMac;
 end;
 
-function TFiscalPrinterDevice.GetLastDocTotal: Int64;
+function TFiscalPrinterDriver.GetLastDocTotal: Int64;
 begin
   Result := FLastDocTotal;
 end;
 
-function TFiscalPrinterDevice.GetLastDocDate: TPrinterDate;
+function TFiscalPrinterDriver.GetLastDocDate: TPrinterDate;
 begin
   Result := FLastDocDate;
 end;
 
-function TFiscalPrinterDevice.GetLastDocTime: TPrinterTime;
+function TFiscalPrinterDriver.GetLastDocTime: TPrinterTime;
 begin
   Result := FLastDocTime;
 end;
 
-function TFiscalPrinterDevice.FSReadLastDocNum2: Int64;
+function TFiscalPrinterDriver.FSReadLastDocNum2: Int64;
 var
   FSState: TFSState;
 begin
@@ -9661,21 +9266,21 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.FSReadLastDocNum: Int64;
+function TFiscalPrinterDriver.FSReadLastDocNum: Int64;
 begin
   if FLastDocNumber = 0 then
     FLastDocNumber := FSReadLastDocNum2;
   Result := FLastDocNumber;
 end;
 
-function TFiscalPrinterDevice.FSReadLastMacValue: Int64;
+function TFiscalPrinterDriver.FSReadLastMacValue: Int64;
 begin
   if FLastDocMac = 0 then
     FLastDocMac := FSReadLastMacValue2;
   Result := FLastDocMac;
 end;
 
-function TFiscalPrinterDevice.FSReadLastMacValue2: Int64;
+function TFiscalPrinterDriver.FSReadLastMacValue2: Int64;
 var
   LastMacValue: Int64;
 begin
@@ -9726,7 +9331,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSCheckItemCode(P: TFSCheckItemCode;
+function TFiscalPrinterDriver.FSCheckItemCode(P: TFSCheckItemCode;
   var R: TFSCheckItemResult): Integer;
 var
   Answer: AnsiString;
@@ -9767,7 +9372,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSSyncRegisters: Integer;
+function TFiscalPrinterDriver.FSSyncRegisters: Integer;
 var
   Command: AnsiString;
 begin
@@ -9798,7 +9403,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSReadMemory(var R: TFSReadMemoryResult): Integer;
+function TFiscalPrinterDriver.FSReadMemory(var R: TFSReadMemoryResult): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -9828,7 +9433,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSWriteTLVFromBuffer: Integer;
+function TFiscalPrinterDriver.FSWriteTLVFromBuffer: Integer;
 var
   Command: AnsiString;
 begin
@@ -9849,7 +9454,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSRandomData(var Data: AnsiString): Integer;
+function TFiscalPrinterDriver.FSRandomData(var Data: AnsiString): Integer;
 var
   Command: AnsiString;
 begin
@@ -9868,7 +9473,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSAuthorize(const DataToAuthorize: AnsiString): Integer;
+function TFiscalPrinterDriver.FSAuthorize(const DataToAuthorize: AnsiString): Integer;
 var
   Command: AnsiString;
 begin
@@ -9931,7 +9536,7 @@ end;
 ******************************************************************************)
 
 
-function TFiscalPrinterDevice.FSBindItemCode(P: TFSBindItemCode;
+function TFiscalPrinterDriver.FSBindItemCode(P: TFSBindItemCode;
   var R: TFSBindItemCodeResult): Integer;
 var
   Answer: AnsiString;
@@ -9996,7 +9601,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSReadTicketStatus(var R: TFSTicketStatus): Integer;
+function TFiscalPrinterDriver.FSReadTicketStatus(var R: TFSTicketStatus): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10028,7 +9633,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSAcceptItemCode(Action: Integer): Integer;
+function TFiscalPrinterDriver.FSAcceptItemCode(Action: Integer): Integer;
 var
   Command: AnsiString;
 begin
@@ -10036,7 +9641,7 @@ begin
   Result := ExecuteData(Command);
 end;
 
-function TFiscalPrinterDevice.FSClearMCCheckResults: Integer;
+function TFiscalPrinterDriver.FSClearMCCheckResults: Integer;
 begin
   Result := FSAcceptItemCode(2);
 end;
@@ -10091,7 +9696,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSReadMarkStatus(var R: TFSMarkStatus): Integer;
+function TFiscalPrinterDriver.FSReadMarkStatus(var R: TFSMarkStatus): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10126,7 +9731,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSStartReadTickets(var R: TFSTicketParams): Integer;
+function TFiscalPrinterDriver.FSStartReadTickets(var R: TFSTicketParams): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10167,7 +9772,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSReadNextTicket(var R: TFSTicketData): Integer;
+function TFiscalPrinterDriver.FSReadNextTicket(var R: TFSTicketData): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10198,7 +9803,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSConfirmTicket(const P: TFSTicketNumber): Integer;
+function TFiscalPrinterDriver.FSConfirmTicket(const P: TFSTicketNumber): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10221,7 +9826,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSReadDeviceInfo(var R: string): Integer;
+function TFiscalPrinterDriver.FSReadDeviceInfo(var R: string): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10247,7 +9852,7 @@ end;
 
 ******************************************************************************)
 
-function TFiscalPrinterDevice.FSReadDocSize(var R: TFSDocSize): Integer;
+function TFiscalPrinterDriver.FSReadDocSize(var R: TFSDocSize): Integer;
 var
   Answer: AnsiString;
   Command: AnsiString;
@@ -10262,14 +9867,14 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.STLVBegin(TagID: Integer);
+procedure TFiscalPrinterDriver.STLVBegin(TagID: Integer);
 begin
   FSTLVTag.Items.Clear;
   FSTLVTag.Tag := TagId;
   FSTLVStarted := True;
 end;
 
-procedure TFiscalPrinterDevice.STLVAddTag(TagID: Integer;
+procedure TFiscalPrinterDriver.STLVAddTag(TagID: Integer;
   TagValue: string);
 begin
   if not FSTLVStarted then
@@ -10277,22 +9882,22 @@ begin
   FSTLVTag.Items.Add(TagID).Data := TagToStr(TagID, TagValue);
 end;
 
-function TFiscalPrinterDevice.STLVGetHex: string;
+function TFiscalPrinterDriver.STLVGetHex: string;
 begin
   Result := StrToHexText(FSTLVTag.RawData);
 end;
 
-procedure TFiscalPrinterDevice.STLVWrite;
+procedure TFiscalPrinterDriver.STLVWrite;
 begin
   Check(FSWriteTLV(FSTLVTag.RawData));
 end;
 
-procedure TFiscalPrinterDevice.STLVWriteOp;
+procedure TFiscalPrinterDriver.STLVWriteOp;
 begin
   Check(FSWriteTLVOperation(FSTLVTag.RawData));
 end;
 
-procedure TFiscalPrinterDevice.WriteTLVItems;
+procedure TFiscalPrinterDriver.WriteTLVItems;
 var
   i: Integer;
 begin
@@ -10303,24 +9908,24 @@ begin
   FTLVItems.Clear;
 end;
 
-procedure TFiscalPrinterDevice.FSWriteTLV2(const TLVData: AnsiString);
+procedure TFiscalPrinterDriver.FSWriteTLV2(const TLVData: AnsiString);
 begin
   FTLVItems.Add(TLVData);
 end;
 
-procedure TFiscalPrinterDevice.ResetPrinter;
+procedure TFiscalPrinterDriver.ResetPrinter;
 begin
   FTLVItems.Clear;
   if FDocPrintMode = 1 then
     FDocPrintMode := 0;
 end;
 
-function TFiscalPrinterDevice.GetDocPrintMode: Integer;
+function TFiscalPrinterDriver.GetDocPrintMode: Integer;
 begin
   Result := FDocPrintMode;
 end;
 
-procedure TFiscalPrinterDevice.CorrectDate;
+procedure TFiscalPrinterDriver.CorrectDate;
 var
   PDate: TPrinterDate;
   TimeDiffInSecs: Int64;
@@ -10343,7 +9948,7 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDevice.CheckPrinterStatus;
+procedure TFiscalPrinterDriver.CheckPrinterStatus;
 
   function GetStateErrorMessage(const Mode: Integer): WideString;
   begin
@@ -10474,12 +10079,12 @@ begin
 end;
 
 
-procedure TFiscalPrinterDevice.SetCapFiscalStorage(const Value: Boolean);
+procedure TFiscalPrinterDriver.SetCapFiscalStorage(const Value: Boolean);
 begin
   FCapFiscalStorage := Value;
 end;
 
-function TFiscalPrinterDevice.GetTrailerHeight: Integer;
+function TFiscalPrinterDriver.GetTrailerHeight: Integer;
 var
   Font: TFontInfo;
 begin
@@ -10487,14 +10092,14 @@ begin
   Result := GetModel.NumTrailerLines * Font.CharHeight;
 end;
 
-function TFiscalPrinterDevice.GetFont(Font: Integer): TFontInfo;
+function TFiscalPrinterDriver.GetFont(Font: Integer): TFontInfo;
 begin
   if not ValidFont(Font) then
     Font := 1;
   Result := FFontInfo[Font];
 end;
 
-function TFiscalPrinterDevice.GetHeaderHeight: Integer;
+function TFiscalPrinterDriver.GetHeaderHeight: Integer;
 var
   Font: TFontInfo;
 begin
@@ -10508,12 +10113,12 @@ begin
   end;
 end;
 
-function TFiscalPrinterDevice.GetTaxInfoList: TTaxInfoList;
+function TFiscalPrinterDriver.GetTaxInfoList: TTaxInfoList;
 begin
   Result := FTaxInfo;
 end;
 
-procedure TFiscalPrinterDevice.WriteTaxRate(Tax, Rate: Integer);
+procedure TFiscalPrinterDriver.WriteTaxRate(Tax, Rate: Integer);
 begin
   if (Tax < 1)or(Tax > Length(FTaxInfo)) then
     raise Exception.CreateFmt('Invalid tax number, %d', [Tax]);

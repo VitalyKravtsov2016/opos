@@ -270,7 +270,6 @@ type
     function GetResultText: WideString;
     function StartDump(DeviceCode: Integer): Integer;
     function GetDumpBlock: TDumpBlock;
-    function GetLongSerial: TGetLongSerial;
     function ReadShortStatus: TShortPrinterStatus;
     function ReadLongStatus: TLongPrinterStatus;
     function GetFMFlags(Flags: Byte): TFMFlags;

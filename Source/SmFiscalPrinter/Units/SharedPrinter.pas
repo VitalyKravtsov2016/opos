@@ -10,7 +10,7 @@ uses
   // Opos
   Opos, OposFptr, OposFptrUtils, OposException, OposSemaphore,
   // This
-  FiscalPrinterDevice, PrinterTypes, PrinterConnection,
+  FiscalPrinterDevice, FiscalPrinterDriver, PrinterTypes, PrinterConnection,
   LogFile, SerialPorts, StringUtils, FiscalPrinterStatistics,
   FiscalPrinterTypes, FixedStrings, FileUtils, DeviceTables, CommunicationError,
   PrinterProtocol1, PrinterProtocol2, TCPConnection, DCOMConnection, VSysUtils,
@@ -277,7 +277,7 @@ begin
   FNumHeaderLines := 4;
   FNumTrailerLines := 4;
 
-  FDevice := TFiscalPrinterDevice.Create;
+  FDevice := TFiscalPrinterDriver.Create;
   FDevice.OnConnect := DeviceConnect;
   FDevice.OnDisconnect := DeviceDisconnect;
   FDevice.OnPrinterStatus := DevicePrinterStatus;
