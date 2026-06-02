@@ -32,6 +32,9 @@ type
     FDriver: TDriver;
     property Driver: TDriver read FDriver;
     procedure SetPrintFlags(Flags: Byte);
+    function IntToAmount(Value: Int64): Currency;
+    function AmountToInt(Value: Currency): Int64;
+    function GetDepartment(ADepartment: Integer): Integer;
   protected
     function ReceiptClose22(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
@@ -876,6 +879,21 @@ begin
   FSTLVTag.Free;
   FTLVItems.Free;
   inherited Destroy;
+end;
+
+function TFiscalPrinterDriver.GetDepartment(ADepartment: Integer): Integer;
+begin
+  Result := ADepartment;
+end;
+
+function TFiscalPrinterDriver.IntToAmount(Value: Int64): Currency;
+begin
+  Result := Value / 100;
+end;
+
+function TFiscalPrinterDriver.AmountToInt(Value: Currency): Int64;
+begin
+  Result := Round(Value * 100);
 end;
 
 procedure TFiscalPrinterDriver.Disconnect;
@@ -2113,91 +2131,41 @@ begin
   FLogger.Debug(Format('SetTime(%s)',
     [PrinterTimeToStr(Time)]));
 
-  Execute(#$21 + IntToBin(GetSysPassword, 4) +
-    Chr(Time.Hour) + Chr(Time.Min) + Chr(Time.Sec));
+  Driver.ECRTime := PrinterTimeToTime(Time);
+  Driver.Check(Driver.SetTime);
 end;
-
-(******************************************************************************
-
-  Set Calendar Date
-
-  Command:	22H. Length: 8 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  ∑	Date (3 bytes) DD-MM-YY
-  Answer:		22H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.WriteDate(const Date: TPrinterDate);
 begin
   FLogger.Debug(Format('WriteDate(%s)',
     [PrinterDateToStr(Date)]));
 
-  Execute(#$22 + IntToBin(GetSysPassword, 4) +
-    Chr(Date.Day) + Chr(Date.Month) + Chr(Date.Year));
+  Driver.ECRDate := PrinterDateToDate(Date);
+  Driver.Check(Driver.SetDate);
 end;
-
-(******************************************************************************
-
-  Confirm Date
-
-  Command:	23H. Length: 8 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  ∑	Date (3 bytes) DD-MM-YY
-  Answer:		23H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.ConfirmDate(const Date: TPrinterDate);
 begin
   FLogger.Debug(Format('ConfirmDate(%.2d.%.2d.%.4d)',
     [Date.Day, Date.Month, Date.Year + 2000]));
 
-  Execute(#$23 + IntToBin(GetSysPassword, 4) +
-    Chr(Date.Day) + Chr(Date.Month) + Chr(Date.Year));
+  Driver.ECRDate := PrinterDateToDate(Date);
+  Driver.Check(Driver.ConfirmDate);
 end;
-
-(******************************************************************************
-
-  Set Table With Default Values
-
-  Command:	24H. Length: 5 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  Answer:		24H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.InitializeTables;
 begin
-  Execute(#$24 + IntToBin(GetSysPassword, 4));
+  Driver.Check(Driver.InitTable);
 end;
 
-(******************************************************************************
-
-  Cut
-  
-  Command:	25H. Length: 6 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Cut type (1 byte) '0' - complete, '1' - incomplete
-  Answer:		25H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
-
 procedure TFiscalPrinterDriver.CutPaper(CutType: Byte);
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   if not FParameters2.Flags.CapCutter then Exit;
   FLogger.Debug(Format('CutPaper(%d)', [CutType]));
 
-  Command := #$25 + IntToBin(GetUsrPassword, 4) + Chr(CutType);
-  ExecuteData(Command, Answer);
+
+  Driver.CutType := CutType = PRINTER_CUTTYPE_PARTIAL;
+  Driver.Check(Driver.CutCheck);
 end;
 
 procedure TFiscalPrinterDriver.FullCut;
@@ -2210,237 +2178,95 @@ begin
   CutPaper(PRINTER_CUTTYPE_PARTIAL);
 end;
 
-(******************************************************************************
-
-  Get Font Parameters
-  
-  Command:	26H. Length: 6 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  ∑	Font type (1 byte)
-  Answer:		26H. Length: 7 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Print width in dots (2 bytes)
-  ∑	Character width in dots (1 byte) the width is given together with inter-character spacing
-  ∑	Character height in dots (1 byte) the height is given together with inter-line spacing
-  ∑	Number of fonts in FP (1 byte)
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.ReadFontInfo(FontNumber: Byte): TFontInfo;
-var
-  Data: AnsiString;
 begin
   FLogger.Debug(Format('ReadFontInfo(%d)', [FontNumber]));
-  Data := Execute(#$26 + IntToBin(GetSysPassword, 4) + Chr(FontNumber));
-  Move(Data[1], Result, Sizeof(Result));
+
+  Driver.FontType := FontNumber;
+  Driver.Check(Driver.GetFontMetrics);
+  Result.PrintWidth := Driver.PrintWidth;
+  Result.CharWidth := Driver.CharWidth;
+  Result.CharHeight := Driver.CharHeight;
+  Result.FontCount := Driver.FontCount;
 end;
-
-(******************************************************************************
-
-  Clear All Totalizers
-
-  Command:	27H. Length: 5 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  Answer:		27H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.ResetTotalizers;
 begin
-  Execute(#$27 + IntToBin(GetSysPassword, 4));
+  Driver.Check(Driver.ResetSummary);
 end;
-
-(******************************************************************************
-
-  Open Cash Drawer
-  
-  Command:	28H. Length: 6 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Cash drawer number (1 byte) 0, 1
-  Answer:		28H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.OpenDrawer(DrawerNumber: Byte);
 begin
   FLogger.Debug(Format('OpenDrawer(%d)', [DrawerNumber]));
-  Execute(#$28 + IntToBin(GetUsrPassword, 4) + Chr(DrawerNumber));
+
+  Driver.DrawerNumber := DrawerNumber;
+  Driver.Check(Driver.OpenDrawer);
 end;
-
-(******************************************************************************
-
-  Feed
-
-  Command:	29H. Length: 7 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Flags (1 byte) Bit 0 - journal station, Bit 1 - receipt station, Bit 2 - slip station
-  ∑	Number of lines to feed (1 byte) 1Ö255 - the maximum number of lines to feed is limited by the size of print buffer, but does not exceed 255
-  Answer:		29H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.FeedPaper(Station: Byte; Lines: Byte);
 begin
   FLogger.Debug(Format('FeedPaper(%d,%d)',
     [Station, Lines]));
 
-  Execute(#$29 + IntToBin(GetUsrPassword, 4) + Chr(Station) + Chr(Lines));
+  SetPrintFlags(Station);
+  Driver.StringQuantity := Lines;
+  Driver.Check(Driver.FeedDocument);
 end;
-
-(******************************************************************************
-
-  Eject Slip
-  
-  Command:	2AH. Length: 6 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Slip paper eject direction (1 byte) '0' - down, '1' - up
-  Answer:		2AH. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.EjectSlip(Direction: Byte);
 begin
   FLogger.Debug(Format('EjectSlip(%d)',
     [Direction]));
-
-  Execute(#$2A + IntToBin(GetUsrPassword, 4) + Chr(Direction));
 end;
-
-(******************************************************************************
-
-  Interrupt Test
-
-  Command:	2BH. Length: 5 bytes.
-  ∑	Operator password (4 bytes)
-  Answer:		2BH. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.StopTest;
 begin
-  Execute(#$2B + IntToBin(GetUsrPassword, 4));
+  Driver.Check(Driver.InterruptTest);
 end;
-
-(******************************************************************************
-
-  Print Operation Totalizers Report
-
-  Command:	2CH. Length: 5 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  Answer:		2CH. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintActnTotalizers;
 begin
-  Execute(#$2C + IntToBin(GetSysPassword, 4));
+
 end;
-
-(******************************************************************************
-
-  Get Table Structure
-
-  Command:	2DH. Length: 6 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  ∑	Table number (1 byte)
-  Answer:		2DH. Length: 45 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Table name (40 bytes)
-  ∑	Number of rows (2 bytes)
-  ∑	Number of fields (1 byte)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReadTableInfo(Table: Byte;
   var R: TPrinterTableRec): Integer;
-var
-  Data: AnsiString;
-  Command: AnsiString;
 begin
   FLogger.Debug(Format('ReadTableInfo(%d)', [Table]));
-  Command := #$2D + IntToBin(GetSysPassword, 4) + Chr(Table);
-  Result := ExecuteData(Command, Data);
+
+  Driver.TableNumber := Table;
+  Result := Driver.GetTableStruct;
   if Result = 0 then
   begin
-    CheckMinLength(Data, 43);
     R.Number := Table;
-    R.Name := Copy(Data, 1, 40);
-    R.RowCount := BinToInt(Data, 41, 2);
-    R.FieldCount := BinToInt(Data, 43, 1);
+    R.Name := Driver.TableName;
+    R.RowCount := Driver.RowNumber;
+    R.FieldCount := Driver.FieldNumber;
   end;
 end;
-
-(******************************************************************************
-
-  Get Field Structure
-
-  Command:	2EH. Length: 7 bytes.
-  ∑	System Administrator password (4 bytes) 30
-  ∑	Table number (1 byte)
-  ∑	Field number (1 byte)
-  Answer:		2EH. Length: (44+X+X) bytes.
-  ∑	Result Code (1 byte)
-  ∑	Field name (40 bytes)
-  ∑	Field type (1 byte) '0' - BIN, '1' - CHAR
-  ∑	Number of bytes - X (1 byte)
-  ∑	Field minimum value (X bytes) for BIN-type fields only
-  ∑	Field maximum value (X bytes) for BIN-type fields only
-
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReadFieldInfo(Table, Field: Byte;
   var R: TPrinterFieldRec): Integer;
-var
-  Data: AnsiString;
-  Command: AnsiString;
 begin
   FLogger.Debug(Format('ReadFieldInfo(%d,%d)', [Table, Field]));
-  Command := #$2E + IntToBin(GetSysPassword, 4) + Chr(Table) + Chr(Field);
-  Result := ExecuteData(Command, Data);
+
+  Driver.TableNumber := Table;
+  Driver.FieldNumber := Field;
+  Result := Driver.GetFieldStruct;
   if Result = 0 then
   begin
-    CheckMinLength(Data, 42);
     R.Table := Table;
     R.Field := Field;
-    R.Name := TrimRight(Copy(Data, 1, 40));
-    R.FieldType := Ord(Data[41]);
-    R.Size := Ord(Data[42]);
-    if (R.FieldType = 0)and(Length(Data) >= (42 + R.Size*2)) then
-    begin
-      R.MinValue := 0;
-      Move(Data[43], R.MinValue, R.Size);
-      R.MaxValue := 0;
-      Move(Data[43 + R.Size], R.MaxValue, R.Size);
-    end;
+    R.Name := Driver.FieldName;
+    R.FieldType := PRINTER_FIELD_TYPE_INT;
+    if Driver.FieldType then
+      R.FieldType := PRINTER_FIELD_TYPE_STR;
+
+    R.Size := Driver.FieldSize;
+    R.MinValue := Driver.MINValueOfField;
+    R.MaxValue := Driver.MAXValueOfField;
   end;
 end;
-
-(******************************************************************************
-
-  Print String With Specific Font
-
-  Command:	2FH. Length: 47 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt station
-  ∑	Font number (1 byte) 0Ö255
-  ∑	String of characters to print (40 bytes)
-  Answer:		2FH. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintStringFont(Flags, Font: Byte;
   const Line: WideString);
@@ -2454,33 +2280,16 @@ begin
   FLogger.Debug(Format('PrintStringFont(%d,%d, ''%s'')',
     [Flags, Font, Text]));
 
-  Execute(#$2F + IntToBin(GetUsrPassword, 4) + Chr(Flags) + Chr(Font) +
-    GetLine(Text, 40, GetPrintWidth(Font)));
+
+  SetPrintFlags(Flags);
+  Driver.FontType := Font;
+  Driver.StringForPrinting := Line;
+  Driver.Check(Driver.PrintStringWithFont);
 end;
-
-(******************************************************************************
-
-  Print X-Report
-
-  Command:	40H. Length: 5 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  Answer:		40H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintXReport;
 begin
-  Execute(#$40 + IntToBin(GetSysPassword, 4));
-  try
-    PrintCommStatus;
-  except
-    on E: Exception do
-    begin
-      Logger.Debug('PrintXReport: ' + GetExceptionMessage(E));
-    end;
-  end;
+  Driver.Check(Driver.PrintReportWithoutCleaning);
 end;
 
 procedure TFiscalPrinterDriver.PrintLines(const Line1, Line2: WideString);
@@ -2511,34 +2320,10 @@ begin
   end;
 end;
 
-(******************************************************************************
-Õ‡˜‡Ú¸ Á‡Í˚ÚËÂ ÒÏÂÌ˚ FF42H
-
- Ó‰ ÍÓÏ‡Ì‰˚ FF42h. ƒÎËÌ‡ ÒÓÓ·˘ÂÌËˇ: 6 ·‡ÈÚ.
-  œ‡ÓÎ¸ ÒËÒÚÂÏÌÓ„Ó ‡‰ÏËÌËÒÚ‡ÚÓ‡: 4 ·‡ÈÚ‡
-ŒÚ‚ÂÚ: FF42h ƒÎËÌ‡ ÒÓÓ·˘ÂÌËˇ: 1 ·‡ÈÚ.
-   Ó‰ Ó¯Ë·ÍË: 1 ·‡ÈÚ
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.BeginZReport: Integer;
-var
-  Answer: string;
 begin
-  Result := ExecuteData(#$FF#$42 + IntToBin(GetSysPassword, 4), Answer);
+  Result := Driver.FNBeginCloseSession;
 end;
-
-(******************************************************************************
-
-  Print Z-Report
-
-  Command:	41H. Length: 5 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  Answer:		41H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintZReport;
 var
@@ -2553,7 +2338,7 @@ begin
     end;
   end;
 
-  Execute(#$41 + IntToBin(GetSysPassword, 4));
+  Driver.Check(Driver.PrintReportWithCleaning);
   FFilter.PrintZReport;
   try
     // Update document number
@@ -2572,147 +2357,43 @@ begin
   end;
 end;
 
-(******************************************************************************
-
-  Print Department Report
-  
-  Command:	42H. Length: 5 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  Answer:		42H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-
-******************************************************************************)
-
 procedure TFiscalPrinterDriver.PrintDepartmentsReport;
 begin
-  Execute(#$42 + IntToBin(GetSysPassword, 4));
+  Driver.Check(Driver.PrintDepartmentReport);
 end;
-
-(******************************************************************************
-
-  Print Taxes Report
-  
-  Command:	43H. Length: 5 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  Answer:		43H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintTaxReport;
 begin
-  Execute(#$43 + IntToBin(GetSysPassword, 4));
+  Driver.Check(Driver.PrintTaxReport);
 end;
-
-(******************************************************************************
-
-  Print Fixed Header
-  
-  Command:	52H. Length: 5 bytes.
-  ∑	Operator password (4 bytes)
-  Answer:		52H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintHeader;
 begin
-  Execute(#$52 + IntToBin(GetUsrPassword, 4));
+  Driver.Check(Driver.PrintCliche);
 end;
-
-(******************************************************************************
-
-  End document
-
-  Command:	53H. Length: 6 bytes
-  ∑	Operator password (4 bytes)
-  ∑	Parameter (1 bytes)
-  ∑	0 - Without trailer
-  ∑	1 - With trailer
-  Answer:		53H. Length: 3 bytes.
-  ∑	Result code (1 bytes)
-  ∑	Operator index number (1 bytes) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintDocTrailer(Flags: Byte);
 begin
   FLogger.Debug(Format('PrintDocTrailer(%d)', [Flags]));
-  Execute(#$53 + IntToBin(GetUsrPassword, 4) + Chr(Flags));
+
+  Driver.FinishDocumentMode := Flags;
+  Driver.Check(Driver.FinishDocument);
 end;
-
-(******************************************************************************
-
-  Print trailer
-  Command:	54H. Length:5 bytes.
-  ∑	Operator password (4 bytes)
-  Answer:		54H. Length: 3 bytes.
-  ∑	Result code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintTrailer;
 begin
-  Execute(#$54 + IntToBin(GetUsrPassword, 4));
+  Driver.Check(Driver.PrintTrailer);
 end;
-
-(******************************************************************************
-
-  Set Serial Number
-
-  Command:	60H. Length: 9 bytes.
-  ∑	Password (4 bytes) (default value is '0')
-  ∑	Serial number (4 bytes) 00000000Ö99999999
-  Answer:		60H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.WriteSerial(Serial: DWORD);
 begin
   FLogger.Debug(Format('WriteSerial(%d)', [Serial]));
-  Execute(#$60 + IntToBin(0, 4) + IntToBin(Serial, 4));
+
 end;
-
-(******************************************************************************
-
-  Initialize FM
-
-  Command:	61H. Length: 1 byte.
-  Answer:		61H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.InitFiscalMemory;
 begin
-  Execute(#$61);
 end;
-
-(******************************************************************************
-
-  Get FM Totals
-
-  Command:	62H. Length: 6 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  ∑	Report type (1 byte) '0' - grand totals, '1' - grand totals after the last
-    refiscalization
-  Answer:		62H. Length: 29 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-  ∑	Grand totals of sales (8 bytes)
-  ∑	Grand totals of buys (6 bytes) If there is no FM2, the value is
-    FFh FFh FFh FFh FFh FFh
-  ∑	Grand totals of sale refunds (6 bytes) If there is no FM2, the value is
-    FFh FFh FFh FFh FFh FFh
-  ∑	Grand totals of buy refunds (6 bytes) If there is no FM2, the value is
-    FFh FFh FFh FFh FFh FFh
-
-******************************************************************************)
 
 function BinToInt2(const Data: AnsiString; Index, Size: Integer): Int64;
 begin
@@ -2722,713 +2403,83 @@ begin
 end;
 
 function TFiscalPrinterDriver.ReadFMTotals(Flags: Byte; var R: TFMTotals): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   FLogger.Debug(Format('ReadFMTotals(%d)', [Flags]));
-  Command := #$62 + IntToBin(GetSysPassword, 4) + Chr(Flags);
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    CheckMinLength(Answer, 27);
-    R.OperatorNumber := Ord(Answer[1]);
-    R.SaleTotal := BinToInt2(Answer, 2, 8);
-    R.BuyTotal := BinToInt2(Answer, 10, 6);
-    R.RetSale := BinToInt2(Answer, 16, 6);
-    R.RetBuy := BinToInt2(Answer, 22, 6);
-  end;
 end;
-
-(******************************************************************************
-
-  Get Date of Last Record In FM
-
-  Command:	63H. Length: 5 bytes.
-  ∑	Administrator or System Administrator password (4 bytes) 29, 30
-  Answer:		63H. Length: 7 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 29, 30
-  ∑	Type of last record in FM (1 byte) '0' - fiscalization/refiscalization,
-    '1' - daily totals
-  ∑	Date (3 bytes) DD-MM-YY
-
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReadFMLastRecordDate: TFMRecordDate;
-var
-  Data: AnsiString;
 begin
-  Data := Execute(#$63 + IntToBin(GetTaxPassword, 4));
-  CheckMinLength(Data, Sizeof(Result));
-  Move(Data[1], Result, Sizeof(Result));
+
 end;
-
-(******************************************************************************
-
-  Get Dates And Days Ranges In FM
-
-  Command:	64H. Length: 5 bytes.
-  ∑	Tax Officer password (4 bytes)
-  Answer:		64H. Length: 12 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Number of first daily totals record in FM (2 bytes) 0000Ö2100
-  ∑	Number of last daily totals record in FM (2 bytes) 0000Ö2100
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReadDaysRange: TDayRange;
-var
-  Data: AnsiString;
 begin
-  Data := Execute(#$64 + IntToBin(GetTaxPassword, 4));
-  CheckMinLength(Data, Sizeof(Result));
-  Move(Data[1], Result, Sizeof(Result));
 end;
-
-(******************************************************************************
-
-  Fiscalize/Refiscalize Printer
-
-  Command:	65H. Length: 20 bytes.
-  ∑	Tax Officer old password (4 bytes)
-  ∑	Tax Officer new password (4 bytes)
-  ∑	ECRRN (5 bytes) 0000000000Ö9999999999
-  ∑	Taxpayer ID (6 bytes) 000000000000Ö999999999999
-  Answer:		65H. Length: 9 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Fiscalization/Refiscalization number (1 byte) 1Ö16
-  ∑	Quantity of free fiscalization/refiscalization records left in FM (1 byte) 0Ö15
-  ∑	Number of last daily totals record in FM (2 bytes) 0000Ö2100
-  ∑	Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.Fiscalization(Password, PrinterID,
   FiscalID: Int64): TFiscalizationResult;
-var
-  Data: AnsiString;
 begin
   FLogger.Debug(Format('Fiscalization(%d,%d,%d)',
     [Password, PrinterID, FiscalID]));
 
-  Data := Execute(#$65 +
-    IntToBin(GetTaxPassword, 4) +
-    IntToBin(Password, 4) +
-    IntToBin(PrinterID, 4) +
-    IntToBin(FiscalID, 4));
-
-  CheckMinLength(Data, Sizeof(Result));
-  Move(Data[1], Result, Sizeof(Result));
 end;
-
-(******************************************************************************
-
-  Periodic Daily Totals Fiscal Report
-
-  Command:	66H. Length: 12 bytes.
-  ∑	Tax Officer password (4 bytes)
-  ∑	Report type (1 byte) '0' - short, '1' - full
-  ∑	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  Answer:		66H. Length: 12 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Number of first daily totals record in FM (2 bytes) 0000Ö2100
-  ∑	Number of last daily totals record in FM (2 bytes) 0000Ö2100
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReportOnDateRange(ReportType: Byte;
   Range: TDayDateRange): TDayRange;
-var
-  Data: AnsiString;
 begin
   FLogger.Debug(Format('ReportOnDateRange(%d,%s,%s)',
     [ReportType, PrinterDateToStr(Range.Date1), PrinterDateToStr(Range.Date2)]));
-
-  Data := Execute(#$66 +
-    IntToBin(GetTaxPassword, 4) +
-    Chr(ReportType) +
-    PrinterDateToBin(Range.Date1) +
-    PrinterDateToBin(Range.Date2));
-
-  CheckMinLength(Data, Sizeof(Result));
-  Move(Data[1], Result, Sizeof(Result));
 end;
-
-(******************************************************************************
-
-  Fiscal Report For Daily Totals Numbers Range
-
-  Command:	67H. Length: 10 bytes.
-  ∑	Tax Officer password (4 bytes)
-  ∑	Report type (1 byte) '0' - short, '1' - full
-  ∑	Day number of first daily totals record in FM (2 bytes) 0000Ö2100
-  ∑	Day number of last daily totals record in FM (2 bytes) 0000Ö2100
-  Answer:		67H. Length: 12 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  ∑	Number of first daily totals record in FM (2 bytes) 0000Ö2100
-  ∑	Number of last daily totals record in FM (2 bytes) 0000Ö2100
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReportOnNumberRange(ReportType: Byte;
   Range: TDayNumberRange): TDayRange;
-var
-  Data: AnsiString;
 begin
   FLogger.Debug(Format('ReportOnDateRange(%d,%d,%d)',
     [ReportType, Range.Number1, Range.Number2]));
 
-  Data := Execute(#$67 +
-    IntToBin(GetTaxPassword, 4) +
-    Chr(ReportType) +
-    IntToBin(Range.Number1, 2) +
-    IntToBin(Range.Number2, 2));
-
-  CheckMinLength(Data, Sizeof(Result));
-  Move(Data[1], Result, Sizeof(Result));
 end;
-
-(******************************************************************************
-
-  Interrupt Full Report
-
-  Command:	68H. Length: 5 bytes.
-  ∑	Tax Officer password (4 bytes)
-  Answer:		68H. Length: 2 bytes.
-  ∑	Result Code (1 byte)
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.InterruptReport;
 begin
-  Execute(#$68 + IntToBin(GetTaxPassword, 4));
 end;
 
-(******************************************************************************
-
-  Get Fiscalization/Refiscalization Parameters
-
-  Command:	69H. Length: 6 bytes.
-  ∑	Tax Officer password (4 bytes) password of Tax Officer who fiscalized the printer
-  ∑	Fiscalization/Refiscalization number (1 byte) 1Ö16
-  Answer:		69H. Length: 22 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Password (4 bytes)
-  ∑	ECRRN (5 bytes) 0000000000Ö9999999999
-  ∑	Taxpayer ID (6 bytes) 000000000000Ö999999999999
-  ∑	Number of the last daily totals record in FM before fiscalization/refiscalization (2 bytes) 0000Ö2100
-  ∑	Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.ReadFiscInfo(FiscNumber: Byte): TFiscInfo;
-var
-  Stream: TBinStream;
 begin
   FLogger.Debug(Format('ReadFiscInfo((%d)',
     [FiscNumber]));
 
-  Stream := TBinStream.Create;
-  try
-    Stream.Data := Execute(#$69 + IntToBin(GetTaxPassword, 4) + Chr(FiscNumber));
-
-    Result.Password := Stream.ReadInt(4);
-    Result.PrinterID := Stream.ReadInt(5);
-    Result.FiscalID := Stream.ReadInt(6);
-    Result.DayNumber := Stream.ReadInt(2);
-    Stream.Read(Result.Date, Sizeof(Result.Date));
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Open Fiscal Slip
-
-  Command:	70H. Length: 26 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Slip type (1 byte) '0' - Sale, '1' - Buy, '2' - Sale Refund, '3' - Buy Refund
-  ∑	Slip duplicates type (1 byte) '0' - duplicates as columns, '1' - duplicates as line blocks
-  ∑	Number of duplicates (1 byte) 0Ö5
-  ∑	Spacing between Original and Duplicate 1 (1 byte) *
-  ∑	Spacing between Duplicate 1 and Duplicate 2 (1 byte) *
-  ∑	Spacing between Duplicate 2 and Duplicate 3 (1 byte) *
-  ∑	Spacing between Duplicate 3 and Duplicate 4 (1 byte) *
-  ∑	Spacing between Duplicate 4 and Duplicate 5 (1 byte) *
-  ∑	Font number of fixed header (1 byte)
-  ∑	Font number of header (1 byte)
-  ∑	Font number of EKLZ serial number (1 byte)
-  ∑	Font number of KPK value and KPK number (1 byte)
-  ∑	Vertical position of the first line of fixed header (1 byte)
-  ∑	Vertical position of the first line of header (1 byte)
-  ∑	Vertical position of line with EKLZ number (1 byte)
-  ∑	Vertical position of line with duplicate marker (1 byte)
-  ∑	Horizontal position of fixed header in line (1 byte)
-  ∑	Horizontal position of header in line (1 byte)
-  ∑	Horizontal position of EKLZ number in line (1 byte)
-  ∑	Horizontal position of KPK value and KPK number in line (1 byte)
-  ∑	Horizontal position of duplicate marker in line (1 byte)
-  Answer:		70H. Length: 5 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-  ∑	Current receipt number (2 bytes)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.OpenSlipDoc(Params: TSlipParams): TDocResult;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($70);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.Write(Params, Sizeof(Params));
-    Check(ExecuteStream(Stream));
-    Stream.Read(Result, Sizeof(Result));
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Open Standard Fiscal Slip
-
-  Command:	71H. Length: 13 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Slip type (1 byte) '0' - Sale, '1' - Buy, '2' - Sale Refund, '3' - Buy Refund
-  ∑	Slip duplicates type (1 byte) '0' - duplicates as columns, '1' - duplicates as line blocks
-  ∑	Number of duplicates (1 byte) 0Ö5
-  ∑	Spacing between Original and Duplicate 1 (1 byte) *
-  ∑	Spacing between Duplicate 1 and Duplicate 2 (1 byte) *
-  ∑	Spacing between Duplicate 2 and Duplicate 3 (1 byte) *
-  ∑	Spacing between Duplicate 3 and Duplicate 4 (1 byte) *
-  ∑	Spacing between Duplicate 4 and Duplicate 5 (1 byte) *
-  Answer:		71H. Length: 5 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-  ∑	Current receipt number (2 bytes)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.OpenStdSlip(Params: TStdSlipParams): TDocResult;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($71);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.Write(Params, Sizeof(Params));
-    Check(ExecuteStream(Stream));
-    Stream.Read(Result, Sizeof(Result));
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Transaction On Slip
-
-  Command:	72H. Length: 82 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Quantity format (1 byte) '0' - no digits after decimal dot, '1' - digits after decimal dot
-  ∑	Number of lines in transaction block (1 byte) 1Ö3
-  ∑	Line number of Text element in transaction block (1 byte) 0Ö3, '0' - do not print
-  ∑	Line number of Quantity Times Unit Price element in transaction block (1 byte) 0Ö3, '0' - do not print
-  ∑	Line number of Transaction Sum element in transaction block (1 byte) 1Ö3
-  ∑	Line number of Department element in transaction block (1 byte) 1Ö3
-  ∑	Font type of Text element (1 byte)
-  ∑	Font type of Quantity element (1 byte)
-  ∑	Font type of Multiplication sign element (1 byte)
-  ∑	Font type of Unit Price element (1 byte)
-  ∑	Font type of Transaction Sum element (1 byte)
-  ∑	Font type of Department element (1 byte)
-  ∑	Length of Text element in characters (1 byte)
-  ∑	Length of Quantity element in characters (1 byte)
-  ∑	Length of Unit Price element in characters (1 byte)
-  ∑	Length of Transaction Sum element in characters (1 byte)
-  ∑	Length of Department element in characters (1 byte)
-  ∑	Position in line of Text element (1 byte)
-  ∑	Position in line of Quantity Times Unit Price element (1 byte)
-  ∑	Position in line of Transaction Sum element (1 byte)
-  ∑	Position in line of Department element (1 byte)
-  ∑	Slip line number with the first line of transaction block (1 byte)
-  ∑	Quantity (5 bytes)
-  ∑	Unit Price (5 bytes)
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		72H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.SlipOperation(Params: TSlipOperation;
   Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($72);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.Write(Params, Sizeof(Params));
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Standard Transaction On Slip
-  
-  Command:	73H. Length: 61 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Slip line number with the first line of transaction block (1 byte)
-  ∑	Quantity (5 bytes)
-  ∑	Unit Price (5 bytes)
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		73H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.SlipStdOperation(LineNumber: Byte;
   Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($73);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteByte(LineNumber);
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Discount/Surcharge On Slip
-  
-  Command:	74H. Length: 68 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Number of lines in transaction block (1 byte) 1Ö2
-  ∑	Line number of Text element in transaction block (1 byte) 0Ö2, '0' - do not print
-  ∑	Line number of Transaction Name element in transaction block (1 byte) 1Ö2
-  ∑	Line number of Transaction Sum element in transaction block (1 byte) 1Ö2
-  ∑	Font type of Text element (1 byte)
-  ∑	Font type of Transaction Name element (1 byte)
-  ∑	Font type of Transaction Sum element (1 byte)
-  ∑	Length of Text element in characters (1 byte)
-  ∑	Length of Transaction Sum element in characters (1 byte)
-  ∑	Position in line of Text element (1 byte)
-  ∑	Position in line of Transaction Name element (1 byte)
-  ∑	Position in line of Transaction Sum element (1 byte)
-  ∑	Transaction type (1 byte) '0' - Discount, '1' - Surcharge
-  ∑	Slip line number with the first line of Discount/Surcharge block (1 byte)
-  ∑	Transaction Sum (5 bytes)
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		74H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.SlipDiscount(Params: TSlipDiscountParams;
   Discount: TSlipDiscount): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($74);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.Write(Params, Sizeof(Params));
-    Stream.WriteByte(Discount.OperationType);
-    Stream.WriteByte(Discount.LineNumber);
-    Stream.WriteInt(Discount.Amount, 5);
-    Stream.WriteInt(Discount.Department, 1);
-    Stream.WriteInt(Discount.Tax1, 1);
-    Stream.WriteInt(Discount.Tax2, 1);
-    Stream.WriteInt(Discount.Tax3, 1);
-    Stream.WriteInt(Discount.Tax4, 1);
-    Stream.WriteString(GetText(Discount.Text, 40));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Standard Discount/Surcharge On Slip
-
-  Command:	75H. Length: 56 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Transaction type (1 byte) '0' - Discount, '1' - Surcharge
-  ∑	Slip line number with the first line of Discount/Surcharge block (1 byte)
-  ∑	Transaction Sum (5 bytes)
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		75H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.SlipStdDiscount(Discount: TSlipDiscount): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($75);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteByte(Discount.OperationType);
-    Stream.WriteByte(Discount.LineNumber);
-    Stream.WriteInt(Discount.Amount, 5);
-    Stream.WriteInt(Discount.Department, 1);
-    Stream.WriteInt(Discount.Tax1, 1);
-    Stream.WriteInt(Discount.Tax2, 1);
-    Stream.WriteInt(Discount.Tax3, 1);
-    Stream.WriteInt(Discount.Tax4, 1);
-    Stream.WriteString(GetText(Discount.Text, 40));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
 end;
-
-(******************************************************************************
-
-  Close Fiscal Slip
-  
-  Command:	76H. Length: 182 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Number of lines in transaction block (1 byte) 1Ö17
-  ∑	Line number of Receipt Total element in transaction block (1 byte) 1Ö17
-  ∑	Line number of Text element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Cash Payment element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Payment Type 2 element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Payment Type 3 element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Payment Type 4 element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Change element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 1 Turnover element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 2 Turnover element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 3 Turnover element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 4 Turnover element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 1 Sum element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 2 Sum element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 3 Sum element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Tax 4 Sum element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Receipt Subtotal Before Discount/Surcharge element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Line number of Discount/Surcharge Value element in transaction block (1 byte) 0Ö17, '0' - do not print
-  ∑	Font type of Text element (1 byte)
-  ∑	Font type of 'TOTAL' element (1 byte)
-  ∑	Font type of Receipt Total Value element (1 byte)
-  ∑	Font type of 'CASH' element (1 byte)
-  ∑	Font type of Cash Payment Value element (1 byte)
-  ∑	Font type of Payment Type 2 Name element (1 byte)
-  ∑	Font type of Payment Type 2 Value element (1 byte)
-  ∑	Font type of Payment Type 3 Name element (1 byte)
-  ∑	Font type of Payment Type 3 Value element (1 byte)
-  ∑	Font type of Payment Type 4Name element (1 byte)
-  ∑	Font type of Payment Type 4Value element (1 byte)
-  ∑	Font type of 'CHANGE' element (1 byte)
-  ∑	Font type of Change Value element (1 byte)
-  ∑	Font type of Tax 1 Name element (1 byte)
-  ∑	Font type of Tax 1 Turnover Value element (1 byte)
-  ∑	Font type of Tax 1 Rate element (1 byte)
-  ∑	Font type of Tax 1 Value element (1 byte)
-  ∑	Font type of Tax 2 Name element (1 byte)
-  ∑	Font type of Tax 2 Turnover Value element (1 byte)
-  ∑	Font type of Tax 2 Rate element (1 byte)
-  ∑	Font type of Tax 2 Value element (1 byte)
-  ∑	Font type of Tax 3 Name element (1 byte)
-  ∑	Font type of Tax 3 Turnover Value element (1 byte)
-  ∑	Font type of Tax 3 Rate element (1 byte)
-  ∑	Font type of Tax 3 Value element (1 byte)
-  ∑	Font type of Tax 4 Name element (1 byte)
-  ∑	Font type of Tax 4 Turnover Value element (1 byte)
-  ∑	Font type of Tax 4 Rate element (1 byte)
-  ∑	Font type of Tax 4 Value element (1 byte)
-  ∑	Font type of 'SUBTOTAL' element (1 byte)
-  ∑	Font type of Receipt Subtotal Before Discount/Surcharge Value element (1 byte)
-  ∑	Font type of 'DISCOUNT XX.XX%' element (1 byte)
-  ∑	Font type of Receipt Discount Value element (1 byte)
-  ∑	Length of Text element in characters (1 byte)
-  ∑	Length of Receipt Total Value element in characters (1 byte)
-  ∑	Length of Cash Payment Value element in characters (1 byte)
-  ∑	Length of Payment Type 2 Value element in characters (1 byte)
-  ∑	Length of Payment Type 3 Value element in characters (1 byte)
-  ∑	Length of Payment Type 4Value element in characters (1 byte)
-  ∑	Length of Change Value element in characters (1 byte)
-  ∑	Length of Tax 1 Name element in characters (1 byte)
-  ∑	Length of Tax 1 Turnover element in characters (1 byte)
-  ∑	Length of Tax 1 Rate element in characters (1 byte)
-  ∑	Length of Tax 1 Value element in characters (1 byte)
-  ∑	Length of Tax 2 Name element in characters (1 byte)
-  ∑	Length of Tax 2 Turnover element in characters (1 byte)
-  ∑	Length of Tax 2 Rate element in characters (1 byte)
-  ∑	Length of Tax 2 Value element in characters (1 byte)
-  ∑	Length of Tax 3 Name element in characters (1 byte)
-  ∑	Length of Tax 3 Turnover element in characters (1 byte)
-  ∑	Length of Tax 3 Rate element in characters (1 byte)
-  ∑	Length of Tax 3 Value element in characters (1 byte)
-  ∑	Length of Tax 4 Name element in characters (1 byte)
-  ∑	Length of Tax 4 Turnover element in characters (1 byte)
-  ∑	Length of Tax 4 Rate element in characters (1 byte)
-  ∑	Length of Tax 4 Value element in characters (1 byte)
-  ∑	Length of Receipt Subtotal Before Discount/Surcharge Value element in characters (1 byte)
-  ∑	Length of 'DISCOUNT XX.XX%' element in characters (1 byte)
-  ∑	Length of Receipt Discount Value element in characters (1 byte)
-  ∑	Position in line of Text element (1 byte)
-  ∑	Position in line of 'TOTAL' element (1 byte)
-  ∑	Position in line of Receipt Total Value element (1 byte)
-  ∑	Position in line of 'CASH' element (1 byte)
-  ∑	Position in line of Cash Payment Value element (1 byte)
-  ∑	Position in line of Payment Type 2 Name element (1 byte)
-  ∑	Position in line of Payment Type 2 Value element (1 byte)
-  ∑	Position in line of Payment Type 3 Name element (1 byte)
-  ∑	Position in line of Payment Type 3 Value element (1 byte)
-  ∑	Position in line of Payment Type 4 Name element (1 byte)
-  ∑	Position in line of Payment Type 4 Value element (1 byte)
-  ∑	Position in line of 'CHANGE' element (1 byte)
-  ∑	Position in line of Change Value element (1 byte)
-  ∑	Position in line of Tax 1 Name element (1 byte)
-  ∑	Position in line of Tax 1 Turnover Value element (1 byte)
-  ∑	Position in line of Tax 1 Rate element (1 byte)
-  ∑	Position in line of Tax 1 Value element (1 byte)
-  ∑	Position in line of Tax 2 Name element (1 byte)
-  ∑	Position in line of Tax 2 Turnover Value element (1 byte)
-  ∑	Position in line of Tax 2 Rate element (1 byte)
-  ∑	Position in line of Tax 2 Value element (1 byte)
-  ∑	Position in line of Tax 3 Name element (1 byte)
-  ∑	Position in line of Tax 3 Turnover Value element (1 byte)
-  ∑	Position in line of Tax 3 Rate element (1 byte)
-  ∑	Position in line of Tax 3 Value element (1 byte)
-  ∑	Position in line of Tax 4 Name element (1 byte)
-  ∑	Position in line of Tax 4 Turnover Value element (1 byte)
-  ∑	Position in line of Tax 4 Rate element (1 byte)
-  ∑	Position in line of Tax 4 Value element (1 byte)
-  ∑	Position in line of 'SUBTOTAL' element (1 byte)
-  ∑	Position in line of Receipt Subtotal Before Discount/Surcharge Value element (1 byte)
-  ∑	Position in line of 'DISCOUNT XX.XX%' element (1 byte)
-  ∑	Position in line of Receipt Discount Value element (1 byte)
-  ∑	Slip line number with the first line of Close Fiscal Slip block (1 byte)
-  ∑	Cash Payment value (5 bytes)
-  ∑	Payment Type 2 value (5 bytes)
-  ∑	Payment Type 3 value (5 bytes)
-  ∑	Payment Type 4 value (5 bytes)
-  ∑	Receipt Discount Value 0 to 99,99 % (2 bytes) 0000Ö9999
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		76H. Length: 8 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-  ∑	Change value (5 bytes) 0000000000Ö9999999999
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.SlipClose(Params: TCloseReceiptParams): TCloseReceiptResult;
 begin
-(*
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($76);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.Write(Params, sizeof(Params));
-
-    Stream.WriteByte(Discount.OperationType);
-    Stream.WriteByte(Discount.LineNumber);
-    Stream.WriteInt(Discount.Amount, 5);
-    Stream.WriteInt(Discount.Department, 1);
-    Stream.WriteInt(Discount.Tax1, 1);
-    Stream.WriteInt(Discount.Tax2, 1);
-    Stream.WriteInt(Discount.Tax3, 1);
-    Stream.WriteInt(Discount.Tax4, 1);
-    Stream.WriteString(Discount.Text, PrintWidth);
-
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
-  *)
 end;
-
-
-(******************************************************************************
-
-  Sale
-
-  Command:	80H. Length: 60 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Quantity (5 bytes) 0000000000Ö9999999999
-  ∑	Unit Price (5 bytes) 0000000000Ö9999999999
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		80H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 procedure TFiscalPrinterDriver.UpdateDepartment(var P: TPriceReg);
 var
@@ -3473,232 +2524,84 @@ begin
 end;
 
 function TFiscalPrinterDriver.Sale(Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
-  Operation.Text := PrintItemText(Operation.Text);
   UpdateDepartment(Operation);
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($80);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.Sale(Operation);
-  finally
-    Stream.Free;
-  end;
+  Driver.Quantity := Operation.Quantity/1000;
+  Driver.Price := IntToAmount(Operation.Price);
+  Driver.Department := Operation.Department;
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.Sale;
+  if Result = 0 then
+    FFilter.Sale(Operation);
 end;
-
-(******************************************************************************
-
-  Buy
-
-  Command:	81H. Length: 60 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Quantity (5 bytes) 0000000000Ö9999999999
-  ∑	Unit Price (5 bytes) 0000000000Ö9999999999
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		81H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.Buy(Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
   UpdateDepartment(Operation);
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($81);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.Buy(Operation);
-  finally
-    Stream.Free;
-  end;
+  Driver.Quantity := Operation.Quantity/1000;
+  Driver.Price := IntToAmount(Operation.Price);
+  Driver.Department := Operation.Department;
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.Buy;
+  if Result = 0 then
+    FFilter.Buy(Operation);
 end;
-
-(******************************************************************************
-
-  Sale Refund
-
-  Command:	82H. Length: 60 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Quantity (5 bytes) 0000000000Ö9999999999
-  ∑	Unit Price (5 bytes) 0000000000Ö9999999999
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		82H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.RetSale(Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
   UpdateDepartment(Operation);
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($82);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.RetSale(Operation);
-  finally
-    Stream.Free;
-  end;
+  Driver.Quantity := Operation.Quantity/1000;
+  Driver.Price := IntToAmount(Operation.Price);
+  Driver.Department := Operation.Department;
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.ReturnSale;
+  if Result = 0 then
+    FFilter.RetSale(Operation);
 end;
-
-(******************************************************************************
-
-  Buy Refund
-
-  Command:	83H. Length: 60 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Quantity (5 bytes) 0000000000Ö9999999999
-  ∑	Unit Price (5 bytes) 0000000000Ö9999999999
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		83H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.RetBuy(Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
   UpdateDepartment(Operation);
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($83);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.RetBuy(Operation);
-  finally
-    Stream.Free;
-  end;
+  Driver.Quantity := Operation.Quantity/1000;
+  Driver.Price := IntToAmount(Operation.Price);
+  Driver.Department := Operation.Department;
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.ReturnBuy;
+  if Result = 0 then
+    FFilter.RetBuy(Operation);
 end;
-
-(******************************************************************************
-
-  Void Transaction
-  
-  Command:	84H. Length: 60 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Quantity (5 bytes) 0000000000Ö9999999999
-  ∑	Unit Price (5 bytes) 0000000000Ö9999999999
-  ∑	Department (1 byte) 0Ö16
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		84H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.Storno(Operation: TPriceReg): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($84);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Quantity, 5);
-    Stream.WriteInt(Operation.Price, 5);
-    Stream.WriteInt(Operation.Department, 1);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.Storno(Operation);
-  finally
-    Stream.Free;
-  end;
+  UpdateDepartment(Operation);
+  Driver.Quantity := Operation.Quantity/1000;
+  Driver.Price := IntToAmount(Operation.Price);
+  Driver.Department := Operation.Department;
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.Storno;
+  if Result = 0 then
+    FFilter.Storno(Operation);
 end;
-
-(******************************************************************************
-
-  Close Receipt
-  
-  Command:	85H. Length: 71 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Cash Payment value (5 bytes) 0000000000Ö9999999999
-  ∑	Payment Type 2 value (5 bytes) 0000000000Ö9999999999
-  ∑	Payment Type 3 value (5 bytes) 0000000000Ö9999999999
-  ∑	Payment Type 4 value (5 bytes) 0000000000Ö9999999999
-  ∑	Receipt Percentage Discount/Surcharge Value 0 to 99,99 % (2 bytes with sign) -9999Ö9999, surcharge if value is negative
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		85H. Length: 8 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-  ∑	Change value (5 bytes) 0000000000Ö9999999999
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReceiptClose(const P: TCloseReceiptParams;
   var R: TCloseReceiptResult): Integer;
@@ -3707,184 +2610,70 @@ var
 begin
   WriteTLVItems;
   FFilter.BeforeCloseReceipt;
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($85);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(P.CashAmount, 5);
-    Stream.WriteInt(P.Amount2, 5);
-    Stream.WriteInt(P.Amount3, 5);
-    Stream.WriteInt(P.Amount4, 5);
-    Stream.WriteInt(P.PercentDiscount, 2);
-    Stream.WriteInt(P.Tax1, 1);
-    Stream.WriteInt(P.Tax2, 1);
-    Stream.WriteInt(P.Tax3, 1);
-    Stream.WriteInt(P.Tax4, 1);
-    Stream.WriteString(GetText(P.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-    begin
-      Stream.Read(R, sizeof(R));
-      FFilter.CloseReceipt(P, R);
-    end;
-  finally
-    Stream.Free;
+
+  Driver.Summ1 := IntToAmount(P.CashAmount);
+  Driver.Summ2 := IntToAmount(P.Amount2);
+  Driver.Summ3 := IntToAmount(P.Amount3);
+  Driver.Summ4 := IntToAmount(P.Amount4);
+  Driver.DiscountOnCheck := IntToAmount(P.PercentDiscount);
+  Driver.Tax1 := P.Tax1;
+  Driver.Tax2 := P.Tax2;
+  Driver.Tax3 := P.Tax3;
+  Driver.Tax4 := P.Tax4;
+  Driver.StringForPrinting := P.Text;
+  Result := Driver.CloseCheck;
+  if Result = 0 then
+  begin
+    R.OperatorNumber := Driver.OperatorNumber;
+    R.Change := AmountToInt(Driver.Change);
+    FFilter.CloseReceipt(P, R);
   end;
 end;
-
-(******************************************************************************
-
-  Discount
-
-  Command:	86H. Length: 54 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Discount value (5 bytes) 0000000000Ö9999999999
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		86H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReceiptDiscount(
   Operation: TAmountOperation): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($86);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Amount, 5);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.ReceiptDiscount(Operation);
-  finally
-    Stream.Free;
-  end;
+  Driver.Price := IntToAmount(Operation.Amount);
+  Driver.Department := GetDepartment(Operation.Department);
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.Discount;
+  if Result = 0 then
+    FFilter.ReceiptDiscount(Operation);
 end;
-
-(*
-—ÍË‰Í‡, Ì‡‰·‡‚Í‡  Ì‡ ˜ÂÍ ‰Îˇ –ÓÒÌÂÙÚË FF4BH
-   Ó‰ ÍÓÏ‡Ì‰˚ FF4Bh . ƒÎËÌ‡ ÒÓÓ·˘ÂÌËˇ:  145 ·‡ÈÚ.
-  œ‡ÓÎ¸ ÒËÒÚÂÏÌÓ„Ó ‡‰ÏËÌËÒÚ‡ÚÓ‡: 4 ·‡ÈÚ‡
-  —ÍË‰Í‡:         5 ·‡ÈÚ
-  Õ‡‰·‡‚Í‡:    5 ·‡ÈÚ
-  Õ‡ÎÓ„:  1 ·‡ÈÚ
-  ŒÔËÒ‡ÌËÂ ÒÍË‰ÍË ËÎË Ì‡‰·‡‚ÍË: 128 ·‡ÈÚ ASCII
-ŒÚ‚ÂÚ:    FF4Bh ƒÎËÌ‡ ÒÓÓ·˘ÂÌËˇ: 1 ·‡ÈÚ.
-   Ó‰ Ó¯Ë·ÍË: 1 ·‡ÈÚ
-
-*)
 
 function TFiscalPrinterDriver.ReceiptDiscount2(
   Operation: TReceiptDiscount2): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$4B +
-    IntToBin(GetUsrPassword, 4) +
-    IntToBin(Operation.Discount, 5) +
-    IntToBin(Operation.Charge, 5) +
-    IntToBin(Operation.Tax, 1) +
-    GetText(Operation.Text, 40);
-  Result := ExecuteData(Command, Answer);
-  FCapReceiptDiscount := IsSupported(Result);
 end;
-
-(******************************************************************************
-
-  Surcharge
-
-  Command:	87H. Length: 54 bytes.
-  ∑	Operator password (4 bytes)
-  ∑	Surcharge value (5 bytes) 0000000000Ö9999999999
-  ∑	Tax 1 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 2 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 3 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Tax 4 (1 byte) '0' - no tax, '1'Ö'4' - tax ID
-  ∑	Text (40 bytes)
-  Answer:		87H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.ReceiptCharge(
   Operation: TAmountOperation): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($87);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Amount, 5);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.ReceiptCharge(Operation);
-  finally
-    Stream.Free;
-  end;
+  Driver.Price := IntToAmount(Operation.Amount);
+  Driver.Department := GetDepartment(Operation.Department);
+  Driver.Tax1 := OPeration.Tax1;
+  Driver.Tax2 := OPeration.Tax2;
+  Driver.Tax3 := OPeration.Tax3;
+  Driver.Tax4 := OPeration.Tax4;
+  Driver.StringForPrinting := OPeration.Text;
+  Result := Driver.Charge;
+  if Result = 0 then
+    FFilter.ReceiptCharge(Operation);
 end;
 
-(******************************************************************************
-
-  Cancel Receipt
-
-  Command:	88H. Length: 5 bytes.
-  ∑	Operator password (4 bytes)
-  Answer:		88H. Length: 3 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.ReceiptCancel: Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($88);
-    Stream.WriteDWORD(GetUsrPassword);
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.CancelReceipt;
-  finally
-    Stream.Free;
-  end;
+  Result := Driver.CancelCheck;
 end;
 
 function TFiscalPrinterDriver.ReceiptCancelPassword(Password: Integer): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($88);
-    Stream.WriteDWORD(Password);
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.CancelReceipt;
-  finally
-    Stream.Free;
-  end;
+  Driver.Password := Password;
+  Result := Driver.CancelCheck;
 end;
 
 procedure TFiscalPrinterDriver.CancelReceipt;
@@ -3921,33 +2710,10 @@ begin
 end;
 
 
-(******************************************************************************
-
-  Get Receipt Subtotal
-
-  Command:	89H. Length: 5 bytes.
-  ∑	Operator password (4 bytes)
-  Answer:		89H. Length: 8 bytes.
-  ∑	Result Code (1 byte)
-  ∑	Operator index number (1 byte) 1Ö30
-  ∑	Receipt Subtotal (5 bytes) 0000000000Ö9999999999
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.GetSubtotal: Int64;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($89);
-    Stream.WriteDWORD(GetUsrPassword);
-    Check(ExecuteStream(Stream));
-    Stream.ReadByte;
-    Result := Stream.ReadInt(5);
-  finally
-    Stream.Free;
-  end;
+  Driver.Check(Driver.CheckSubTotal);
+  
 end;
 
 (******************************************************************************
