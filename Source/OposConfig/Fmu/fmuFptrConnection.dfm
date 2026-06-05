@@ -2,7 +2,7 @@ object fmFptrConnection: TfmFptrConnection
   Left = 533
   Top = 150
   Width = 512
-  Height = 381
+  Height = 383
   Caption = 'Connection'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,8 +15,8 @@ object fmFptrConnection: TfmFptrConnection
   PixelsPerInch = 96
   TextHeight = 13
   object lblStorage: TTntLabel
-    Left = 8
-    Top = 304
+    Left = 264
+    Top = 296
     Width = 94
     Height = 13
     Caption = 'Parameters storage:'
@@ -28,40 +28,40 @@ object fmFptrConnection: TfmFptrConnection
     Height = 13
     Caption = 'Model:'
   end
-  object gbConenctionParams: TTntGroupBox
+  object gbConenction: TTntGroupBox
     Left = 8
     Top = 8
     Width = 249
-    Height = 289
+    Height = 313
     Caption = 'Connection'
     TabOrder = 0
     DesignSize = (
       249
-      289)
+      313)
     object lblComPort: TTntLabel
       Left = 8
-      Top = 120
+      Top = 144
       Width = 48
       Height = 13
       Caption = 'COM port:'
     end
     object lblBaudRate: TTntLabel
       Left = 8
-      Top = 144
+      Top = 168
       Width = 46
       Height = 13
       Caption = 'Baudrate:'
     end
     object lblByteTimeout: TTntLabel
       Left = 8
-      Top = 168
+      Top = 192
       Width = 80
       Height = 13
       Caption = 'Byte timeout, ms:'
     end
     object lblMaxRetryCount: TTntLabel
       Left = 8
-      Top = 192
+      Top = 216
       Width = 74
       Height = 13
       Caption = 'Connect retries:'
@@ -75,36 +75,33 @@ object fmFptrConnection: TfmFptrConnection
     end
     object lblRemoteHost: TTntLabel
       Left = 8
-      Top = 72
+      Top = 96
       Width = 25
       Height = 13
       Caption = 'Host:'
     end
     object lblRemotePort: TTntLabel
       Left = 8
-      Top = 96
+      Top = 120
       Width = 22
       Height = 13
       Caption = 'Port:'
     end
     object lblPrinterProtocol: TTntLabel
       Left = 8
-      Top = 48
+      Top = 72
       Width = 65
       Height = 13
       Caption = 'Protocol type:'
     end
-    object cbComPort: TTntComboBox
-      Left = 112
-      Top = 120
-      Width = 129
-      Height = 21
-      Style = csDropDownList
-      Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 13
-      TabOrder = 4
+    object lblDriverType: TTntLabel
+      Left = 8
+      Top = 48
+      Width = 54
+      Height = 13
+      Caption = 'Driver type:'
     end
-    object cbBaudRate: TTntComboBox
+    object cbComPort: TTntComboBox
       Left = 112
       Top = 144
       Width = 129
@@ -113,6 +110,16 @@ object fmFptrConnection: TfmFptrConnection
       Anchors = [akLeft, akTop, akRight]
       ItemHeight = 13
       TabOrder = 5
+    end
+    object cbBaudRate: TTntComboBox
+      Left = 112
+      Top = 168
+      Width = 129
+      Height = 21
+      Style = csDropDownList
+      Anchors = [akLeft, akTop, akRight]
+      ItemHeight = 13
+      TabOrder = 6
       Items.Strings = (
         '2400'
         '4800'
@@ -124,21 +131,21 @@ object fmFptrConnection: TfmFptrConnection
     end
     object chbSearchByPort: TTntCheckBox
       Left = 8
-      Top = 248
+      Top = 272
       Width = 233
       Height = 17
       Alignment = taLeftJustify
       Caption = 'Find device on all available COM ports'
-      TabOrder = 8
+      TabOrder = 9
     end
     object chbSearchByBaudRate: TTntCheckBox
       Left = 8
-      Top = 224
+      Top = 248
       Width = 233
       Height = 17
       Alignment = taLeftJustify
       Caption = 'Find device on all available baud rates'
-      TabOrder = 7
+      TabOrder = 8
     end
     object cbConnectionType: TTntComboBox
       Left = 112
@@ -157,53 +164,53 @@ object fmFptrConnection: TfmFptrConnection
     end
     object edtRemoteHost: TTntEdit
       Left = 112
-      Top = 72
+      Top = 96
       Width = 129
       Height = 21
-      TabOrder = 2
+      TabOrder = 3
       Text = 'edtRemoteHost'
     end
     object seRemotePort: TSpinEdit
       Left = 112
-      Top = 96
+      Top = 120
       Width = 129
       Height = 22
       MaxValue = 0
       MinValue = 0
-      TabOrder = 3
+      TabOrder = 4
       Value = 0
     end
     object seByteTimeout: TSpinEdit
       Left = 112
-      Top = 168
+      Top = 192
       Width = 129
       Height = 22
       MaxValue = 0
       MinValue = 0
-      TabOrder = 6
+      TabOrder = 7
       Value = 0
     end
     object cbPrinterProtocol: TTntComboBox
       Left = 112
-      Top = 48
+      Top = 72
       Width = 129
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       ItemHeight = 13
-      TabOrder = 1
+      TabOrder = 2
       Items.Strings = (
         'Standard'
         'Protocol 2.0')
     end
     object cbMaxRetryCount: TTntComboBox
       Left = 112
-      Top = 192
+      Top = 216
       Width = 129
       Height = 21
       Style = csDropDownList
       ItemHeight = 13
-      TabOrder = 9
+      TabOrder = 10
       Items.Strings = (
         'INFINITE'
         '1'
@@ -217,6 +224,19 @@ object fmFptrConnection: TfmFptrConnection
         '9'
         '10')
     end
+    object cbDriverType: TTntComboBox
+      Left = 112
+      Top = 48
+      Width = 129
+      Height = 21
+      Style = csDropDownList
+      Anchors = [akLeft, akTop, akRight]
+      ItemHeight = 13
+      TabOrder = 1
+      Items.Strings = (
+        'Internal'
+        'SHTRIH-M DrvFR')
+    end
   end
   object gbPassword: TTntGroupBox
     Left = 264
@@ -224,7 +244,7 @@ object fmFptrConnection: TfmFptrConnection
     Width = 225
     Height = 73
     Caption = 'Passwords'
-    TabOrder = 1
+    TabOrder = 2
     object lblUsrPassword: TTntLabel
       Left = 8
       Top = 20
@@ -261,25 +281,25 @@ object fmFptrConnection: TfmFptrConnection
     end
   end
   object cbStorage: TTntComboBox
-    Left = 120
-    Top = 304
-    Width = 129
+    Left = 368
+    Top = 296
+    Width = 121
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 2
+    TabOrder = 4
     Items.Strings = (
       'Registry'
       'Ini file'
       'Registry IBT')
   end
-  object GroupBox1: TTntGroupBox
+  object gbPolling: TTntGroupBox
     Left = 264
     Top = 8
     Width = 225
     Height = 169
     Caption = 'Polling'
-    TabOrder = 3
+    TabOrder = 1
     DesignSize = (
       225
       169)
@@ -383,6 +403,6 @@ object fmFptrConnection: TfmFptrConnection
     Height = 21
     Style = csDropDownList
     ItemHeight = 13
-    TabOrder = 4
+    TabOrder = 3
   end
 end

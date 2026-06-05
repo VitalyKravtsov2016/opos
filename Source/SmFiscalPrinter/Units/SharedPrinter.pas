@@ -187,7 +187,7 @@ type
     property Station: Integer read FStation write FStation;
     property StatusLinks: TNotifyLinks read GetStatusLinks;
     property PrintWidthInDots: Integer read GetPrintWidthInDots;
-    property Device: IFiscalPrinterDevice read FDevice write FDevice;
+    property Device: IFiscalPrinterDevice read GetDevice write FDevice;
     property CheckTotal: Boolean read GetCheckTotal write SetCheckTotal;
     property OnProgress: TProgressEvent read GetOnProgress write SetOnProgress;
     property PollEnabled: Boolean read GetPollEnabled write SetPollEnabled;
@@ -276,11 +276,6 @@ begin
   FStation := PRINTER_STATION_REC;
   FNumHeaderLines := 4;
   FNumTrailerLines := 4;
-
-  FDevice := TFiscalPrinterDriver.Create;
-  FDevice.OnConnect := DeviceConnect;
-  FDevice.OnDisconnect := DeviceDisconnect;
-  FDevice.OnPrinterStatus := DevicePrinterStatus;
 end;
 
 destructor TSharedPrinter.Destroy;
@@ -309,6 +304,22 @@ begin
   FConnectLinks.Free;
   inherited Destroy;
   ODS('TSharedPrinter.Destroy.1');
+end;
+
+function TSharedPrinter.GetDevice: IFiscalPrinterDevice;
+begin
+  if FDevice = nil then
+  begin
+    if Parameters.DriverType = DriverTypeInternal then
+      FDevice := TFiscalPrinterDevice.Create
+    else
+      FDevice := TFiscalPrinterDriver.Create;
+
+    FDevice.OnConnect := DeviceConnect;
+    FDevice.OnDisconnect := DeviceDisconnect;
+    FDevice.OnPrinterStatus := DevicePrinterStatus;
+  end;
+  Result := FDevice;
 end;
 
 procedure TSharedPrinter.SetDevice(Value: IFiscalPrinterDevice);
@@ -1299,12 +1310,6 @@ begin
     FConnection := CreateConnection;
   Result := FConnection;
 end;
-
-function TSharedPrinter.GetDevice: IFiscalPrinterDevice;
-begin
-  Result := FDevice;
-end;
-
 
 procedure TSharedPrinter.SetConnection(const Value: IPrinterConnection);
 begin

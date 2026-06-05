@@ -89,7 +89,11 @@ uses
   EkmClient in '..\SmFiscalPrinter\Units\EkmClient.pas',
   WException in '..\Shared\WException.pas',
   TntIniFiles in '..\Shared\TntIniFiles.pas',
-  RegExpr in '..\Shared\RegExpr.pas';
+  RegExpr in '..\Shared\RegExpr.pas',
+  FiscalPrinterDevice in '..\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',
+  untDriver in '..\Shared\untDriver.pas',
+  DrvFRLib_TLB in '..\Shared\DrvFRLib_TLB.pas',
+  BinUtils in '..\Shared\BinUtils.pas';
 
 {$R *.TLB}
 

@@ -6,7 +6,7 @@ uses
   // VCL
   Windows, SysUtils, Classes,
   // 3'd
-  TntClasses, TntStdCtrls, TntRegistry, TntIniFiles, TntSysUtils, 
+  TntClasses, TntStdCtrls, TntRegistry, TntIniFiles, TntSysUtils,
   // This
   PrinterParameters, FileUtils, LogFile, SmIniFile, SmFiscalPrinterLib_TLB,
   DirectIOAPI, VatCode;
@@ -214,6 +214,7 @@ begin
       FParameters.RemoteHost := IniFile.ReadText(Section, 'RemoteHost', DefRemoteHost);
       FParameters.RemotePort := IniFile.ReadInteger(Section, 'RemotePort', DefRemotePort);
       FParameters.ConnectionType := IniFile.ReadInteger(Section, 'ConnectionType', DefConnectionType);
+      FParameters.DriverType := IniFile.ReadInteger(Section, 'DriverType', DefDriverType);
       FParameters.PortNumber := IniFile.ReadInteger(Section, 'PortNumber', DefPortNumber);
       FParameters.BaudRate :=  IniFile.ReadInteger(Section, 'BaudRate', DefBaudRate);
       FParameters.SysPassword := IniFile.ReadInteger(Section, 'SysPassword', DefSysPassword);
@@ -399,6 +400,7 @@ begin
   try
     Section := GetSectionName(DeviceName);
     IniFile.WriteInteger(Section, 'ConnectionType', Parameters.ConnectionType);
+    IniFile.WriteInteger(Section, 'DriverType', Parameters.DriverType);
     IniFile.WriteInteger(Section, 'RemotePort', Parameters.RemotePort);
     IniFile.WriteText(Section, 'RemoteHost', Parameters.RemoteHost);
     IniFile.WriteInteger(Section, 'PortNumber', Parameters.PortNumber);

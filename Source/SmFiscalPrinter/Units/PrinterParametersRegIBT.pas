@@ -233,6 +233,9 @@ begin
       if Reg.ValueExists('ConnectionType') then
         Parameters.ConnectionType := Reg.ReadInteger('ConnectionType');
 
+      if Reg.ValueExists('DriverType') then
+        Parameters.DriverType := Reg.ReadInteger('DriverType');
+
       if Reg.ValueExists('ComNumber') then
         Parameters.PortNumber := Reg.ReadInteger('ComNumber');
 
@@ -631,6 +634,7 @@ begin
     Reg.WriteInteger('LogoPosition', Parameters.LogoPosition);
 
     Reg.WriteInteger('ConnectionType', Parameters.ConnectionType);
+    Reg.WriteInteger('DriverType', Parameters.DriverType);
     Reg.WriteInteger('RemotePort', Parameters.RemotePort);
     Reg.WriteString('RemoteHost', Parameters.RemoteHost);
     Reg.WriteString('SubtotalText', Parameters.SubtotalText);

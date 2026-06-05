@@ -13,7 +13,7 @@ uses
   // This
   untDriver,
 
-  PrinterCommand, PrinterTypes, BinStream, StringUtils,
+  PrinterTypes, BinStream, StringUtils,
   SerialPort, PrinterTable, LogFile, ByteUtils, FiscalPrinterTypes,
   DeviceTables, PrinterModel, XmlModelReader, PrinterConnection,
   CommunicationError, VersionInfo, DefaultModel, DriverTypes,
@@ -30,11 +30,20 @@ type
   TFiscalPrinterDriver = class(TInterfacedObject, IFiscalPrinterDevice)
   private
     FDriver: TDriver;
+    FDriverConnected: Boolean;
     property Driver: TDriver read FDriver;
     procedure SetPrintFlags(Flags: Byte);
     function IntToAmount(Value: Int64): Currency;
+    function IntToQuantity(Value: Int64): Double;
     function AmountToInt(Value: Currency): Int64;
     function GetDepartment(ADepartment: Integer): Integer;
+    procedure ApplyDriverConnection;
+    procedure EnsureConnected;
+    procedure CheckDriver(Code: Integer);
+    procedure SetDriverPassword(Password: DWORD);
+    procedure MapLongStatusFromDriver(var Status: TLongPrinterStatus);
+    procedure MapShortStatusFromDriver(var Status: TShortPrinterStatus);
+    procedure SetPrinterStatusFromDriver;
   protected
     function ReceiptClose22(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
@@ -156,7 +165,6 @@ type
     procedure LoadBitmap320(StartLine: Integer; Bitmap: TBitmap);
     procedure LoadBitmap512(StartLine: Integer; Bitmap: TBitmap;
       Scale: Integer);
-    function TestCommand(Code: Integer): Boolean;
     function ReadEJDocumentText(MACNumber: Integer): WideString;
     function ReadEJDocument(MACNumber: Integer; var Line: WideString): Integer;
     function ParseEJDocument(const Text: WideString): TEJDocument;
@@ -197,7 +205,6 @@ type
     function GetCapDiscount: Boolean;
     function ReadLoaderVersion(var Version: WideString): Integer;
     function ReceiptCancelPassword(Password: Integer): Integer;
-    function IsSupported(ResultCode: Integer): Boolean;
     function IsCapFooterFlag: Boolean;
     function GetPrintFlags(Flags: Integer): Integer;
     procedure SetFooterFlag(Value: Boolean);
@@ -351,9 +358,7 @@ type
     function GetPrintWidth: Integer; overload;
     function GetPrintWidth(Font: Integer): Integer; overload;
 
-    function Execute(const Data: AnsiString): AnsiString;
     function ExecuteStream(Stream: TBinStream): Integer;
-    function ExecutePrinterCommand(Command: TPrinterCommand): Integer;
 
     function GetSubtotal: Int64;
     function ReceiptCancel: Integer;
@@ -404,11 +409,7 @@ type
     class function CodeToBaudRate(BaudRate: Integer): Integer;
     function FieldToInt(FieldInfo: TPrinterFieldRec; const Value: WideString): Integer;
     function ReadFieldInfo(Table, Field: Byte; var R: TPrinterFieldRec): Integer;
-    function ExecuteData(const TxData: AnsiString): Integer; overload;
     function ExecuteData(const TxData: AnsiString; var RxData: AnsiString): Integer; overload;
-    function ExecuteCommand(var Command: TCommandRec): Integer;
-
-    function SendCommand(var Command: TCommandRec): Integer;
     function GetModel: TPrinterModelRec;
     function GetOnCommand: TCommandEvent;
     function GetOnPrinterStatus: TNotifyEvent;
@@ -603,9 +604,6 @@ begin
     raise Exception.Create(Format('%s, %s', [_('Invalid parameter value'), ParamName]));
 end;
 
-// 0	По левому краю
-// 1	По центру
-// 2	По правому краю
 function IntToAlignment(Alignment: Integer): Integer;
 begin
   Result := 1;
@@ -613,205 +611,6 @@ begin
     BARCODE_ALIGNMENT_CENTER: Result := 1;
     BARCODE_ALIGNMENT_LEFT: Result := 0;
     BARCODE_ALIGNMENT_RIGHT: Result := 2;
-  end;
-end;
-
-{ Получение таймаута выполнения команды }
-function GetCommandTimeout(Command: Word): Integer;
-begin
-  case Command of
-    $01: Result := 3000; // Get dump
-    $02: Result := 3000; // Get data block from dump
-    $03: Result := 3000; // Interrupt data stream
-    $0D: Result := 3000; // Fiscalization/refiscalization with long ECRRN
-    $0E: Result := 3000; // Set long serial number
-    $0F: Result := 3000; // Get long serial number and long ECRRN
-    $10: Result := 3000; // Get short ECR status
-    $11: Result := 3000; // Get ECR status
-    $12: Result := 3000; // Print bold AnsiString
-    $13: Result := 3000; // Beep
-    $14: Result := 3000; // Set communication parameters
-    $15: Result := 3000; // Read communication parameters
-    $16: Result := 60000; // Technological reset
-    $17: Result := 3000; // Print AnsiString
-    $18: Result := 3000; // Print document header
-    $19: Result := 10000; // Test run
-    $1A: Result := 3000; // Get cash totalizer value
-    $1B: Result := 3000; // Get operation totalizer value
-    $1C: Result := 3000; // Write license
-    $1D: Result := 3000; // Read license
-    $1E: Result := 3000; // Write table
-    $1F: Result := 3000; // Read table
-    $20: Result := 3000; // Set decimal point position
-    $21: Result := 3000; // Set clock time
-    $22: Result := 3000; // Set calendar date
-    $23: Result := 3000; // Confirm date
-    $24: Result := 3000; // Initialize tables with default values
-    $25: Result := 10000; // Cut receipt
-    $26: Result := 3000; // Get font parameters
-    $27: Result := 30000; // Common clear
-    $28: Result := 10000; // Open cash drawer
-    $29: Result := 3000; // Feed
-    $2A: Result := 3000; // Eject slip
-    $2B: Result := 3000; // Interrupt test
-    $2C: Result := 30000; // Print operation totalizers report
-    $2D: Result := 3000; // Get table structure
-    $2E: Result := 3000; // Get field structure
-    $2F: Result := 3000; // Print AnsiString with font
-    $40: Result := 30000; // Daily report without cleaning
-    $41: Result := 30000; // Daily report with cleaning
-    $42: Result := 30000; // Print Department report
-    $43: Result := 30000; // Print tax report
-    $4D: Result := 3000; // Print graphics 512
-    $4E: Result := 3000; // Load graphics 512
-    $4F: Result := 3000; // Print scaled graphics
-    $50: Result := 10000; // Cash in
-    $51: Result := 10000; // Cash out
-    $52: Result := 10000; // Print fixed document header
-    $53: Result := 10000; // Print document footer
-    $54: Result := 10000; // Print trailer
-    $60: Result := 3000; // Set serial number
-    $61: Result := 30000; // Initialize FM
-    $62: Result := 30000; // Get FM totals
-    $63: Result := 30000; // Get last FM record date
-    $64: Result := 30000; // Get dates and sessions range
-    $65: Result := 30000; // Fiscalization/refiscalization
-    $66: Result := 30000; // Fiscal report in dates range
-    $67: Result := 30000; // Fiscal report in days range
-    $68: Result := 30000; // Interrupt full report
-    $69: Result := 30000; // Get fiscalization parameters
-    $70: Result := 30000; // Open fiscal slip
-    $71: Result := 30000; // Open standard fiscal slip
-    $72: Result := 30000; // Transaction on slip
-    $73: Result := 30000; // Standard transaction on slip
-    $74: Result := 30000; // Discount/charge on slip
-    $75: Result := 30000; // Standard discount/charge on slip
-    $76: Result := 30000; // Close fiscal slip
-    $77: Result := 30000; // Close standard fiscal slip
-    $78: Result := 30000; // Slip configuration
-    $79: Result := 30000; // Standard slip configuration
-    $7A: Result := 30000; // Fill slip buffer with nonfiscal information
-    $7B: Result := 30000; // Clear slip buffer AnsiString
-    $7C: Result := 30000; // Clear slip buffer
-    $7D: Result := 30000; // Print slip
-    $7E: Result := 30000; // Common slip configuration
-    $80: Result := 10000; // Sale
-    $81: Result := 10000; // Buy
-    $82: Result := 10000; // Sale refund
-    $83: Result := 10000; // Buy refund
-    $84: Result := 10000; // Void transaction
-    $85: Result := 30000; // Close receipt
-    $86: Result := 10000; // Discount
-    $87: Result := 10000; // Charge
-    $88: Result := 10000; // Cancel receipt
-    $89: Result := 10000; // Receipt subtotal
-    $8A: Result := 10000; // Void discount
-    $8B: Result := 10000; // Void charge
-    $8C: Result := 30000; // Print last receipt duplicate
-    $8D: Result := 10000; // Open receipt
-    $90: Result := 30000; // Oil products sale receipt in defined dose pre-payment mode
-    $91: Result := 30000; // Oil products sale receipt in defined sum pre-payment mode
-    $92: Result := 30000; // Correction receipt on incomplete oil-products sale
-    $93: Result := 30000; // Set fuel-dispensing unit dose in milliliters
-    $94: Result := 30000; // Set fuel-dispensing unit dose in cash units
-    $95: Result := 30000; // Oil products sale
-    $96: Result := 30000; // Stop fuel-dispensing unit
-    $97: Result := 30000; // Start fuel-dispensing unit
-    $98: Result := 30000; // Reset fuel-dispensing unit
-    $99: Result := 30000; // Reset all fuel-dispensing units
-    $9A: Result := 30000; // Set fuel-dispensing unit parameters
-    $9B: Result := 30000; // Read liter totals counter
-    $9E: Result := 30000; // Get current fuel-dispensing unit dose
-    $9F: Result := 30000; // Get fuel-dispensing unit status
-    $A0: Result := 30000; // EJ department report in dates range
-    $A1: Result := 30000; // EJ department report in days range
-    $A2: Result := 30000; // EJ day report in dates range
-    $A3: Result := 30000; // EJ day report in days range
-    $A4: Result := 30000; // Print day totals by EJ day number
-    $A5: Result := 30000; // Print pay document from EJ by KPK number
-    $A6: Result := 30000; // Print EJ journal by day number
-    $A7: Result := 30000; // Interrupt full EJ report
-    $A8: Result := 30000; // Print EJ activization result
-    $A9: Result := 30000; // EJ activization
-    $AA: Result := 30000; // Close EJ archive
-    $AB: Result := 30000; // Get EJ serial number
-    $AC: Result := 30000; // Interrupt EJ
-    $AD: Result := 30000; // Get EJ status by code 1
-    $AE: Result := 30000; // Get EJ status by code 2
-    $AF: Result := 30000; // Test EJ integrity
-    $B0: Result := 10000; // Continue printing
-    $B1: Result := 10000; // Get EJ version
-    $B2: Result := 150000; // Initialize EJ
-    $B3: Result := 30000; // Get EJ report data
-    $B4: Result := 30000; // Get EJ journal
-    $B5: Result := 30000; // Get EJ document
-    $B6: Result := 150000; // Get department EJ report in dates range
-    $B7: Result := 150000; // Get EJ department report in days range
-    $B8: Result := 150000; // Get EJ day report in dates range
-    $B9: Result := 150000; // Get EJ day report in days range
-    $BA: Result := 150000; // Get EJ day totals by day number
-    $BB: Result := 150000; // Get EJ activization result
-    $BC: Result := 30000; // Get EJ error
-    $C0: Result := 10000; // Load graphics
-    $C1: Result := 10000; // Print graphics
-    $C2: Result := 10000; // Print barcode
-    $C3: Result := 10000; // Print exteneded graphics
-    $C4: Result := 10000; // Load extended graphics
-    $C5: Result := 10000; // Print line
-    $C8: Result := 30000; // Get line count in printing buffer
-    $C9: Result := 30000; // Get line from printing buffer
-    $CA: Result := 30000; // Clear printing buffer
-    $D0: Result := 30000; // Get ECR IBM status
-    $D1: Result := 30000; // Get short ECR IBM status
-    $DE: Result := 30000; // Print barcode 2D
-    $F0: Result := 30000; // Change shutter position
-    $F1: Result := 30000; // Discharge receipt from presenter
-    $F3: Result := 30000; // Set service center password
-    $FC: Result := 30000; // Get device type
-    $FD: Result := 30000; // Send commands to external device port
-    $E0: Result := 100000; // Open fiscal day
-    $E1: Result := 30000; // Finish slip
-    $E2: Result := 30000; // Close nonfiscal document
-    $E4: Result := 30000; // Print attribute
-    $FF01: Result := 30000; // FS: Read status
-    $FF02: Result := 30000; // FS: Read number
-    $FF03: Result := 30000; // FS: Read expiration time
-    $FF04: Result := 30000; // FS: Read version
-    $FF05: Result := 30000; // FS: Start activation
-    $FF06: Result := 30000; // FS: Do activation
-    $FF07: Result := 30000; // FS: Clear status
-    $FF08: Result := 30000; // FS: Void document
-    $FF09: Result := 30000; // FS: Read activation result
-    $FF0A: Result := 30000; // FS: Find document by number
-    $FF0B: Result := 30000; // FS: Open day
-    $FF0C: Result := 30000; // FS: Send TLV data
-    $FF0D: Result := 30000; // FS: Registration with discount/charge
-    $FF0E: Result := 30000; // FS: Read open parameter
-    $FF30: Result := 30000; // FS: Read data in buffer
-    $FF31: Result := 30000; // FS: Read data block from buffer
-    $FF32: Result := 30000; // FS: Start write buffer
-    $FF33: Result := 30000; // FS: Write data block in buffer
-    $FF34: Result := 30000; // FS: Create fiscalization report
-    $FF35: Result := 30000; // FS: Start correction receipt
-    $FF36: Result := 30000; // FS: Create correction receipt
-    $FF37: Result := 30000; // FS: Start report on calculations
-    $FF38: Result := 30000; // FS: Create report on calculations
-    $FF39: Result := 30000; // FS: Read data transfer status
-    $FF3A: Result := 30000; // FS: Read fiscal document in TLV format
-    $FF3B: Result := 30000; // FS: Read fiscal document TLV
-    $FF3C: Result := 30000; // FS: Read server ticket on document number
-    $FF3D: Result := 30000; // FS: Start close fiscal mode
-    $FF3E: Result := 30000; // FS: Close fiscal mode
-    $FF3F: Result := 30000; // FS: Read fiscal documents count without server ticket
-    $FF40: Result := 30000; // FS: Read fiscal day parameters
-    $FF41: Result := 30000; // FS: Start opening fiscal day
-    $FF42: Result := 30000; // FS: Start closing fiscal day
-    $FF43: Result := 30000; // FS: Close day
-    $FF44: Result := 30000; // FS: Registration with discount/charge 2
-    $FF45: Result := 30000; // FS: Close receipt extended
-    $FF4B: Result := 30000; // FS: Print receipt discount
-  else
-    Result := 30000;
   end;
 end;
 
@@ -829,6 +628,10 @@ end;
 
 const
   MinLineWidth = 40;
+  DrvFRConnectionLocal = 0;
+  DrvFRConnectionTCP = 1;
+  DrvFRConnectionDCOM = 2;
+  DrvFRConnectionTCPSocket = 6;
 
 function PrinterDateToBin(Value: TPrinterDate): AnsiString;
 begin
@@ -847,6 +650,8 @@ end;
 constructor TFiscalPrinterDriver.Create;
 begin
   inherited Create;
+  FDriver := TDriver.Create(nil);
+  FDriverConnected := False;
   SetLength(FTaxInfo, 4);
   FTLVItems := TStringList.Create;
   FSTLVTag := TTLV.Create(nil);
@@ -867,6 +672,12 @@ end;
 
 destructor TFiscalPrinterDriver.Destroy;
 begin
+  try
+    if FDriverConnected then
+      FDriver.Disconnect;
+  except
+  end;
+  FDriverConnected := False;
   FLock.Free;
   FFields.Free;
   FTables.Free;
@@ -878,6 +689,7 @@ begin
   FContext.Free;
   FSTLVTag.Free;
   FTLVItems.Free;
+  FDriver.Free;
   inherited Destroy;
 end;
 
@@ -891,13 +703,211 @@ begin
   Result := Value / 100;
 end;
 
+function TFiscalPrinterDriver.IntToQuantity(Value: Int64): Double;
+begin
+  Result := Value / 1000;
+end;
+
 function TFiscalPrinterDriver.AmountToInt(Value: Currency): Int64;
 begin
   Result := Round(Value * 100);
 end;
 
+function DateTimeToPrinterDate(Value: TDateTime): TPrinterDate;
+var
+  Year, Month, Day: Word;
+begin
+  DecodeDate(Value, Year, Month, Day);
+  Result.Day := Day;
+  Result.Month := Month;
+  Result.Year := Year - 2000;
+end;
+
+function DateTimeToPrinterTime(Value: TDateTime): TPrinterTime;
+var
+  Hour, Min, Sec, MSec: Word;
+begin
+  DecodeTime(Value, Hour, Min, Sec, MSec);
+  Result.Hour := Hour;
+  Result.Min := Min;
+  Result.Sec := Sec;
+end;
+
+function DateTimeToPrinterDateTime(Value: TDateTime): TPrinterDateTime;
+var
+  D: TPrinterDate;
+  T: TPrinterTime;
+begin
+  D := DateTimeToPrinterDate(Value);
+  T := DateTimeToPrinterTime(Value);
+  Result.Day := D.Day;
+  Result.Month := D.Month;
+  Result.Year := D.Year;
+  Result.Hour := T.Hour;
+  Result.Min := T.Min;
+  Result.Sec := T.Sec;
+end;
+
+function DriverConnectionType(ConnectionType: Integer): Integer;
+begin
+  case ConnectionType of
+    ConnectionTypeLocal:
+      Result := DrvFRConnectionLocal;
+    ConnectionTypeDCOM:
+      Result := DrvFRConnectionDCOM;
+    ConnectionTypeTCP:
+      Result := DrvFRConnectionTCP;
+    ConnectionTypeSocket:
+      Result := DrvFRConnectionTCPSocket;
+  else
+    Result := DrvFRConnectionLocal;
+  end;
+end;
+
+procedure TFiscalPrinterDriver.CheckDriver(Code: Integer);
+begin
+  Driver.Check(Code);
+end;
+
+procedure TFiscalPrinterDriver.SetDriverPassword(Password: DWORD);
+begin
+  Driver.Password := Password;
+end;
+
+procedure TFiscalPrinterDriver.ApplyDriverConnection;
+begin
+  Driver.Password := GetUsrPassword;
+  Driver.ComNumber := Parameters.PortNumber;
+  Driver.BaudRate := Parameters.BaudRate;
+  Driver.Timeout := Parameters.ByteTimeout;
+  Driver.ConnectionType := DriverConnectionType(Parameters.ConnectionType);
+  Driver.UseIPAddress := Parameters.ConnectionType in
+    [ConnectionTypeTCP, ConnectionTypeSocket];
+  if Driver.UseIPAddress then
+  begin
+    Driver.IPAddress := Parameters.RemoteHost;
+    Driver.TCPPort := Parameters.RemotePort;
+  end;
+end;
+
+procedure TFiscalPrinterDriver.EnsureConnected;
+begin
+  ApplyDriverConnection;
+  if not FDriverConnected then
+  begin
+    CheckDriver(Driver.Connect);
+    FDriverConnected := True;
+    FIsOnline := True;
+    if Assigned(FOnConnect) then
+      FOnConnect(Self);
+  end;
+end;
+
+procedure VersionChars(const Version: WideString; var Hi, Lo: Char);
+var
+  S: AnsiString;
+  P: Integer;
+begin
+  S := AnsiString(Version);
+  P := Pos('.', S);
+  if (P > 1) and (P < Length(S)) then
+  begin
+    Hi := S[1];
+    Lo := S[P + 1];
+  end else
+  if Length(S) >= 2 then
+  begin
+    Hi := S[1];
+    Lo := S[2];
+  end else
+  begin
+    Hi := '0';
+    Lo := '0';
+  end;
+end;
+
+procedure SetPrinterFlagsFromWord(var Flags: TPrinterFlags; Value: Word);
+begin
+  FillChar(Flags, SizeOf(Flags), 0);
+  Flags.Value := Value;
+  Flags.JrnNearEnd := TestBit(Value, 0);
+  Flags.RecNearEnd := TestBit(Value, 1);
+  Flags.SlpUpSensor := TestBit(Value, 2);
+  Flags.SlpLoSensor := TestBit(Value, 3);
+  Flags.DecimalPosition := TestBit(Value, 4);
+  Flags.EJPresent := TestBit(Value, 5);
+  Flags.JrnEmpty := TestBit(Value, 6);
+  Flags.RecEmpty := TestBit(Value, 7);
+  Flags.JrnLeverUp := TestBit(Value, 8);
+  Flags.RecLeverUp := TestBit(Value, 9);
+  Flags.CoverOpened := TestBit(Value, 10);
+  Flags.DrawerOpened := TestBit(Value, 11);
+  Flags.Bit12 := TestBit(Value, 12);
+  Flags.Bit13 := TestBit(Value, 13);
+  Flags.EJNearEnd := TestBit(Value, 14);
+  Flags.Bit15 := TestBit(Value, 15);
+end;
+
+procedure TFiscalPrinterDriver.MapShortStatusFromDriver(
+  var Status: TShortPrinterStatus);
+begin
+  FillChar(Status, SizeOf(Status), 0);
+  Status.OperatorNumber := Driver.OperatorNumber;
+  Status.Flags := Driver.ECRFlags;
+  Status.Mode := Driver.ECRMode;
+  Status.AdvancedMode := Driver.ECRAdvancedMode;
+end;
+
+procedure TFiscalPrinterDriver.MapLongStatusFromDriver(
+  var Status: TLongPrinterStatus);
+begin
+  FillChar(Status, SizeOf(Status), 0);
+  Status.OperatorNumber := Driver.OperatorNumber;
+  VersionChars(Driver.ECRSoftVersion,
+    Status.FirmwareVersionHi, Status.FirmwareVersionLo);
+  Status.FirmwareBuild := Driver.ECRBuild;
+  Status.FirmwareDate := DateTimeToPrinterDate(Driver.ECRSoftDate);
+  Status.LogicalNumber := Driver.LogicalNumber;
+  Status.DocumentNumber := Driver.DocumentNumber;
+  Status.Flags := Driver.ECRFlags;
+  Status.Mode := Driver.ECRMode;
+  Status.AdvancedMode := Driver.ECRAdvancedMode;
+  Status.PortNumber := Driver.PortNumber;
+  VersionChars(Driver.FMSoftVersion, Status.FMVersionHi, Status.FMVersionLo);
+  Status.FMBuild := Driver.FMBuild;
+  Status.FMFirmwareDate := DateTimeToPrinterDate(Driver.FMSoftDate);
+  Status.Date := DateTimeToPrinterDate(Driver.ECRDate);
+  Status.Time := DateTimeToPrinterTime(Driver.ECRTime);
+  Status.FMFlags := Driver.FMFlags;
+  Status.SerialNumber := Driver.SerialNumber;
+  Status.DayNumber := Driver.SessionNumber;
+  Status.RemainingFiscalMemory := Driver.FreeMemorySize;
+  Status.RegistrationNumber := Driver.RegistrationNumber;
+  Status.FreeRegistration := Driver.FreeRegistration;
+  Status.FiscalID := Driver.INN;
+end;
+
+procedure TFiscalPrinterDriver.SetPrinterStatusFromDriver;
+var
+  Status: TPrinterStatus;
+begin
+  FillChar(Status, SizeOf(Status), 0);
+  Status.OperatorNumber := Driver.OperatorNumber;
+  Status.Mode := Driver.ECRMode;
+  Status.AdvancedMode := Driver.ECRAdvancedMode;
+  SetPrinterFlagsFromWord(Status.Flags, Driver.ECRFlags);
+  SetPrinterStatus(Status);
+end;
+
 procedure TFiscalPrinterDriver.Disconnect;
 begin
+  if FDriverConnected then
+  begin
+    Driver.Disconnect;
+    FDriverConnected := False;
+    if Assigned(FOnDisconnect) then
+      FOnDisconnect(Self);
+  end;
   Initialize;
 end;
 
@@ -1319,459 +1329,106 @@ begin
   end;
 end;
 
-function CanRepeatCommand(Code: Integer): Boolean;
-begin
-  Result := False;
-  case Code of
-    $01, // Get dump
-    $02, // Get data block from dump
-    $03, // Interrupt data stream
-    $0F, // Get long serial number and long ECRRN
-    $10, // Get short ECR status
-    $11, // Get ECR status
-    $12, // Print bold AnsiString
-    $13, // Beep
-    $14, // Set communication parameters
-    $15, // Read communication parameters
-    $16, // Technological reset
-    $17, // Print AnsiString
-    $18, // Print document header
-    $19, // Test run
-    $1A, // Get cash totalizer value
-    $1B, // Get operation totalizer value
-    $1C, // Write license
-    $1D, // Read license
-    $1E, // Write table
-    $1F, // Read table
-    $20, // Set decimal point position
-    $21, // Set clock time
-    $22, // Set calendar date
-    $23, // Confirm date
-    $24, // Initialize tables with default values
-    $25, // Cut receipt
-    $26, // Get font parameters
-    $27, // Common clear
-    $28, // Open cash drawer
-    $29, // Feed
-    $2A, // Eject slip
-    $2B, // Interrupt test
-    $2C, // Print operation totalizers report
-    $2D, // Get table structure
-    $2E, // Get field structure
-    $2F, // Print AnsiString with font
-    $40, // Daily report without cleaning
-    $41, // Daily report with cleaning
-    $42, // Print Department report
-    $43, // Print tax report
-    $4D, // Print graphics 512
-    $4E, // Load graphics 512
-    $4F, // Print scaled graphics
-    $52, // Print fixed document header
-    $53, // Print document footer
-    $54, // Print trailer
-    $60, // Set serial number
-    $61, // Initialize FM
-    $62, // Get FM totals
-    $63, // Get last FM record date
-    $64, // Get dates and sessions range
-    $66, // Fiscal report in dates range
-    $67, // Fiscal report in days range
-    $68, // Interrupt full report
-    $69, // Get fiscalization parameters
-    $70, // Open fiscal slip
-    $71, // Open standard fiscal slip
-    $72, // Transaction on slip
-    $73, // Standard transaction on slip
-    $74, // Discount/charge on slip
-    $75, // Standard discount/charge on slip
-    $78, // Slip configuration
-    $79, // Standard slip configuration
-    $7A, // Fill slip buffer with nonfiscal information
-    $7B, // Clear slip buffer AnsiString
-    $7C, // Clear slip buffer
-    $7D, // Print slip
-    $7E, // Common slip configuration
-    $89, // Receipt subtotal
-    $8C, // Print last receipt duplicate
-    $8D, // Open receipt
-    $A0, // EJ department report in dates range
-    $A1, // EJ department report in days range
-    $A2, // EJ day report in dates range
-    $A3, // EJ day report in days range
-    $A4, // Print day totals by EJ day number
-    $A5, // Print pay document from EJ by KPK number
-    $A6, // Print EJ journal by day number
-    $A7, // Interrupt full EJ report
-    $A8, // Print EJ activization result
-    $A9, // EJ activization
-    $AA, // Close EJ archive
-    $AB, // Get EJ serial number
-    $AC, // Interrupt EJ
-    $AD, // Get EJ status by code 1
-    $AE, // Get EJ status by code 2
-    $AF, // Test EJ integrity
-    $B0, // Continue printing
-    $B1, // Get EJ version
-    $B2, // Initialize EJ
-    $B3, // Get EJ report data
-    $B4, // Get EJ journal
-    $B5, // Get EJ document
-    $B6, // Get department EJ report in dates range
-    $B7, // Get EJ department report in days range
-    $B8, // Get EJ day report in dates range
-    $B9, // Get EJ day report in days range
-    $BA, // Get EJ day totals by day number
-    $BB, // Get EJ activization result
-    $BC, // Get EJ error
-    $C0, // Load graphics
-    $C1, // Print graphics
-    $C2, // Print barcode
-    $C3, // Print exteneded graphics
-    $C4, // Load extended graphics
-    $C5, // Print line
-    $C8, // Get line count in printing buffer
-    $C9, // Get line from printing buffer
-    $CA, // Clear printing buffer
-    $D0, // Get ECR IBM status
-    $D1, // Get short ECR IBM status
-    $DE, // Print barcode 2D
-    $F0, // Change shutter position
-    $F1, // Discharge receipt from presenter
-    $F3, // Set service center password
-    $FC, // Get device type
-    $FD, // Send commands to external device port
-    $E4, // Print attribute
-    $FF01, // FS: Read status
-    $FF02, // FS: Read number
-    $FF03, // FS: Read expiration time
-    $FF04, // FS: Read version
-    $FF05, // FS: Start activation
-    $FF06, // FS: Do activation
-    $FF07, // FS: Clear status
-    $FF08, // FS: Void document
-    $FF09, // FS: Read activation result
-    $FF0A, // FS: Find document by number
-    $FF0B, // FS: Open day
-    $FF0C, // FS: Send TLV data
-    $FF0D, // FS: Registration with discount/charge
-    $FF0E, // FS: Read open parameter
-    $FF30, // FS: Read data in buffer
-    $FF31, // FS: Read data block from buffer
-    $FF32, // FS: Start write buffer
-    $FF33, // FS: Write data block in buffer
-    $FF34, // FS: Create fiscalization report
-    $FF35, // FS: Start correction receipt
-    $FF36, // FS: Create correction receipt
-    $FF37, // FS: Start report on Calc
-    $FF38, // FS: Create report on Calc
-    $FF39, // FS: Read data transfer status
-    $FF3A, // FS: Read fiscal document in TLV format
-    $FF3B, // FS: Read fiscal document TLV
-    $FF3C, // FS: Read server ticket on document number
-    $FF3D, // FS: Start close fiscal mode
-    $FF3E, // FS: Close fiscal mode
-    $FF3F, // FS: Read fiscal documents count without server ticket
-    $FF40, // FS: Read fiscal day parameters
-    $FF41, // FS: Start opening fiscal day
-    $FF42, // FS: Start closing fiscal day
-    $FF43, // FS: Close day
-    $FF44: // FS: Registration with discount/charge 2
-      Result := True;
-  end;
-end;
-
-function TFiscalPrinterDriver.SendCommand(var Command: TCommandRec): Integer;
-var
-  i: Integer;
-  Index: Integer;
-  CommandCode: Integer;
-begin
-  i := 0;
-  while (Parameters.MaxRetryCount = MaxRetryCountInfinite)or(i < Parameters.MaxRetryCount) do
-  begin
-    try
-      Logger.Debug(Format('0x%.2X, %s', [Command.Code, GetCommandName(Command.Code)]));
-      if (i <> 0) then
-      begin
-        Logger.Debug(Format('Retry %d...', [i]));
-      end;
-
-      Command.RxData := Connection.Send(Command.Timeout, Command.TxData);
-      SetIsOnline(True);
-      Break;
-    except
-      on E: Exception do
-      begin
-        Logger.Error(E.Message);
-
-        SetIsOnline(False);
-        if not CanRepeatCommand(Command.Code) then Break;
-        if (i = (Parameters.MaxRetryCount-1)) then
-          raise ECommunicationError.Create(_('Нет связи'));
-      end;
-    end;
-    if Parameters.MaxRetryCount > 0 then
-    begin
-      Inc(i);
-    end;
-  end;
-
-  if Length(Command.RxData) < 1 then
-    raise ECommunicationError.Create(_('Invalid answer length'));
-
-  CommandCode := Ord(Command.RxData[1]);
-
-  Index := 2;
-  if CommandCode = $FF then
-  begin
-    Index := 3;
-    CommandCode := $FF00 + Ord(Command.RxData[2]);
-    if CommandCode <> Command.Code then
-      Result := Ord(Command.RxData[2])
-    else
-      Result := Ord(Command.RxData[3]);
-  end else
-  begin
-    if CommandCode <> Command.Code then
-      raise ECommunicationError.Create(_('Invalid answer code'));
-    Result := Ord(Command.RxData[2]);
-  end;
-
-  FResultCode := Result;
-  FResultText := GetErrorText(Result);
-  Command.ResultCode := Result;
-  Command.RxData := Copy(Command.RxData, Index + 1, Length(Command.RxData));
-  if FResultCode <> 0 then
-  begin
-    Logger.Error(GetFullErrorText(FResultCode, FCapFiscalStorage));
-  end;
-end;
-
 function TFiscalPrinterDriver.GetErrorText(Code: Integer): WideString;
 begin
   Result := PrinterTypes.GetErrorText(Code, FCapFiscalStorage);
 end;
 
-function TFiscalPrinterDriver.ExecuteCommand(var Command: TCommandRec): Integer;
-begin
-  Lock;
-  try
-    repeat
-      Command.RepeatFlag := False;
-      if Assigned(FBeforeCommand) then
-        FBeforeCommand(Self, Command);
-
-      if Command.Code = $8D then
-      begin
-        CheckPrinterStatus;
-      end;
-      if Command.Code = $0E then
-      begin
-        CheckPrinterStatus;
-        CorrectDate;
-      end;
-
-      SendCommand(Command);
-
-      if Assigned(FOnCommand) then
-        FOnCommand(Self, Command);
-
-      Result := Command.ResultCode;
-
-      if not Command.RepeatFlag then Break;
-    until false;
-  finally
-    Unlock;
-  end;
-end;
-
-function TFiscalPrinterDriver.ExecuteData(const TxData: AnsiString): Integer;
-var
-  RxData: AnsiString;
-begin
-  Result := ExecuteData(TxData, RxData);
-end;
-
 function TFiscalPrinterDriver.ExecuteData(const TxData: AnsiString;
   var RxData: AnsiString): Integer;
-
-function GetCommandCode(const TxData: AnsiString): Integer;
 begin
-  Result := 0;
-  if Length(TxData) > 0 then
-    Result := Ord(TxData[1]);
-  if Result = $FF then
-    Result := (Result shl 8) + Ord(TxData[2]);
-end;
-
-var
-  Command: TCommandRec;
-begin
-  Command.Code := GetCommandCode(TxData);
-  Command.Timeout := GetCommandTimeout(Command.Code);
-  Command.TxData := TxData;
-  Result := ExecuteCommand(Command);
-  RxData := Command.RxData;
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
+  RxData := '';
 end;
 
 function TFiscalPrinterDriver.ExecuteStream(Stream: TBinStream): Integer;
-var
-  RxData: AnsiString;
-  TxData: AnsiString;
 begin
-  RxData := '';
-  TxData := Stream.Data;
-  Result := ExecuteData(TxData, RxData);
-  Stream.Data := RxData;
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
+  Stream.Data := '';
 end;
 
 function TFiscalPrinterDriver.ExecuteStream2(Stream: TBinStream): Integer;
-var
-  RxData: AnsiString;
-  TxData: AnsiString;
 begin
-  RxData := '';
-  TxData := Stream.Data;
-  Result := ExecuteData(TxData, RxData);
-  Stream.Data := Chr(Result) + RxData;
-end;
-
-function TFiscalPrinterDriver.ExecutePrinterCommand(Command: TPrinterCommand): Integer;
-var
-  RxData: AnsiString;
-  TxData: AnsiString;
-  Stream: TBinStream;
-begin
-  Stream := TBinStream.Create;
-  try
-    Command.Encode(Stream);
-    TxData := Chr(Command.GetCode) + Stream.Data;
-    Result := ExecuteData(TxData, RxData);
-    Stream.Data := RxData;
-    Command.ResultCode := Result;
-    if Command.ResultCode = 0 then
-      Command.Decode(Stream);
-  finally
-    Stream.Free;
-  end;
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
+  Stream.Data := Chr(Result);
 end;
 
 procedure TFiscalPrinterDriver.CashIn(Amount: Int64);
-var
-  Command: TCashInCommand;
 begin
   FLogger.Debug(Format('CashIn(%d)', [Amount]));
-
   FFilter.BeforeCashIn;
-  Command := TCashInCommand.Create;
-  try
-    Command.Password := GetUsrPassword;
-    Command.Amount := Amount;
-    Check(ExecutePrinterCommand(Command));
-
-    FFilter.CashIn(Amount);
-  finally
-    Command.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.Summ1 := IntToAmount(Amount);
+  CheckDriver(Driver.CashIncome);
+  FFilter.CashIn(Amount);
 end;
 
 procedure TFiscalPrinterDriver.CashOut(Amount: Int64);
-var
-  Command: TCashOutCommand;
 begin
   FLogger.Debug(Format('CashOut(%d)', [Amount]));
-
   FFilter.BeforeCashOut;
-  Command := TCashOutCommand.Create;
-  try
-    Command.Password := GetUsrPassword;
-    Command.Amount := Amount;
-    Check(ExecutePrinterCommand(Command));
-    FFilter.CashOut(Amount);
-  finally
-    Command.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.Summ1 := IntToAmount(Amount);
+  CheckDriver(Driver.CashOutcome);
+  FFilter.CashOut(Amount);
 end;
 
 function TFiscalPrinterDriver.StartDump(DeviceCode: Integer): Integer;
-var
-  Stream: TBinStream;
 begin
   FLogger.Debug(Format('StartDump(%d)', [DeviceCode]));
-
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte(SMFP_COMMAND_START_DUMP);
-    Stream.WriteDWORD(GetTaxPassword);
-    Stream.WriteByte(DeviceCode);
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetTaxPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
 
 function TFiscalPrinterDriver.GetDumpBlock: TDumpBlock;
-var
-  Command: TGetDumpBlockCommand;
 begin
-  Command := TGetDumpBlockCommand.Create;
-  try
-    Command.Password := GetTaxPassword;
-    Check(ExecutePrinterCommand(Command));
-    Result := Command.DumpBlock;
-  finally
-    Command.Free;
-  end;
+  FillChar(Result, SizeOf(Result), 0);
+  EnsureConnected;
+  SetDriverPassword(GetTaxPassword);
+  Check(ERROR_COMMAND_NOT_SUPPORTED);
 end;
 
 procedure TFiscalPrinterDriver.StopDump;
-var
-  Command: TStopDumpCommand;
 begin
-  Command := TStopDumpCommand.Create;
-  try
-    Command.Password := GetTaxPassword;
-    Check(ExecutePrinterCommand(Command));
-  finally
-    Command.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetTaxPassword);
 end;
 
 function TFiscalPrinterDriver.LongFisc(NewPassword: DWORD;
   PrinterID, FiscalID: Int64): TLongFiscResult;
-var
-  Command: TLongFiscalizationCommand;
 begin
   FLogger.Debug(Format('LongFisc(%d,%d,%d)',
     [NewPassword, PrinterID, FiscalID]));
-
-  Command := TLongFiscalizationCommand.Create;
-  try
-    Command.TaxPassword := GetTaxPassword;
-    Command.NewPassword := NewPassword;
-    Command.PrinterID := PrinterID;
-    Command.FiscalID := FiscalID;
-    Check(ExecutePrinterCommand(Command));
-    Result := Command.FiscResult;
-  finally
-    Command.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetTaxPassword);
+  Driver.NewPasswordTI := NewPassword;
+  Driver.RNM := IntToStr(PrinterID);
+  Driver.INN := IntToStr(FiscalID);
+  CheckDriver(Driver.FiscalizationWithLongRNM);
+  Result.FiscNumber := Driver.RegistrationNumber;
+  Result.LeftNumber := Driver.FreeRegistration;
+  Result.DayNumber := Driver.SessionNumber;
+  Result.Date := DateTimeToPrinterDate(Driver.ECRDate);
 end;
 
 procedure TFiscalPrinterDriver.SetLongSerial(Serial: Int64);
-var
-  Command: TSetLongSerialCommand;
 begin
   FLogger.Debug(Format('SetLongSerial(%d)', [Serial]));
-
-  Command := TSetLongSerialCommand.Create;
-  try
-    Command.Password := 0;
-    Command.Serial := Serial;
-    Check(ExecutePrinterCommand(Command));
-  finally
-    Command.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(0);
+  Driver.SerialNumber := IntToStr(Serial);
+  CheckDriver(Driver.SetLongSerialNumber);
 end;
 
 function TFiscalPrinterDriver.ReadOperatorNumber(Password: Integer): Integer;
@@ -1791,23 +1448,31 @@ end;
 
 function TFiscalPrinterDriver.ReadShortStatus2(Password: Integer): TShortPrinterStatus;
 begin
-  Driver.Check(Driver.GetShortECRStatus);
-  Result.OperatorNumber := Driver.OperatorNumber;
-  { !!! }
+  EnsureConnected;
+  SetDriverPassword(Password);
+  CheckDriver(Driver.GetShortECRStatus);
+  MapShortStatusFromDriver(Result);
+  FShortStatus := Result;
 end;
 
 function TFiscalPrinterDriver.ReadShortStatus: TShortPrinterStatus;
 begin
-  Driver.Check(Driver.GetShortECRStatus);
-  Result.OperatorNumber := Driver.OperatorNumber;
-  { !!! }
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  CheckDriver(Driver.GetShortECRStatus);
+  MapShortStatusFromDriver(Result);
+  FShortStatus := Result;
+  SetPrinterStatusFromDriver;
 end;
 
 function TFiscalPrinterDriver.ReadLongStatus: TLongPrinterStatus;
 begin
-  Driver.Check(Driver.GetECRStatus);
-  Result.OperatorNumber := Driver.OperatorNumber;
-  { !!! }
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  CheckDriver(Driver.GetECRStatus);
+  MapLongStatusFromDriver(Result);
+  FLongStatus := Result;
+  SetPrinterStatusFromDriver;
 end;
 
 function TFiscalPrinterDriver.GetFMFlags(Flags: Byte): TFMFlags;
@@ -2081,8 +1746,6 @@ end;
 function TFiscalPrinterDriver.DoWriteTable(
   Table, Row, Field: Integer;
   const FieldValue: WideString): Integer;
-var
-  Command: TWriteTableCommand;
 begin
   FLogger.Debug(Format('DoWriteTable(%d,%d,%d,%s)',
     [Table, Row, Field, StrToHexText(FieldValue)]));
@@ -2101,8 +1764,6 @@ end;
 
 function TFiscalPrinterDriver.ReadTableBin(Table, Row,
   Field: Integer): WideString;
-var
-  Command: TReadTableCommand;
 begin
   FLogger.Debug(Format('ReadTableBin(%d,%d,%d)',
     [Table, Row, Field]));
@@ -2716,43 +2377,18 @@ begin
   
 end;
 
-(******************************************************************************
-
-  Void Discount
-
-  Command:	8AH. Length: 54 bytes.
-  ·	Operator password (4 bytes)
-  ·	Void Discount value (5 bytes) 0000000000…9999999999
-  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Text (40 bytes)
-  Answer:		8AH. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.ReceiptStornoDiscount(
   Operation: TAmountOperation): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($8A);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Amount, 5);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.Summ1 := IntToAmount(Operation.Amount);
+  Driver.Tax1 := Operation.Tax1;
+  Driver.Tax2 := Operation.Tax2;
+  Driver.Tax3 := Operation.Tax3;
+  Driver.Tax4 := Operation.Tax4;
+  Driver.StringForPrinting := Operation.Text;
+  Result := Driver.StornoDiscount;
 end;
 
 (******************************************************************************
@@ -2760,38 +2396,31 @@ end;
   Void Surcharge
 
   Command:	8BH. Length: 54 bytes.
-  ·	Operator password (4 bytes)
-  ·	Void Surcharge value (5 bytes) 0000000000…9999999999
-  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
-  ·	Text (40 bytes)
+  ?	Operator password (4 bytes)
+  ?	Void Surcharge value (5 bytes) 0000000000?9999999999
+  ?	Tax 1 (1 byte) '0' - no tax, '1'?'4' - tax ID
+  ?	Tax 2 (1 byte) '0' - no tax, '1'?'4' - tax ID
+  ?	Tax 3 (1 byte) '0' - no tax, '1'?'4' - tax ID
+  ?	Tax 4 (1 byte) '0' - no tax, '1'?'4' - tax ID
+  ?	Text (40 bytes)
   Answer:		8BH. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.ReceiptStornoCharge(
   Operation: TAmountOperation): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($8B);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Operation.Amount, 5);
-    Stream.WriteInt(Operation.Tax1, 1);
-    Stream.WriteInt(Operation.Tax2, 1);
-    Stream.WriteInt(Operation.Tax3, 1);
-    Stream.WriteInt(Operation.Tax4, 1);
-    Stream.WriteString(GetText(Operation.Text, 40));
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.Summ1 := IntToAmount(Operation.Amount);
+  Driver.Tax1 := Operation.Tax1;
+  Driver.Tax2 := Operation.Tax2;
+  Driver.Tax3 := Operation.Tax3;
+  Driver.Tax4 := Operation.Tax4;
+  Driver.StringForPrinting := Operation.Text;
+  Result := Driver.StornoCharge;
 end;
 
 (******************************************************************************
@@ -2799,25 +2428,18 @@ end;
   Print Last Receipt Duplicate
 
   Command:	8CH. Length: 5 bytes.
-  ·	Operator password (4 bytes)
+  ?	Operator password (4 bytes)
   Answer:		8CH. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.PrintReceiptCopy: Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($8C);
-    Stream.WriteDWORD(GetUsrPassword);
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Result := Driver.RepeatDocument;
 end;
 
 (******************************************************************************
@@ -2825,32 +2447,25 @@ end;
   Open Receipt
 
   Command:	8DH. Length: 6 bytes.
-  ·	Operator password (4 bytes)
-  ·	Receipt type (1 byte):		0 - Sale;
+  ?	Operator password (4 bytes)
+  ?	Receipt type (1 byte):		0 - Sale;
   1 - Buy;
   2 - Sale Refund;
   3 - Buy Refund.
   Answer:		8DH. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.OpenReceipt(ReceiptType: Byte): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($8D);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteByte(ReceiptType);
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-      FFilter.OpenReceipt(ReceiptType);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.CheckType := ReceiptType;
+  Result := Driver.OpenCheck;
+  if Result = 0 then
+    FFilter.OpenReceipt(ReceiptType);
 end;
 
 (******************************************************************************
@@ -2858,25 +2473,18 @@ end;
   Continue Printing
 
   Command:	B0H. Length: 5 bytes.
-  ·	Operator, Administrator or System Administrator password (4 bytes)
+  ?	Operator, Administrator or System Administrator password (4 bytes)
   Answer:		B0H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.ContinuePrint: Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($B0);
-    Stream.WriteDWORD(GetUsrPassword);
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Result := Driver.ContinuePrint;
 end;
 
 (******************************************************************************
@@ -2884,33 +2492,26 @@ end;
   Load Graphics In FP
 
   Command: 	C0H. Length: 46 bytes.
-  ·	Operator password (4 bytes)
-  ·	Graphics line number (1 byte) 0…199
-  ·	Graphical data (40 bytes)
+  ?	Operator password (4 bytes)
+  ?	Graphics line number (1 byte) 0?199
+  ?	Graphical data (40 bytes)
   Answer:		C0H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.LoadGraphics1(Line: Byte; Data: AnsiString): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($C0);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteByte(Line);
-    Stream.WriteString(GetDataBlock(Data, 40, 40));
-    Result := ExecuteStream(Stream);
-    if Result = ERROR_COMMAND_NOT_SUPPORTED then
-    begin
-      FCapGraphics1 := False;
-      FModelData.CapGraphics := False;
-    end;
-  finally
-    Stream.Free;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.LineNumber := Line;
+  Driver.LineDataHex := StrToHex(GetDataBlock(Data, 40, 40));
+  Result := Driver.LoadLineData;
+  if Result = ERROR_COMMAND_NOT_SUPPORTED then
+  begin
+    FCapGraphics1 := False;
+    FModelData.CapGraphics := False;
   end;
 end;
 
@@ -2919,31 +2520,24 @@ end;
   Print Graphics
 
   Command:	C1H. Length: 7 bytes.
-  ·	Operator password (4 bytes)
-  ·	Number of first line of preloaded graphics to be printed (1 byte) 1…200
-  ·	Number of last line of preloaded graphics to be printed (1 byte) 1…200
+  ?	Operator password (4 bytes)
+  ?	Number of first line of preloaded graphics to be printed (1 byte) 1?200
+  ?	Number of last line of preloaded graphics to be printed (1 byte) 1?200
   Answer:		C1H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.PrintGraphics1(Line1, Line2: Byte): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($C1);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteByte(Line1);
-    Stream.WriteByte(Line2);
-    Result := ExecuteStream(Stream);
-    if Result = ERROR_COMMAND_NOT_SUPPORTED then
-      FModelData.CapGraphics := False;
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.FirstLineNumber := Line1;
+  Driver.LastLineNumber := Line2;
+  Result := Driver.PrintGraphics512;
+  if Result = ERROR_COMMAND_NOT_SUPPORTED then
+    FModelData.CapGraphics := False;
 end;
 
 (******************************************************************************
@@ -2951,29 +2545,20 @@ end;
   Print Bar Code
 
   Command:	C2H. Length: 10 bytes.
-  ·	Operator password (4 bytes)
-  ·	Bar code (5 bytes) 000000000000…999999999999
+  ?	Operator password (4 bytes)
+  ?	Bar code (5 bytes) 000000000000?999999999999
   Answer:		C2H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.PrintBarcode(const Barcode: WideString): Integer;
-var
-  IBarcode: Int64;
-  Stream: TBinStream;
 begin
-  IBarcode := StrToInt64(Copy(Barcode, 1, 12));
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($C2);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(IBarcode, 5);
-    Result := ExecuteStream(Stream);
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.BarCode := Barcode;
+  Result := Driver.PrintBarCode;
 end;
 
 (******************************************************************************
@@ -2981,31 +2566,24 @@ end;
   Extended Graphics Load In FP
 
   Command: 	C3H. Length: 47 bytes.
-  ·	Operator password (4 bytes)
-  ·	Graphics line number (2 bytes) 0…1199
-  ·	Graphical data (40 bytes)
+  ?	Operator password (4 bytes)
+  ?	Graphics line number (2 bytes) 0?1199
+  ?	Graphical data (40 bytes)
   Answer:		C3H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.PrintGraphics2(Line1, Line2: Word): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($C3);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Line1, 2);
-    Stream.WriteInt(Line2, 2);
-    Result := ExecuteStream(Stream);
-    if Result = ERROR_COMMAND_NOT_SUPPORTED then
-      FModelData.CapGraphicsEx := False;
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.FirstLineNumber := Line1;
+  Driver.LastLineNumber := Line2;
+  Result := Driver.PrintGraphics512;
+  if Result = ERROR_COMMAND_NOT_SUPPORTED then
+    FModelData.CapGraphicsEx := False;
 end;
 
 (******************************************************************************
@@ -3013,33 +2591,26 @@ end;
   Print Extended Graphics
 
   Command:	C4H. Length: 9 bytes.
-  ·	Operator password (4 bytes)
-  ·	Number of first line of preloaded graphics to be printed (1 byte) 1…1200
-  ·	Number of last line of preloaded graphics to be printed (1 byte) 1…1200
+  ?	Operator password (4 bytes)
+  ?	Number of first line of preloaded graphics to be printed (1 byte) 1?1200
+  ?	Number of last line of preloaded graphics to be printed (1 byte) 1?1200
   Answer:		C4H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.LoadGraphics2(Line: Word; Data: AnsiString): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($C4);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Line, 2);
-    Stream.WriteString(GetDataBlock(Data, 40, 40));
-    Result := ExecuteStream(Stream);
-    if Result = ERROR_COMMAND_NOT_SUPPORTED then
-    begin
-      FCapGraphics2 := False;
-      FModelData.CapGraphicsEx := False;
-    end;
-  finally
-    Stream.Free;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.LineNumber := Line;
+  Driver.LineDataHex := StrToHex(GetDataBlock(Data, 40, 40));
+  Result := Driver.LoadLineDataEx;
+  if Result = ERROR_COMMAND_NOT_SUPPORTED then
+  begin
+    FCapGraphics2 := False;
+    FModelData.CapGraphicsEx := False;
   end;
 end;
 
@@ -3048,39 +2619,28 @@ end;
   Print Graphical Line
 
   Command: 	C5H. Length: X + 7 bytes.
-  ·	Operator password (4 bytes)
-  ·	Number of repetitions (2 bytes)
-  ·	Flags (1 byte)
-  ·	Graphical data (X bytes)
+  ?	Operator password (4 bytes)
+  ?	Number of repetitions (2 bytes)
+  ?	Flags (1 byte)
+  ?	Graphical data (X bytes)
   Answer:		C5H. Length: 3 bytes.
-  ·	Result Code (1 byte)
-  ·	Operator index number (1 byte) 1…30
+  ?	Result Code (1 byte)
+  ?	Operator index number (1 byte) 1?30
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.PrintGraphicsLine(Height: Word; Flags: Byte;
   Data: WideString): Integer;
-var
-  Stream: TBinStream;
 begin
   Flags := GetPrintFlags(Flags);
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($C5);
-    Stream.WriteDWORD(GetUsrPassword);
-    Stream.WriteInt(Height, 2);
-    if FCapParameters2 and FParameters2.Flags.CapFlagsGraphicsEx then
-    begin
-      Stream.WriteByte(Flags);
-    end;
-    Stream.WriteString(Data);
-    Result := ExecuteStream(Stream);
-    if Result = ERROR_COMMAND_NOT_SUPPORTED then
-    begin
-      FCapBarLine := False;
-    end;
-  finally
-    Stream.Free;
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.LineNumber := Height;
+  Driver.LineDataHex := StrToHex(AnsiString(Data));
+  Result := Driver.WideLoadLineData;
+  if Result = ERROR_COMMAND_NOT_SUPPORTED then
+  begin
+    FCapBarLine := False;
   end;
 end;
 
@@ -3090,36 +2650,29 @@ end;
 
   Command:	FCH. Length: 1 byte.
   Answer:		FCH. Length: (8+X) bytes.
-  ·	Result Code (1 byte)
-  ·	Device type (1 byte) 0…255
-  ·	Device subtype (1 byte) 0…255
-  ·	Protocol version supported by device (1 byte) 0…255
-  ·	Subprotocol version supported by device (1 byte) 0…255
-  ·	Device model (1 byte) 0…255
-  ·	Language (1 byte) 0…255, '0' - Russian, '1' - English
-  ·	Device name (X bytes) AnsiString of WIN1251 code page characters;
+  ?	Result Code (1 byte)
+  ?	Device type (1 byte) 0?255
+  ?	Device subtype (1 byte) 0?255
+  ?	Protocol version supported by device (1 byte) 0?255
+  ?	Subprotocol version supported by device (1 byte) 0?255
+  ?	Device model (1 byte) 0?255
+  ?	Language (1 byte) 0?255, '0' - Russian, '1' - English
+  ?	Device name (X bytes) AnsiString of WIN1251 code page characters;
     AnsiString length in bytes depends on device model
 
 ******************************************************************************)
 
 function TFiscalPrinterDriver.ReadDeviceMetrics: TDeviceMetrics;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($FC);
-    Check(ExecuteStream(Stream));
-    Result.DeviceType := Stream.ReadByte;
-    Result.DeviceSubType := Stream.ReadByte;
-    Result.ProtocolVersion := Stream.ReadByte;
-    Result.ProtocolSubVersion := Stream.ReadByte;
-    Result.Model := Stream.ReadByte;
-    Result.Language := Stream.ReadByte;
-    Result.DeviceName := Stream.ReadString;
-  finally
-    Stream.Free;
-  end;
+  EnsureConnected;
+  CheckDriver(Driver.GetDeviceMetrics);
+  Result.DeviceType := Driver.UMajorType;
+  Result.DeviceSubType := Driver.UMinorType;
+  Result.ProtocolVersion := Driver.UMajorProtocolVersion;
+  Result.ProtocolSubVersion := Driver.UMinorProtocolVersion;
+  Result.Model := Driver.UModel;
+  Result.Language := Driver.UCodePage;
+  Result.DeviceName := Driver.UDescription;
 end;
 
 function TFiscalPrinterDriver.FieldToInt(FieldInfo: TPrinterFieldRec;
@@ -3395,42 +2948,30 @@ end;
   Get Data Of EKLZ Daily Totals Report
 
   Command:	BAH. Length: 7 bytes.
-  ·	System Administrator password (4 bytes) 30
-  ·	Number of daily totals (2 bytes) 0000…2100
+  ?	System Administrator password (4 bytes) 30
+  ?	Number of daily totals (2 bytes) 0000?2100
   Answer:		BAH. Length: 18 bytes.
-  ·	Result Code (1 byte)
-  ·	ECR model (16 bytes) AnsiString of WIN1251 code page characters
+  ?	Result Code (1 byte)
+  ?	ECR model (16 bytes) AnsiString of WIN1251 code page characters
 
 *******************************************************************************)
 
 function TFiscalPrinterDriver.GetEJSesssionResult(Number: Word;
   var Text: WideString): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
-  Command := #$BA + IntToBin(GetSysPassword, 4) + IntToBin(Number, 2);
-  Result := ExecuteData(Command, Answer);
-  Text := Answer;
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.SessionNumber := Number;
+  Result := Driver.GetEKLZSessionTotal;
+  Text := Driver.EKLZData;
 end;
 
-(*******************************************************************************
-
-Запрос итога активизации ЭКЛЗ
-Команда: BBH. Длина сообщения: 5 байт.
-Пароль системного администратора (4 байта)
-Ответ: BBH. Длина сообщения: 18 байт.
-Код ошибки (1 байт)
-Тип ККМ – строка символов в кодировке WIN1251 (16 байт)
-
-*******************************************************************************)
-
 function TFiscalPrinterDriver.ReadEJActivation(var Line: WideString): Integer;
-var
-  Answer: AnsiString;
 begin
-  Result := ExecuteData(#$BB + IntToBin(GetSysPassword, 4), Answer);
-  Line := TrimRight(PChar(Answer));
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.EKLZActivizationResult;
+  Line := TrimRight(Driver.EKLZData);
 end;
 
 (*******************************************************************************
@@ -3438,19 +2979,19 @@ end;
   Get Data Of EKLZ Report
 
   Command:	B3H. Length: 5 bytes.
-  ·	System Administrator password (4 bytes) 30
+  ?	System Administrator password (4 bytes) 30
   Answer:		B3H. Length: (2+X) bytes.
-  ·	Result Code (1 byte)
-  ·	Report part or line (X bytes)
+  ?	Result Code (1 byte)
+  ?	Report part or line (X bytes)
 
 *******************************************************************************)
 
 function TFiscalPrinterDriver.GetEJReportLine(var Line: WideString): Integer;
-var
-  Answer: AnsiString;
 begin
-  Result := ExecuteData(#$B3 + IntToBin(GetSysPassword, 4), Answer);
-  Line := TrimRight(PChar(Answer));
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.GetEKLZCode2Report;
+  Line := TrimRight(Driver.EKLZData);
 end;
 
 (*******************************************************************************
@@ -3458,17 +2999,17 @@ end;
   Cancel Active EKLZ Operation
 
   Command:	ACH. Length: 5 bytes.
-  ·	System Administrator password (4 bytes) 30
+  ?	System Administrator password (4 bytes) 30
   Answer:		ACH. Length: 2 bytes.
-  ·	Result Code (1 byte)
+  ?	Result Code (1 byte)
 
 *******************************************************************************)
 
 function TFiscalPrinterDriver.EJReportStop: Integer;
-var
-  RxData: AnsiString;
 begin
-  Result := ExecuteData(#$AC + IntToBin(GetSysPassword, 4), RxData);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.EKLZInterrupt;
 end;
 
 function TFiscalPrinterDriver.DecodeEJFlags(Flags: Byte): TEJFlags;
@@ -3487,38 +3028,31 @@ end;
   Get EKLZ Status 1
 
   Command:	ADH. Length: 5 bytes.
-  ·	System Administrator password (4 bytes) 30
+  ?	System Administrator password (4 bytes) 30
   Answer:		ADH. Length: 22 bytes.
-  ·	Result Code (1 byte)
-  ·	KPK value of last fiscal receipt (5 bytes) 0000000000…9999999999
-  ·	Date of last KPK (3 bytes) DD-MM-YY
-  ·	Time of last KPK (2 bytes) HH-MM
-  ·	Number of last KPK (4 bytes) 00000000…99999999
-  ·	EKLZ serial number (5 bytes) 0000000000…9999999999
-  ·	EKLZ flags (1 byte)
+  ?	Result Code (1 byte)
+  ?	KPK value of last fiscal receipt (5 bytes) 0000000000?9999999999
+  ?	Date of last KPK (3 bytes) DD-MM-YY
+  ?	Time of last KPK (2 bytes) HH-MM
+  ?	Number of last KPK (4 bytes) 00000000?99999999
+  ?	EKLZ serial number (5 bytes) 0000000000?9999999999
+  ?	EKLZ flags (1 byte)
 
 *******************************************************************************)
 
 function TFiscalPrinterDriver.GetEJStatus1(var Status: TEJStatus1): Integer;
-var
-  Stream: TBinStream;
 begin
-  Stream := TBinStream.Create;
-  try
-    Stream.WriteByte($AD);
-    Stream.WriteDWORD(GetSysPassword);
-    Result := ExecuteStream(Stream);
-    if Result = 0 then
-    begin
-      Status.DocAmount := Stream.ReadInt(5);
-      Stream.Read(Status.DocDate, sizeof(Status.DocDate));
-      Stream.Read(Status.DocTime, sizeof(Status.DocTime));
-      Stream.Read(Status.DocNumber, sizeof(Status.DocNumber));
-      Status.EJNumber := Stream.ReadInt(5);
-      Status.Flags := DecodeEJFlags(Stream.ReadByte);
-    end;
-  finally
-    Stream.Free;
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.GetEKLZCode1Report;
+  if Result = 0 then
+  begin
+    Status.DocAmount := AmountToInt(Driver.Summ1);
+    Status.DocDate := DateTimeToPrinterDate(Driver.ECRDate);
+    //Status.DocTime := DateTimeToPrinterTime(Driver.ECRTime);
+    Status.DocNumber := Driver.DocumentNumber;
+    Status.EJNumber := StrToInt64Def(Driver.EKLZNumber, 0);
+    Status.Flags := DecodeEJFlags(Driver.EKLZFlags);
   end;
 end;
 
@@ -3537,23 +3071,24 @@ end;
   Print Daily Totals Report In Dates Range From EKLZ
 
   Command:	A2H. Length: 12 bytes.
-  ·	System Administrator password (4 bytes) 30
-  ·	Report type (1 byte) '0' - short, '1' - full
-  ·	Date of first daily totals in range (3 bytes) DD-MM-YY
-  ·	Date of last daily totals in range (3 bytes) DD-MM-YY
+  ?	System Administrator password (4 bytes) 30
+  ?	Report type (1 byte) '0' - short, '1' - full
+  ?	Date of first daily totals in range (3 bytes) DD-MM-YY
+  ?	Date of last daily totals in range (3 bytes) DD-MM-YY
   Answer:		A2H. Length: 2 bytes.
-  ·	Result Code (1 byte)
+  ?	Result Code (1 byte)
 
 ******************************************************************************)
 
 procedure TFiscalPrinterDriver.EJTotalsReportDate(
   const Parameters: TDateReport);
 begin
-  Execute(#$A2 +
-    IntToBin(GetSysPassword, 4) +
-    Chr(Parameters.ReportType) +
-    PrinterDateToBin(Parameters.Date1) +
-    PrinterDateToBin(Parameters.Date2));
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.ReportType := Parameters.ReportType <> 0;
+  Driver.FirstSessionDate := PrinterDateToDate(Parameters.Date1);
+  Driver.LastSessionDate := PrinterDateToDate(Parameters.Date2);
+  CheckDriver(Driver.EKLZSessionReportInDatesRange);
 end;
 
 (******************************************************************************
@@ -3561,23 +3096,24 @@ end;
   Print Daily Totals Report In Daily Totals Numbers Range From EKLZ
 
   Command:	A3H. Length: 10 bytes.
-  ·	System Administrator password (4 bytes) 30
-  ·	Report type (1 byte) '0' - short, '1' - full
-  ·	Number of first daily totals in range (2 bytes) 0000…2100
-  ·	Number of last daily totals in range (2 bytes) 0000…2100
+  ?	System Administrator password (4 bytes) 30
+  ?	Report type (1 byte) '0' - short, '1' - full
+  ?	Number of first daily totals in range (2 bytes) 0000?2100
+  ?	Number of last daily totals in range (2 bytes) 0000?2100
   Answer:		A3H. Length: 2 bytes.
-  ·	Result Code (1 byte)
+  ?	Result Code (1 byte)
 
 ******************************************************************************)
 
 procedure TFiscalPrinterDriver.EJTotalsReportNumber(
   const Parameters: TNumberReport);
 begin
-  Execute(#$A3 +
-    IntToBin(GetSysPassword, 4) +
-    Chr(Parameters.ReportType) +
-    IntToBin(Parameters.Number1, 2) +
-    IntToBin(Parameters.Number2, 2));
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.ReportType := Parameters.ReportType <> 0;
+  Driver.FirstSessionNumber := Parameters.Number1;
+  Driver.LastSessionNumber := Parameters.Number2;
+  CheckDriver(Driver.EKLZSessionReportInSessionsRange);
 end;
 
 function TFiscalPrinterDriver.GetModel: TPrinterModelRec;
@@ -3812,21 +3348,33 @@ procedure TFiscalPrinterDriver.OpenPort(
   PortNumber, BaudRate, ByteTimeout: Integer);
 begin
   Logger.Debug(Format('OpenPort(COM%d, %d, %d)', [PortNumber, BaudRate, ByteTimeout]));
-  Connection.OpenPort(PortNumber, BaudRate, ByteTimeout);
+  ApplyDriverConnection;
+  Driver.ComNumber := PortNumber;
+  Driver.BaudRate := BaudRate;
+  Driver.Timeout := ByteTimeout;
+  if FDriverConnected then
+  begin
+    Driver.Disconnect;
+    FDriverConnected := False;
+  end;
+  EnsureConnected;
 end;
 
 procedure TFiscalPrinterDriver.ClaimDevice(PortNumber, Timeout: Integer);
 begin
-  Connection.ClaimDevice(PortNumber, Timeout);
+  EnsureConnected;
+  CheckDriver(Driver.LockPort);
 end;
 
 procedure TFiscalPrinterDriver.ReleaseDevice;
 begin
-  Connection.ReleaseDevice;
+  if FDriverConnected then
+    CheckDriver(Driver.UnlockPort);
 end;
 
 procedure TFiscalPrinterDriver.Close;
 begin
+  Disconnect;
   FConnection := nil;
   FIsOnline := False;
 end;
@@ -3834,11 +3382,18 @@ end;
 procedure TFiscalPrinterDriver.Open(AConnection: IPrinterConnection);
 begin
   FConnection := AConnection;
+  ApplyDriverConnection;
 end;
 
 procedure TFiscalPrinterDriver.ClosePort;
 begin
-  Connection.ClosePort;
+  if FDriverConnected then
+  begin
+    Driver.Disconnect;
+    FDriverConnected := False;
+    if Assigned(FOnDisconnect) then
+      FOnDisconnect(Self);
+  end;
   FIsOnline := False;
 end;
 
@@ -3885,11 +3440,6 @@ begin
   RaiseError(Code, GetErrorText(Code));
 end;
 
-function TFiscalPrinterDriver.Execute(const Data: AnsiString): AnsiString;
-begin
-  Check(ExecuteData(Data, Result));
-end;
-
 function TFiscalPrinterDriver.GetDeviceMetrics: TDeviceMetrics;
 begin
   if not FValidDeviceMetrics then
@@ -3929,17 +3479,20 @@ end;
   Print Daily Log Report For Daily Totals Number From EKLZ
 
   Command:	A6H. Length: 7 bytes.
-  ·	System Administrator password (4 bytes) 30
-  ·	Day number (2 bytes) 0000…2100
+  ?	System Administrator password (4 bytes) 30
+  ?	Day number (2 bytes) 0000?2100
 
   Answer:		A6H. Length: 2 bytes.
-  ·	Result Code (1 byte)
+  ?	Result Code (1 byte)
 
 ******************************************************************************)
 
 procedure TFiscalPrinterDriver.PrintJournal(DayNumber: Integer);
 begin
-  Execute(#$A6 + IntToBin(GetSysPassword, 4) + IntToBin(DayNumber, 2));
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.SessionNumber := DayNumber;
+  CheckDriver(Driver.EKLZJournalOnSessionNumber);
 end;
 
 function TFiscalPrinterDriver.ValidRow(Table, Row: Integer): Boolean;
@@ -4004,13 +3557,13 @@ end;
 
 function TFiscalPrinterDriver.ReadEJDocument(MACNumber: Integer;
   var Line: WideString): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
-  Command := #$B5 + IntToBin(GetSysPassword, 4) + IntToBin(MACNumber, 4);
-  Result := ExecuteData(Command, Answer);
-  Line := Answer;
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.KPKNumber := MACNumber;
+  Result := Driver.GetEKLZDocument;
+  if Result = 0 then
+    Line := Driver.EKLZData;
 end;
 
 
@@ -4361,8 +3914,6 @@ end;
 
 function TFiscalPrinterDriver.DrawScale(const P: TDrawScale): Integer;
 var
-  Command: AnsiString;
-  Answer: AnsiString;
   LastLine: Integer;
 begin
   LastLine := P.LastLine;
@@ -4371,13 +3922,13 @@ begin
     LastLine := LastLine - 1;
   end;
 
-  Command := #$4F +
-    IntToBin(GetUsrPassword, 4) +
-    Chr(P.FirstLine) +
-    Chr(LastLine) +
-    Chr(P.VScale) +
-    Chr(P.HScale);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.FirstLineNumber := P.FirstLine;
+  Driver.LastLineNumber := LastLine;
+  Driver.VertScale := P.VScale;
+  Driver.HorizScale := P.HScale;
+  Result := Driver.PrintGraphics512;
 end;
 
 function TFiscalPrinterDriver.GetStartLine: Integer;
@@ -5200,8 +4751,6 @@ var
   i, j: Integer;
   Line: AnsiString;
   Row: Integer;
-  Answer: AnsiString;
-  Command: AnsiString;
   Progress: Integer;
   NewProgress: Integer;
   ProgressStep: Double;
@@ -5233,10 +4782,14 @@ begin
       Inc(RowCount);
       if Row >= Bitmap.Height then Break;
     end;
-    Command := #$4E + IntToBin(GetUsrPassword, 4) + Chr(LineLength) +
-      IntToBin(StartLine, 2) + IntToBin(RowCount, 2) + #1 + Line;
-
-    Check(ExecuteData(Command, Answer));
+    EnsureConnected;
+    SetDriverPassword(GetUsrPassword);
+    Driver.LineLength := LineLength;
+    Driver.FirstLineNumber := StartLine;
+    Driver.LineNumber := RowCount;
+    Driver.GraphBufferType := 1;
+    Driver.LineDataHex := StrToHex(Line);
+    CheckDriver(Driver.LoadGraphics512);
     Inc(StartLine, RowsPerCommand);
     NewProgress := 0;
     if ProgressStep <> 0 then
@@ -5304,7 +4857,6 @@ begin
   end;
 end;
 
-// 17,1,17,1,0,4,4,'Rus формат фд','4'
 function TFiscalPrinterDriver.GetFFDVersion: TFFDVersion;
 begin
   if FFFDVersion = TFFDVersion(-1) then
@@ -5320,7 +4872,7 @@ end;
 procedure TFiscalPrinterDriver.UpdateInfo;
 begin
   GetPrinterModel;
-  FCapCloseReceipt3 := TestCommand($FF76);
+  FCapCloseReceipt3 := False;
   FCapParameters2 := ReadParameters2(FParameters2) = 0;
   if FCapParameters2 then
   begin
@@ -5342,21 +4894,17 @@ begin
   begin
     FCapGraphics512 := True;
     FCapScaleGraphics := True;
-    //FCapGraphics512 := TestCommand($4E);
-    //FCapScaleGraphics := TestCommand($4F);
   end;
   FCapFooterFlag := FCapParameters2 and FParameters2.Flags.CapFlagsGraphicsEx;
 
   ReadLongStatus;
   FCapBarcode2D := True;
-  //FCapBarcode2D := TestCommand($DE);
 
   FCapFiscalStorage := True;
   if Parameters.ModelId <> MODEL_ID_WEB_CASSA then
     FCapFiscalStorage := ReadCapFiscalStorage;
 
   FCapFontInfo := True;
-  //FCapFontInfo := TestCommand($26);
   if FCapFontInfo then
   begin
     FFontInfo := ReadFontInfoList;
@@ -5446,24 +4994,6 @@ begin
     Result := FSReadState(R) = 0;
   except
     Result := False;
-  end;
-end;
-
-function TFiscalPrinterDriver.IsSupported(ResultCode: Integer): Boolean;
-begin
-  Result := ResultCode <> ERROR_COMMAND_NOT_SUPPORTED;
-end;
-
-function TFiscalPrinterDriver.TestCommand(Code: Integer): Boolean;
-var
-  RxData: AnsiString;
-begin
-  if Code > $FF then
-  begin
-    Result := IsSupported(ExecuteData(Chr(Hi(Code)) + Chr(Lo(Code)), RxData));
-  end else
-  begin
-    Result := IsSupported(ExecuteData(Chr(Code), RxData));
   end;
 end;
 
@@ -5592,140 +5122,56 @@ begin
 end;
 
 function TFiscalPrinterDriver.LoadBarcode2D(const Data: TBarcode2DData): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$DD +
-      IntToBin(GetUsrPassword, 4) +
-      Chr(Data.BlockType) +
-      Chr(Data.BlockNumber) +
-      Data.BlockData;
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.BlockType := Data.BlockType;
+  Driver.BlockNumber := Data.BlockNumber;
+  Driver.BlockDataHex := StrToHex(Data.BlockData);
+  Result := Driver.LoadBlockData;
 end;
-
-(*
-Печать многомерного штрих-кода
-Команда: DEH. Длина сообщения: 15 байт.
-"	Пароль (4 байта)
-"	Тип штрих-кода (1 байт)
-"	Длина данных штрих-кода (2 байта) 1...70891
-"	Номер начального блока данных (1 байт) 0...127
-"	Параметр 1 (1 байт)
-"	Параметр 2 (1 байт)
-"	Параметр 3 (1 байт)
-"	Параметр 4 (1 байт)
-"	Параметр 5 (1 байт)
-"	Выравнивание (1 байт)
-	Ответ:		DEH. Длина сообщения: 3 байт или 122 байт.
-"	Код ошибки (1 байт)
-"	Порядковый номер оператора (1 байт) 1…30
-"	Параметр 1 (1 байт) 2
-"	Параметр 2 (1 байт) 2
-"	Параметр 3 (1 байт) 2
-"	Параметр 4 (1 байт) 2
-"	Параметр 5 (1 байт) 2
-"	Размер штрих-кода (горизонтальный) в точках (2 байта) 2
-"	Размер штрих-кода (вертикальный) в точках (2 байта) 2
-
-Тип штрих-кода	Штрих-код
-0	PDF 417
-1	DATAMATRIX
-2	AZTEC
-3	QR code
-1312	QR code2
-
-Номер параметра	PDF 417	DATAMATRIX	AZTEC	QR Code
-1	Number of columns	Encoding scheme	Encoding scheme	Version, 0=auto; 40 (max)
-2	Number of rows	Rotate	-	Mask; 8 (max)
-3	Width of module	Dot size	Dot size	Dot size; 3...8
-4	Module height	Symbol size	Symbol size	-
-5	Error correction level	-	Error correction level	Error correction level; 0...3=L,M,Q,H
-
-Выравнивание	Тип выравнивания
-0	По левому краю
-1	По центру
-2	По правому краю
-Примечания:
-1 - в зависимости от версии печатаемого QR кода и типа данных;
-2 - для типа штрих-кода (QR код).
-*)
 
 function TFiscalPrinterDriver.PrintBarcode2D(const Barcode: TBarcode2D): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
-  Command := #$DE +
-    IntToBin(GetUsrPassword, 4) +
-    Chr(Barcode.BarcodeType) +
-    IntToBin(Barcode.DataLength, 2) +
-    Chr(Barcode.BlockNumber) +
-    Chr(Barcode.Parameter1) +
-    Chr(Barcode.Parameter2) +
-    Chr(Barcode.Parameter3) +
-    Chr(Barcode.Parameter4) +
-    Chr(Barcode.Parameter5) +
-    Chr(Barcode.Alignment);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.BarcodeType := Barcode.BarcodeType;
+  Driver.BarcodeDataLength := Barcode.DataLength;
+  Driver.BarcodeStartBlockNumber := Barcode.BlockNumber;
+  Driver.BarcodeParameter1 := Barcode.Parameter1;
+  Driver.BarcodeParameter2 := Barcode.Parameter2;
+  Driver.BarcodeParameter3 := Barcode.Parameter3;
+  Driver.BarcodeParameter4 := Barcode.Parameter4;
+  Driver.BarcodeParameter5 := Barcode.Parameter5;
+  Result := Driver.Print2DBarcode;
 end;
 
-(*
-Загрузка графики-512
-Команда: 	4EH. Длина сообщения: 11+X2 байт.
-Пароль оператора (4 байта)
-Длина линии L (1 байт) 1…40 для T = 0; 1…643 для T = 1
-Номер начальной линии (2 байта) 1…12004 для T = 0; 1…6005 для T = 1
-Количество последующих линий N6 (2 байта) 1…12004 для T = 0; 1…6005 для T = 1
-Тип графического буфера T (1 байт) 0 - для команд [расширенной] графики; 1 - для команд графики-512
-Графическая информация (X2 = N * L байт)
-Ответ:		4EH. Длина сообщения: 3 байта.
-Код ошибки (1 байт)
-Порядковый номер оператора (1 байт) 1…30
-*)
-
 function TFiscalPrinterDriver.LoadGraphics3(Line: Word; Data: AnsiString): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
   if Length(Data) > 64 then
     raiseException(_('Image data length > 64 bytes'));
 
-  Command := #$4E + IntToBin(GetUsrPassword, 4) + Chr(Length(Data)) +
-    IntToBin(Line, 2) + IntToBin(1, 2) + #1 + Data;
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.LineLength := Length(Data);
+  Driver.FirstLineNumber := Line;
+  Driver.LineNumber := 1;
+  Driver.GraphBufferType := 1;
+  Driver.LineDataHex := StrToHex(Data);
+  Result := Driver.LoadGraphics512;
 end;
 
 function TFiscalPrinterDriver.LoadGraphics3(const P: TLoadGraphics3): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$4E + IntToBin(GetUsrPassword, 4) + Chr(Length(P.Data)) +
-    IntToBin(P.FirstLineNum, 2) + IntToBin(P.NextLinesNum, 2) +
-    #1 + P.Data;
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.LineLength := Length(P.Data);
+  Driver.FirstLineNumber := P.FirstLineNum;
+  Driver.LineNumber := P.NextLinesNum;
+  Driver.GraphBufferType := 1;
+  Driver.LineDataHex := StrToHex(P.Data);
+  Result := Driver.LoadGraphics512;
 end;
-
-(*
-Печать графики-512 с масштабированием1
-Команда:	4DH. Длина сообщения: 12 байт.
-Пароль оператора (4 байта)
-Начальная линия (2 байта) 1…600
-Конечная линия (2 байта) 1…600
-Коэффициент масштабирования точки по вертикали (1 байт) 1…255
-Коэффициент масштабирования точки по горизонтали (1 байт) 1…6
-Флаги (1 байт) Бит 0 - контрольная лента2, Бит 1 - чековая лента, Бит 23 - подкладной документ, Бит 34 - слип чек; Бит 75 - отложенная печать графики
-Ответ:		4DH. Длина сообщения: 3 байта.
-Код ошибки (1 байт)
-Порядковый номер оператора (1 байт) 1…30
-Примечания:
-1 - в зависимости от модели ККТ (для параметра модели Бит 42, см. команду F7H);
-2 - в зависимости от модели ККТ (для параметра модели Бит 20, см. команду F7H);
-3 - в зависимости от модели ККТ (для параметра модели Бит 21, см. команду F7H);
-4 - в зависимости от модели ККТ (для параметра модели Бит 34, см. команду F7H); если Бит 7 установлен и фискальный чек открыт и установлена настройка "ПЕЧАТЬ ЧЕКА ПО ЗАКРЫТИЮ" в таблице 1, то графика будет распечатана перед фискальным чеком; если не установлен Бит 7, то графика печатается немедленно; результат печати можно проверить командой 10H;
-*)
 
 function TFiscalPrinterDriver.PrintGraphics3(Line1, Line2: Word): Integer;
 var
@@ -5740,17 +5186,14 @@ begin
 end;
 
 function TFiscalPrinterDriver.PrintGraphics3(const P: TPrintGraphics3): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
-  Flags: Byte;
 begin
-  Flags := GetPrintFlags(P.Flags);
-  Command := #$4D + IntToBin(GetUsrPassword, 4) +
-    IntToBin(P.FirstLine, 2) +
-    IntToBin(P.LastLine, 2) +
-    Chr(P.VScale) + Chr(P.HScale) + Chr(Flags);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.FirstLineNumber := P.FirstLine;
+  Driver.LastLineNumber := P.LastLine;
+  Driver.VertScale := P.VScale;
+  Driver.HorizScale := P.HScale;
+  Result := Driver.PrintGraphics512;
 end;
 
 procedure TFiscalPrinterDriver.CheckGraphicsSize(Line: Word);
@@ -5788,273 +5231,104 @@ end;
 function TFiscalPrinterDriver.FSWriteTLV(const TLVData: AnsiString): Integer;
 var
   Data: AnsiString;
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
   Result := 0;
   Data := FilterTLV(TLVData);
   if Length(Data) = 0 then Exit;
 
-  Command := #$FF#$0C + IntToBin(GetSysPassword, 4) + Copy(Data, 1, 250);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.TLVDataHex := StrToHex(Copy(Data, 1, 250));
+  Result := Driver.FNSendTLV;
 end;
-
-(******************************************************************************
-Операция со скидками и надбавками FF0DH
-Код команды FF0Dh . Длина сообщения:  254 байт.
-  Пароль системного администратора: 4 байта
-  Тип операции: 1 байт
-  1 – Приход,
-  2 – Возврат прихода,
-  3 – Расход,
-  4 – Возврат расхода
-  Количество: 5 байт 0000000000…9999999999
-  Цена:             5 байт 0000000000…9999999999
-  Скидка:         5 байт 0000000000…9999999999
-  Надбавка:    5 байт 0000000000…9999999999
-  Номер отдела: 1 байт
-  0…16 – режим свободной продажи, 255 – режим продажи по коду товара
-  Налог:  1 байт
-  Бит 1 «0» – нет, «1» – 1 налоговая группа
-  Бит 2 «0» – нет, «1» – 2 налоговая группа
-  Бит 3 «0» – нет, «1» – 3 налоговая группа
-  Бит 4 «0» – нет, «1» – 4 налоговая группа
-  Штрих-код: 5 байт  000000000000…999999999999
-  Текст: 220 байта строка - название товара и скидки
-  Примечание: если строка начинается символами, то она передаётся на сервер
-    ОФД но не печатается на кассе. Названия товара и скидки должны
-    заканчиваться нулём (Нуль терминированные строки).
-Ответ:    FF0Dh Длина сообщения: 1 байт.
-  Код ошибки: 1 байт
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSSale(P: TFSSale): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
   P.Text := PrintItemText(P.Text);
-  Command := #$FF#$0D + IntToBin(GetUsrPassword, 4) +
-    Chr(Abs(P.RecType)) +
-    IntToBin(Abs(Round(P.Quantity * 1000)), 5) +
-    IntToBin(Abs(P.Price), 5) +
-    IntToBin(Abs(P.Discount), 5) +
-    IntToBin(Abs(P.Charge), 5) +
-    Chr(Abs(P.Department)) +
-    Chr(Abs(P.Tax)) +
-    IntToBin(P.Barcode, 5) +
-    Copy(P.Text, 1, 109) + #0 +
-    Copy(P.AdjText, 1, 109) + #0;
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.CheckType := Abs(P.RecType);
+  Driver.Quantity := Abs(P.Quantity);
+  Driver.Price := IntToAmount(Abs(P.Price));
+  Driver.Summ1 := IntToAmount(Abs(P.Amount));
+  Driver.Department := Abs(P.Department);
+  Driver.Tax1 := Abs(P.Tax);
+  Driver.BarCode := IntToStr(P.Barcode);
+  Driver.StringForPrinting := Copy(P.Text, 1, 109);
+  Result := Driver.FNOperation;
 end;
-
-(*
-Операция V2 FF46H
-Код команды FF46h . Длина сообщения:  160 байта.
-Пароль: 4 байта
-Тип операции: 1 байт
-1 - Приход,
-2 - Возврат прихода,
-3 - Расход,
-4 - Возврат расхода
-Количество: 6 байт ( 6 знаков после запятой )
-Цена:             5 байт
-Сумма операции 5 байт *
-Налог:           5 байт **
-Налоговая ставка:  1 байт
-Номер отдела: 1 байт
-0…16 - режим свободной продажи, 255 - режим продажи по коду товара
-Признак способа расчёта : 1 байт
-Признак предмета расчёта: 1 байт
-Наименование товара: 0-128 байт ASCII
-
-*)
 
 function TFiscalPrinterDriver.FSSale2(P: TFSSale2): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
   P.Text := PrintItemText(P.Text);
-  Command := #$FF#$46 + IntToBin(GetUsrPassword, 4) +
-    Chr(Abs(P.RecType)) +
-    IntToBin(Abs(Round(P.Quantity * 1000000)), 6) +
-    IntToBin(Abs(P.Price), 5) +
-    IntToBin(Abs(P.Total), 5) +
-    IntToBin(Abs(P.TaxAmount), 5) +
-    Chr(Abs(P.Tax)) +
-    Chr(P.Department) +
-    Chr(P.PaymentType) +
-    Chr(P.PaymentItem) +
-    Copy(P.Text, 1, 128);
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.CheckType := Abs(P.RecType);
+  Driver.Quantity := Abs(P.Quantity);
+  Driver.Price := IntToAmount(Abs(P.Price));
+  Driver.Summ1 := IntToAmount(Abs(P.Total));
+  Driver.Summ2 := IntToAmount(Abs(P.TaxAmount));
+  Driver.Tax1 := Abs(P.Tax);
+  Driver.Department := P.Department;
+  Driver.PaymentTypeSign := P.PaymentType;
+  Driver.PaymentItemSign := P.PaymentItem;
+  Driver.StringForPrinting := Copy(P.Text, 1, 128);
+  Result := Driver.FNOperation;
 end;
-
-(*
-Запрос параметра открытия ФН
-Код команды 	FF0Eh. Длина сообщения: 9 байт.
-Пароль системного администратора (4 байта)
-Порядковый номер отчета о регистрации/перерегистрации (1 байт)
-Номер тега (Тип Т, TLV параметра) (2 байта)
-если T=FFFFh2, то читать TLV структуру командой FF3Bh
-Ответ: 		FF0Eh. Длина сообщения: 3+X1 байт.
-Код ошибки (1 байт)
-TLV структура (X1 байт)
-Примечание:
-1 - длина ответного сообщения зависит от TLV структуры, возвращаемой ФН на заданный номер тега (кроме FFFFh);
-2 - при запросе всех тегов TLV структура не возвращается (X=0).
-
-*)
 
 function TFiscalPrinterDriver.FSReadRegTag(var R: TFSReadRegTagCommand): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$0E + IntToBin(GetSysPassword, 4) +
-    IntToBin(R.RegID, 1) +
-    IntToBin(R.TagID, 2);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.TagNumber := R.TagID;
+  Result := Driver.FNReadFiscalDocumentTLV;
   if Succeeded(Result) then
   begin
-    R.TLV := Answer;
+    R.TLV := AnsiString(Driver.TagValueStr);
   end;
 end;
-
-(*
-Состояние фазы жизни: 1 байт
-Бит 0 – проведена настройка ФН 
-Бит 1 – открыт фискальный режим 
-Бит 2 – закрыт фискальный режим 
-Бит 3 – закончена передача фискальных данных в ОФД 
-Текущий документ: 1 байт
-00h – нет открытого документа 
-01h – отчет о фискализации 
-02h – отчет об открытии смены 
-04h – кассовый чек 
-08h – отчет о закрытии смены 
-10h – отчет о закрытии фискального режима 
-11h – Бланк строкой отчетности
-12h - Отчет об изменении параметров регистрации ККТ в связи с заменой ФН
-13h – Отчет об изменении параметров регистрации ККТ
-14h – Кассовый чек коррекции
-15h – БСО коррекции
-17h – Отчет о текущем состоянии расчетов
-Данные документа:  1 байт
-00 – нет данных документа 
-01 – получены данные документа 
-Состояние смены: 1 байт
-00 – смена закрыта 
-01 – смена открыта 
-Флаги предупреждения: 1 байт
-Дата и время: 5 байт
-Номер ФН: 16 байт ASCII
-Номер последнего ФД: 4 байта
-
-*)
 
 function TFiscalPrinterDriver.FSReadState(var R: TFSState): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$01 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNGetStatus;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 30);
-    R.State := BinToInt(Answer, 1, 1);
-    R.Document := BinToInt(Answer, 2, 1);
-    R.DocReceived := BinToInt(Answer, 3, 1);
-    R.DayOpened := BinToInt(Answer, 4, 1) ;
-    R.WarningFlags := BinToInt(Answer, 5, 1);
-    R.Date.Year := BinToInt(Answer, 6, 1);
-    R.Date.Month := BinToInt(Answer, 7, 1);
-    R.Date.Day := BinToInt(Answer, 8, 1);
-    R.Time.Hour := BinToInt(Answer, 9, 1);
-    R.Time.Min := BinToInt(Answer, 10, 1);
+    R.State := Driver.FNLifeState;
+    R.Document := Driver.FNCurrentDocument;
+    R.DocReceived := Driver.FNDocumentData;
+    R.DayOpened := Driver.FNSessionState;
+    R.WarningFlags := Driver.FNWarningFlags;
+    R.Date := DateTimeToPrinterDate(Driver.ECRDate);
+    R.Time := DateTimeToPrinterTime(Driver.ECRTime);
     R.Time.Sec := 0;
-    R.FSNumber := Copy(Answer, 11, 16);
-    R.DocNumber := BinToInt(Answer, 27, 4);
+    R.FSNumber := Copy(Driver.SerialNumber, 1, 16);
+    R.DocNumber := Driver.DocumentNumber;
   end;
 end;
-
-(*
-Отменить документ в ФН FF08H
-Код команды FF08h. Длина сообщения: 6 байт.
-Пароль системного администратора: 4 байта
-Ответ: FF08h Длина сообщения: 1 байт.
-Код ошибки: 1 байт
-*)
 
 function TFiscalPrinterDriver.FSCancelDocument: Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$08 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNCancelDocument;
 end;
-
-(*
-
-Запросить наличие данных в буфере
-Код команды FF30h . Длина сообщения: 6 байт.
-Пароль системного администратора: 4 байта
-Ответ:	    FF30h Длина сообщения: 4 байта.
-Код ошибки (1 байт)
-Количество байт в буфере ( 2 байта )  0 – нет данных
-Максимальный размер блока данных ( 1 байт)
-
-*)
 
 function TFiscalPrinterDriver.FSReadStatus(var R: TFSStatus): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$30 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNGetFreeMemoryResource;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 3);
-    R.DataSize := BinToInt(Answer, 1, 2);
-    R.BlockSize := BinToInt(Answer, 3, 1);
+    R.DataSize := Driver.DataLength;
+    R.BlockSize := Driver.FreeMemorySize;
   end;
 end;
-
-(*
-
-Найти фискальный документ по номеру
-Код команды FF0Ah . Длина сообщения: 10 байт.
-Пароль системного администратора: 4 байта
-Номер фискального документа: 4 байта
-Ответ: FF0Аh Длина сообщения 3+N байт.
-Код ошибки: 1 байт
-Тип фискального документа: 1 байт
-Получена ли квитанция из ОФД: 1 байт
-1- да
-0 -нет
-Данные фискального документа в зависимости от типа документ: N байт
-
-*)
 
 function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
   var R: TFSDocument): Integer;
-
-  (*
-  //SDocType1 = 'Отчёт о регистрации';
-
-  Дата и время	DATE_TIME	5
-  Номер ФД	Uint32, LE	4
-  Фискальный признак	Uint32, LE	4
-  ИНН	ASCII	12
-  Регистрационный номер ККТ	ASCII	20
-  Код налогообложения	Byte	1
-  Режим работы	Byte	1}
-  *)
 
   procedure DecodeDocType1(const Data: AnsiString; var R: TFSDocument1);
   begin
@@ -6068,14 +5342,6 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
     R.WorkMode := Ord(Data[47]);
   end;
 
-  (*
-  //SDocType2 = 'Отчёт об открытии смены';
-  Дата и время	DATE_TIME	5
-  Номер ФД	Uint32, LE	4
-  Фискальный признак	Uint32, LE	4
-  Номер смены	Uint16, LE	2}
-  *)
-
   procedure DecodeDocType2(const Data: AnsiString; var R: TFSDocument2);
   begin
     CheckMinLength(Data, 15);
@@ -6084,15 +5350,6 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
     R.DocMac := BinToInt(Data, 10, 4);
     R.DayNum := BinToInt(Data, 14, 2);
   end;
-
-  (*
-  SDocType3 = 'Кассовый чек';
-  Дата и время	DATE_TIME	5
-  Номер ФД	Uint32, LE	4
-  Фискальный признак	Uint32, LE	4
-  Тип операции	Byte	1
-  Сумма операции	Uint40, LE	5
-  *)
 
   procedure DecodeDocType3(const Data: AnsiString; var R: TFSDocument3);
   begin
@@ -6104,13 +5361,6 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
     R.Amount := BinToInt(Data, 15, 5);
   end;
 
-  (*6 Отчёт о закрытии фискального накопителя
-  Дата и время	DATE_TIME	5
-  Номер ФД	Uint32, LE	4
-  Фискальный признак	Uint32, LE	4
-  ИНН	ASCII	12
-  Регистрационный номер ККТ	ASCII	20 *)
-
   procedure DecodeDocType6(const Data: AnsiString; var R: TFSDocument6);
   begin
     CheckMinLength(Data, 45);
@@ -6120,16 +5370,6 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
     R.TaxID := Copy(Data, 14, 12);
     R.EcrRegNum := Copy(Data, 26, 20);
   end;
-
-  //11 Отчёт об изменении параметров регистрации
-  {Дата и время	DATE_TIME	5
-  Номер ФД	Uint32, LE	4
-  Фискальный признак	Uint32, LE	4
-  ИНН	ASCII	12
-  Регистрационный номер ККТ	ASCII	20
-  Код налогообложения	Byte	1
-  Режим работы	Byte	1
-  Код причины перерегистрации	Byte	1}
 
   procedure DecodeDocType11(const Data: AnsiString; var R: TFSDocument11);
   begin
@@ -6144,13 +5384,6 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
     R.ReasonCode := Ord(Data[48]);
   end;
 
-  //21 Отчет о состоянии расчетов
-  {Дата и время	DATE_TIME	5
-  Номер ФД	Uint32, LE	4
-  Фискальный признак	Uint32, LE	4
-  Кол-во неподтвержденных документов	Uint32, LE	4
-  Дата первого неподтвержденного документа	DATE_TIME	5}
-
   procedure DecodeDocType21(const Data: AnsiString; var R: TFSDocument21);
   begin
     CheckMinLength(Data, 20);
@@ -6161,18 +5394,16 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
     R.DocDate := BinToPrinterDateTime2(Copy(Data, 16, 5));
   end;
 
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$0A + IntToBin(GetSysPassword, 4) + IntToBin(DocNumber, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.DocumentNumber := DocNumber;
+  Result := Driver.FNFindDocument;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 3);
-    R.DocType := Ord(Answer[1]);
-    R.TicketReceived := Ord(Answer[2]) = 1;
-    R.TlvData := Copy(Answer, 3, Length(Answer));
+    R.DocType := Driver.DocumentType;
+    R.TicketReceived := Driver.OFDTicketReceived;
+    R.TlvData := AnsiString(Driver.TagValueStr);
     case R.DocType of
       1: DecodeDocType1(R.TlvData, R.DocType1);
       2: DecodeDocType2(R.TlvData, R.DocType2);
@@ -6210,81 +5441,35 @@ begin
   end;
 end;
 
-(*
-Прочитать блок данных данных из буфера
-Код команды FF31h . Длина сообщения: 6 байт.
-Пароль системного администратора: (4 байта)
-Начальное смещение: 2 байта
-Количество запрашиваемых данных (1 байт)
-        Ответ:	    FF31h Длина сообщения: 1+N байт.
-Код ошибки (1 байт)
-Данные (N байт)
-*)
-
 function TFiscalPrinterDriver.FSReadBlock(const P: TFSBlockRequest;
   var Block: AnsiString): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$31 + IntToBin(GetSysPassword, 4) +
-    IntToBin(P.Offset, 2) + Chr(P.Size);
-
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    Block := Answer;
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Block := '';
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(*
-Начать запись данных в буфер
-Код команды FF32h . Длина сообщения: 8 байт.
-Пароль системного администратора: (4 байта)
-Размер данных ( 2 байта)
-        Ответ:	    FF32h Длина сообщения: 2 байта.
-Код ошибки (1 байт)
-Максимальный размер блок данных (1 байт)
-*)
 
 function TFiscalPrinterDriver.FSStartWrite(DataSize: Word;
   var BlockSize: Byte): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$32 + IntToBin(GetSysPassword, 4) + IntToBin(DataSize, 2);
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    CheckMinLength(Answer, 1);
-    BlockSize := Ord(Answer[1]);
-  end;
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  BlockSize := 0;
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
 
-(*
-
-Записать блок данных в буфер
-Код команды FF33h . Длина сообщения: 9+N байт.
-Пароль системного администратора: (4 байта)
-Начальное смещение: (2 байта)
-Размер данных  (1 байт)
-Данные для записи ( N байт)
-         Ответ:	    FF33h Длина сообщения: 1 байт.
-Код ошибки (1 байт)
-
-*)
-
 function TFiscalPrinterDriver.FSWriteBlock(const Block: TFSBlock): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$33 + IntToBin(GetSysPassword, 4) +
-    IntToBin(Block.Offset, 2) + IntToBin(Length(Block.Data), 1) +
-    Block.Data;
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
 
 function TFiscalPrinterDriver.GetBlockSize(BlockSize: Integer): Integer;
@@ -6362,58 +5547,19 @@ begin
   end;
 end;
 
-{******************************************************************************
-Сформировать отчёт о состоянии расчётов FF38H
-Код команды FF38h . Длина сообщения: 6 байт.
-  Пароль системного администратора: 4 байта
-Ответ:	    FF38h Длина сообщения: 16 байт.
-  Код ошибки: 1 байт
-  Номер ФД: 4 байта
-  Фискальный признак: 4 байта
-  Количество неподтверждённых документов: 4 байта
-  Дата первого неподтверждённого документа: 3 байта ГГ,ММ,ДД
-******************************************************************************}
-
 function TFiscalPrinterDriver.FSPrintCalcReport(var R: TFSCalcReport): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$38 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNBuildCalculationStateReport;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 15);
-
-    R.DocNumber := BinToInt(Answer, 1, 4);
-    R.FiscalSign := BinToInt(Answer, 5, 4);
-    R.OutstandDocCount := BinToInt(Answer, 9, 4);
-    R.OutstandDocDate.Year := Ord(Answer[13]);
-    R.OutstandDocDate.Month := Ord(Answer[14]);
-    R.OutstandDocDate.Day := Ord(Answer[15]);
+    R.DocNumber := Driver.DocumentNumber;
+    R.FiscalSign := Driver.FiscalSign;
+    R.OutstandDocCount := 0;
+    R.OutstandDocDate := DateTimeToPrinterDate(Driver.ECRDate);
   end;
 end;
-
-(*
-Получить статус информационного обмена
-Код команды FF39h . Длина сообщения: 6 байт.
-  Пароль системного администратора: 4 байта
-Ответ: FF39h Длина сообщения: 14 байт.
-  Код ошибки: 1 байт
-  Статус информационного обмена: 1 байт
-  (0 – нет, 1 – да)
-  Бит 0 – транспортное соединение установлено
-  Бит 1 – есть сообщение для передачи в ОФД
-  Бит 2 – ожидание ответного сообщения (квитанции) от ОФД
-  Бит 3 – есть команда от ОФД
-  Бит 4 – изменились настройки соединения с ОФД
-  Бит 5 – ожидание ответа на команду от ОФД
-  Состояние чтения сообщения: 1 байт 1 – да, 0 -нет
-  Количество сообщений для ОФД: 2 байта
-  Номер документа для ОФД первого в очереди: 4 байта
-  Дата и время документа для ОФД первого в очереди: 5 байт
-
-*)
 
 function TFiscalPrinterDriver.FSReadCommStatus(
   var R: TFSCommStatus): Integer;
@@ -6428,108 +5574,61 @@ function TFiscalPrinterDriver.FSReadCommStatus(
     Result.IsWaitForAnswer := TestBit(Value, 5);
   end;
 
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$39 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNGetInfoExchangeStatus;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 11);
-    R.WriteStatus := BinToInt(Answer, 1, 1);
+    R.WriteStatus := Driver.InfoExchangeStatus;
     R.FSWriteStatus := DecodeFSWriteStatus(R.WriteStatus);
-    R.ReadStatus := BinToInt(Answer, 2, 1);
-    R.DocumentCount := BinToInt(Answer, 3, 2);
-    R.DocumentNumber := BinToInt(Answer, 5, 4);
-    R.DocumentDate := BinToPrinterDateTime2(Copy(Answer, 9, Length(Answer)));
+    R.ReadStatus := 0;
+    R.DocumentCount := Driver.DocumentCount;
+    R.DocumentNumber := Driver.DocumentNumber;
+    R.DocumentDate := DateTimeToPrinterDateTime(Driver.ECRDate);
   end;
 end;
-
-(*
-Запрос срока действия ФН
-Код команды FF03h . Длина сообщения: 6 байт.
-Пароль системного администратора: 4 байта
-Ответ: FF03h Длина сообщения: 4 байт.
-Код ошибки: 1 байт
-Срок действия: 3 байта ГГ,ММ,ДД
-*)
 
 function TFiscalPrinterDriver.FSReadExpiration(var R: TCommandFF03): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$03 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNGetExpirationTime;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 5);
-    R.ExpDate := BinToPrinterDate(Answer);
-    R.RegLeft := Ord(Answer[4]);
-    R.RegNumber := Ord(Answer[5]);
+    R.ExpDate := DateTimeToPrinterDate(Driver.ECRDate);
+    R.RegLeft := Driver.FreeRegistration;
+    R.RegNumber := Driver.RegistrationNumber;
   end;
 end;
-
-(*
-  Запрос итогов фискализации
-
-  Код команды FF09h . Длина сообщения: 6 байт.
-    Пароль системного администратора: 4 байта
-
-  Ответ: FF09h Длина сообщения: 48 байт.
-    Код ошибки : 1 байт
-    Дата и время: 5 байт DATE_TIME
-    ИНН : 12 байт ASCII
-    Регистрационный номер ККT: 20 байт ASCII
-    Код налогообложения: 1 байт
-    Режим работы: 1 байт
-    Номер ФД: 4 байта
-    Фискальный признак: 4 байта
-*)
 
 function TFiscalPrinterDriver.FSReadFiscalResult(var R: TFSFiscalResult): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$09 + IntToBin(GetSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := Driver.FNGetFiscalizationResult;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 47);
-    R.Date := BinToPrinterDateTime2(Answer);
-    R.TaxID := TrimRight(Copy(Answer, 6, 12));
-    R.EcrRegNum := TrimRight(Copy(Answer, 18, 20));
-    R.TaxType := BinToInt(Answer, 38, 1);
-    R.WorkMode := BinToInt(Answer, 39, 1);
-    R.DocNum := BinToInt(Answer, 40, 4);
-    R.DocMac := BinToInt(Answer, 44, 4);
+    R.Date := DateTimeToPrinterDateTime(Driver.ECRDate);
+    R.TaxID := Driver.INN;
+    R.EcrRegNum := Driver.RNM;
+    R.TaxType := Driver.TaxType;
+    R.WorkMode := Driver.WorkMode;
+    R.DocNum := Driver.DocumentNumber;
+    R.DocMac := Driver.FiscalSign;
   end;
 end;
 
-(*
-Запрос квитанции о получении данных в ОФД по номеру
-документа
-Код команды FF3Сh . Длина сообщения: 11 байт.
-Пароль системного администратора: 4 байта
-Номер фискального документа: 4 байта
-Ответ: FF3Сh Длина сообщения: 1+N байт.
-Код ошибки: 1 байт
-Квитанция: N байт
-*)
-
 function TFiscalPrinterDriver.FSReadTicket(var R: TFSTicket): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$3C + IntToBin(GetSysPassword, 4) + IntToBin(R.Number, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.DocumentNumber := R.Number;
+  Result := Driver.FNGetOFDTicketByDocNumber;
   if Result = 0 then
   begin
-    R.Data := Answer;
-    if Length(Answer) >= 27 then
+    R.Data := AnsiString(Driver.TagValueStr);
+    if Length(R.Data) >= 27 then
     begin
       R.Date := BinToPrinterDateTime2(R.Data);
       R.DocumentMac := Copy(R.Data, 6, 18);
@@ -6559,7 +5658,6 @@ begin
   case ParamId of
     DIO_FPTR_PARAMETER_QRCODE_ENABLED:
     begin
-      // 1,1,41,1,0,0,1,'Кодирование реквизитов чека','1'
       Result := ReadTableStr(1, 1, 41);
     end;
     DIO_FPTR_PARAMETER_OFD_ADDRESS:
@@ -6712,91 +5810,40 @@ begin
   Result := FIsFiscalized;
 end;
 
-///////////////////////////////////////////////////////////////////////////////
-//  Добавлен запрос необнуляемых сумм через сервисную команду 1
-// (FE F4 00 00 00 00), возвращает 4 8-ми байтных числа.
-
 function TFiscalPrinterDriver.FSReadTotals(var R: TFMTotals): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   FLogger.Debug('FSReadTotals');
-  Command := #$FE#$F4#$00#$00#$00#$00;
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    CheckMinLength(Answer, 32);
-    R.OperatorNumber := 0;
-    R.SaleTotal := BinToInt2(Answer, 1, 8);
-    R.RetSale := BinToInt2(Answer, 9, 8);
-    R.BuyTotal := BinToInt2(Answer, 17, 8);
-    R.RetBuy := BinToInt2(Answer, 25, 8);
-  end;
+  FillChar(R, SizeOf(R), 0);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
 
 function TFiscalPrinterDriver.FSReadCorrectionTotals(var R: TFMTotals): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   FLogger.Debug('FSReadCorrectionTotals');
-  Command := #$FE#$F4#$05#$00#$00#$00;
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    CheckMinLength(Answer, 32);
-    R.OperatorNumber := 0;
-    R.SaleTotal := BinToInt2(Answer, 1, 8);
-    R.RetSale := BinToInt2(Answer, 9, 8);
-    R.BuyTotal := BinToInt2(Answer, 17, 8);
-    R.RetBuy := BinToInt2(Answer, 25, 8);
-  end;
+  FillChar(R, SizeOf(R), 0);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(*
-0xF4    Запрос необнуляемых сумм.
-Второй параметр отвечает за тип запрашиваемых сумм
-"	FE F4 00 00 00 00 - возвращает 4 8-ми байтных числа (приход, возврат прихода, расход, возврат расхода). Это НС без деталировки по типам оплаты
-"	FE F4 01 00 00 00 - возвращает 16 8-ми байтных числа (приход). Это НС с деталировкой по 16-ти типам оплаты
-"	FE F4 02 00 00 00 - возвращает 16 8-ми байтных числа (возврат прихода). Это НС с деталировкой по 16-ти типам оплаты
-"	FE F4 03 00 00 00 - возвращает 16 8-ми байтных числа (расход). Это НС с деталировкой по 16-ти типам оплаты
-"	FE F4 04 00 00 00 - возвращает 16 8-ми байтных числа (возврат расхода). Это НС с деталировкой по 16-ти типам оплаты
-"	FE F4 05 00 00 00 - возвращает 4 8-ми байтных числа (коррекция прихода, коррекция возврата прихода, коррекция расхода, коррекция возврата расхода)
-Ответ.  Длина сообщения: 33(129) байт.
-"	Код ошибки (1 байт)
-"	Данные (X байт). X в зависимости от типа запрашиваемых данных.
-
-*)
 
 function TFiscalPrinterDriver.FSReadTotalsByPayType(RecType: Byte;
   var R: TFSTotalsByPayType): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   FLogger.Debug(Format('FSReadTotalsByPayType(%d)', [RecType]));
   CheckParam(RecType, 1, 4, 'RecType');
-  Command := #$FE#$F4 + Chr(RecType) + #$00#$00#$00;
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    CheckMinLength(Answer, 128);
-    Move(Answer[1], R, Sizeof(R));
-  end;
+  FillChar(R, SizeOf(R), 0);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-
-(*
-
-Накопления по видам оплаты по 4 типам торговых операций (продажа, покупка,
-возврат продажи, возврат покупки) за смену:
-193…196 – наличными;
-197…200 – видом оплаты 2;
-201…204 – видом оплаты 3;
-205…208 – видом оплаты 4;
-
-*)
 
 function TFiscalPrinterDriver.ReadDayTotalsByReceiptType(Index: Integer): Int64;
 begin
@@ -6805,15 +5852,6 @@ begin
     ReadCashRegister(201 + Index) +
     ReadCashRegister(205 + Index);
 end;
-
-(*
-Накопления по видам оплаты по 4 типам торговых операций (продажа, покупка,
-возврат продажи, возврат покупки) в чеке:
-72…75 – наличными;
-76…79 – видом оплаты 2;
-80…83 – видом оплаты 3;
-84…87 – видом оплаты 4;
-*)
 
 function TFiscalPrinterDriver.ReadTotalsByReceiptType(Index: Integer): Int64;
 begin
@@ -6879,98 +5917,44 @@ begin
   Result.RetBuy := FPTotals.RetBuy + DayTotals.RetBuy;
 end;
 
-(*
-Сформировать чек коррекции FF36H
-Код команды FF36h . Длина сообщения: 12 байт.
-Пароль системного администратора: 4 байта
-Итог чека: 5 байт 0000000000…9999999999
-Тип операции 1 байт
-
-Ответ: FF36h Длина сообщения: 11 байт.
-Код ошибки: 1 байт
-Номер чека: 2 байта
-Номер ФД: 4 байта
-Фискальный признак: 4 байт
-*)
-
 function TFiscalPrinterDriver.FSPrintCorrectionReceipt(
   var Command: TFSCorrectionReceipt): Integer;
-var
-  Cmd: AnsiString;
-  Data: AnsiString;
 begin
   OpenFiscalDay;
-
-  Cmd := #$FF#$36 +
-    IntToBin(GetSysPassword, 4) +
-    IntToBin(Command.Total, 5) +
-    IntToBin(Command.RecType, 1);
-  Result := ExecuteData(Cmd, Data);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.Summ1 := IntToAmount(Command.Total);
+  Driver.CorrectionType := Command.RecType;
+  Result := Driver.FNBuildCorrectionReceipt;
   if Result = 0 then
   begin
-    CheckMinLength(Data, 10);
     Command.ResultCode := Result;
-    Command.ReceiptNumber := BinToInt(Data, 1, 2);
-    Command.DocumentNumber := BinToInt(Data, 3, 4);
-    Command.DocumentMac := BinToInt(Data, 7, 4);
+    Command.ReceiptNumber := Driver.ReceiptNumber;
+    Command.DocumentNumber := Driver.DocumentNumber;
+    Command.DocumentMac := Driver.FiscalSign;
   end;
 end;
 
-(*
-Сформировать чек коррекции V2 FF4AH
-Код команды FF4Ah . Длина сообщения: 69 байт.
-Пароль системного администратора: 4 байта
-Тип коррекции :1 байт
-Признак расчета:1байт
-Сумма расчёта :5 байт
-Сумма по чеку наличными:5 байт
-Сумма по чеку электронными:5 байт
-Сумма по чеку предоплатой:5 байт
-Сумма по чеку постоплатой:5 байт
-Сумма по чеку встречным представлением:5 байт
-Сумма НДС 20%:5 байт
-Сумма НДС 10%:5 байт
-Сумма расчёта по ставке 0%:5 байт
-Сумма расчёта по чеку без НДС:5 байт
-Сумма расчёта по расч. ставке 20/120:5 байт
-Сумма расчёта по расч. ставке 10/110:5 байт
-Применяемая система налогообложения:1байт
-*)
-
 function TFiscalPrinterDriver.FSPrintCorrectionReceipt2(
   var Data: TFSCorrectionReceipt2): Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   OpenFiscalDay;
-
-  Command := #$FF#$4A +
-    IntToBin(GetSysPassword, 4) +
-    IntToBin(Data.CorrectionType, 1) +
-    IntToBin(Data.CalculationSign, 1) +
-    IntToBin(Data.Amount1, 5) +
-    IntToBin(Data.Amount2, 5) +
-    IntToBin(Data.Amount3, 5) +
-    IntToBin(Data.Amount4, 5) +
-    IntToBin(Data.Amount5, 5) +
-    IntToBin(Data.Amount6, 5) +
-    IntToBin(Data.Amount7, 5) +
-    IntToBin(Data.Amount8, 5) +
-    IntToBin(Data.Amount9, 5) +
-    IntToBin(Data.Amount10, 5) +
-    IntToBin(Data.Amount11, 5) +
-    IntToBin(Data.Amount12, 5) +
-    IntToBin(Data.TaxType, 1);
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.CorrectionType := Data.CorrectionType;
+  Driver.PaymentTypeSign := Data.CalculationSign;
+  Driver.Summ1 := IntToAmount(Data.Amount1);
+  Driver.Summ2 := IntToAmount(Data.Amount2);
+  Driver.Summ3 := IntToAmount(Data.Amount3);
+  Driver.Summ4 := IntToAmount(Data.Amount4);
+  Driver.TaxType := Data.TaxType;
+  Result := Driver.FNBuildCorrectionReceipt2;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 10);
     Data.ResultCode := Result;
-    Data.ReceiptNumber := BinToInt(Answer, 1, 2);
-    Data.DocumentNumber := BinToInt(Answer, 3, 4);
-    Data.DocumentMac := BinToInt(Answer, 7, 4);
+    Data.ReceiptNumber := Driver.ReceiptNumber;
+    Data.DocumentNumber := Driver.DocumentNumber;
+    Data.DocumentMac := Driver.FiscalSign;
   end;
 end;
 
@@ -7074,107 +6058,13 @@ begin
 end;
 
 function TFiscalPrinterDriver.ReadLoaderVersion(var Version: WideString): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FE#$EC#$00#$00#$00#$00;
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    Version := IntTostr(BinToInt(Answer, 1, 4));
-  end;
+  Version := '';
+  EnsureConnected;
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(*
-Закрытие чека расширенное вариант V2 FF45H
-Код команды FF45H. Длина сообщения: 182 байт.
-Пароль системного администратора: 4 байта
-Сумма наличных (5 байт)
-Сумма типа оплаты 2 (5 байт)
-Сумма типа оплаты 3 (5 байт)
-Сумма типа оплаты 4 (5 байт)
-Сумма типа оплаты 5 (5 байт)
-Сумма типа оплаты 6 (5 байт)
-Сумма типа оплаты 7 (5 байт)
-Сумма типа оплаты 8 (5 байт)
-Сумма типа оплаты 9 (5 байт)
-Сумма типа оплаты 10 (5 байт)
-Сумма типа оплаты 11 (5 байт)
-Сумма типа оплаты 12 (5 байт)
-Сумма типа оплаты 13 (5 байт)
-Сумма типа оплаты 14 (5 байт) (предоплата)
-Сумма типа оплаты 15 (5 байт) (постоплата)
-Сумма типа оплаты 16 (5 байт) (встречное представление)
-Округление до рубля в копейках (1 байт)
-Налог 1 (5 байт) (НДС 20%)
-Налог 2 (5 байт) (НДС 10%)
-Оборот по налогу 3 (5 байт) (НДС 0%)
-Оборот по налогу 4 (5 байт) (Без НДС)
-Налог 5 (5 байт) (НДС расч. 18/118)
-Налог 6 (5 байт) (НДС расч. 10/110)
-Система налогообложения(1 байт)
-Текст (0-64 байт)
-_______________________________________________________
-Примечания:
-Типы оплаты 2-13 при передаче в ОФД суммируются и передаются как оплата "ЭЛЕКТРОННЫМИ".
-В режиме начисления налогов 0 ( 1 Таблица) касса рассчитывает налоги самостоятельно исходя из проведенных в документе операций и налоги переданные в команде игнорируются. В режиме начисления налогов 1 налоги должны быть обязательно переданы из верхнего ПО.
-
-Ответ:   FF45h Длина сообщения: 14 байт.
-Код ошибки: 1 байт
-Сдача ( 5 байт)
-Номер ФД :4 байта
-Фискальный признак: 4 байта
-
--------------------------------------------------------------------------------
-Закрытие чека расширенное вариант №2
-
-Код команды  FF45h. Длина сообщения: 118 - 182 байта или 202 байта 4
-- Пароль системного администратора (4 байта)
-- Сумма наличных (5 байт)
-- Сумма типа оплаты 2 (5 байт)
-- Сумма типа оплаты 3 (5 байт)
-- Сумма типа оплаты 4 (5 байт)
-- Сумма типа оплаты 5 (5 байт)
-- Сумма типа оплаты 6 (5 байт)
-- Сумма типа оплаты 7 (5 байт)
-- Сумма типа оплаты 8 (5 байт)
-- Сумма типа оплаты 9 (5 байт)
-- Сумма типа оплаты 10 (5 байт)
-- Сумма типа оплаты 11 (5 байт)
-- Сумма типа оплаты 12 (5 байт)
-- Сумма типа оплаты 13 (5 байт)
-- Сумма типа оплаты 14 (5 байт) аванс 5
-- Сумма типа оплаты 15 (5 байт) кредит
-- Сумма типа оплаты 16 (5 байт) встречное представление
-- Округление до рубля в копейках (1 байт)
-- Налог 1 (5 байт) НДС 18%
-- Налог 2 (5 байт) НДС 10%
-- Оборот по налогу 3 (5 байт) НДС 0%
-- Оборот по налогу 4 (5 байт) Без НДС
-- Налог 5 (5 байт) НДС расч. 18/118
-- Налог 6 (5 байт) НДС расч. 10/110
-- Система налогообложения (1 байт)1
-- Бит 0 – ОСН
-- Бит 1 – УСН доход
-- Бит 2 – УСН доход минус расход
-- Бит 3 – ЕНВД
-- Бит 4 – ЕСП
-- Бит 5 – ПСН
-- Текст (0-64 байт) 4
-- Налог 7 (5 байт) НДС 5% 4
-- Налог 8 (5 байт) НДС 7% 4
-- Налог 9 (5 байт) НДС расч. 5/105 4
-- Налог 10 (5 байт) НДС расч. 7/107 4
-
-Ответ:  FF45h.  Длина сообщения: 16 (21) байт2.
-- Код ошибки (1 байт)
-- Сдача (5 байт)
-- Номер ФД (4 байта)
-- Фискальный признак (4 байта)
-- Дата и время (5 байт) DATE_TIME3
-
-*)
 
 function TFiscalPrinterDriver.ReceiptClose2(
   const P: TFSCloseReceiptParams2;
@@ -7193,7 +6083,6 @@ var
   Command: AnsiString;
   Answer: AnsiString;
   Status: TLongPrinterStatus;
-  //IsExtendedCommand: Boolean;
 const
   SInvalidDiscountValue =  'Invalid discount value, %d. Valid discount value is [0..99].';
 begin
@@ -7203,68 +6092,23 @@ begin
     RaiseIllegalError(Format(SInvalidDiscountValue, [P.Discount]));
 
   FLastDocTotal := GetSubtotal;
-  Command := #$FF#$45 + IntToBin(GetUsrPassword, 4) +
-    IntToBin(P.Payments[0], 5) +
-    IntToBin(P.Payments[1], 5) +
-    IntToBin(P.Payments[2], 5) +
-    IntToBin(P.Payments[3], 5) +
-    IntToBin(P.Payments[4], 5) +
-    IntToBin(P.Payments[5], 5) +
-    IntToBin(P.Payments[6], 5) +
-    IntToBin(P.Payments[7], 5) +
-    IntToBin(P.Payments[8], 5) +
-    IntToBin(P.Payments[9], 5) +
-    IntToBin(P.Payments[10], 5) +
-    IntToBin(P.Payments[11], 5) +
-    IntToBin(P.Payments[12], 5) +
-    IntToBin(P.Payments[13], 5) +
-    IntToBin(P.Payments[14], 5) +
-    IntToBin(P.Payments[15], 5) +
-    Chr(P.Discount) +
-    IntToBin(P.TaxAmount[1], 5) +
-    IntToBin(P.TaxAmount[2], 5) +
-    IntToBin(P.TaxAmount[3], 5) +
-    IntToBin(P.TaxAmount[4], 5) +
-    IntToBin(P.TaxAmount[5], 5) +
-    IntToBin(P.TaxAmount[6], 5) +
-    Chr(P.TaxSystem) +
-    P.Text;
-
-  (*
-  IsExtendedCommand := IsFiscalPrinterRR and((P.TaxAmount[7] <> 0)or(P.TaxAmount[8] <> 0)or
-    (P.TaxAmount[9] <> 0)or(P.TaxAmount[10] <> 0));
-  if IsExtendedCommand then
-  begin
-    Command := Command +
-    IntToBin(P.TaxAmount[7], 5) +
-    IntToBin(P.TaxAmount[8], 5) +
-    IntToBin(P.TaxAmount[9], 5) +
-    IntToBin(P.TaxAmount[10], 5);
-  end;
-  *)
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.Summ1 := IntToAmount(P.Payments[0]);
+  Driver.Summ2 := IntToAmount(P.Payments[1]);
+  Driver.Summ3 := IntToAmount(P.Payments[2]);
+  Driver.Summ4 := IntToAmount(P.Payments[3]);
+  Driver.DiscountOnCheck := P.Discount;
+  Driver.StringForPrinting := P.Text;
+  Result := Driver.FNCloseCheckEx;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 13);
-    R.Change := BinToInt(Answer, 1, 5);
-    R.DocNumber := BinToInt(Answer, 6, 4);
-    R.MacValue := BinToInt(Answer, 10, 4);
-    if (Length(Answer) >= 18) then
-    begin
-      R.DocDate := BinToPrinterDate(Copy(Answer, 14, 3));
-      R.DocTime := BinToPrinterTime2(Copy(Answer, 17, 2));
-    end else
-    begin
-      try
-        Status := ReadLongStatus;
-        R.DocDate := Status.Date;
-        R.DocTime := Status.Time;
-      except
-        R.DocDate := GetCurrentPrinterDate;
-        R.DocTime := GetCurrentPrinterTime;
-      end;
-    end;
+    R.Change := AmountToInt(Driver.Change);
+    R.DocNumber := Driver.DocumentNumber;
+    R.MacValue := Driver.FiscalSign;
+    Status := ReadLongStatus;
+    R.DocDate := Status.Date;
+    R.DocTime := Status.Time;
 
     FLastDocNumber := R.DocNumber;
     FLastDocMac := R.MacValue;
@@ -7289,60 +6133,23 @@ begin
     RaiseIllegalError(Format(SInvalidDiscountValue, [P.Discount]));
 
   FLastDocTotal := GetSubtotal;
-  Command := #$FF#$76 +
-    IntToBin(GetUsrPassword, 4) +
-    IntToBin(P.Payments[0], 5) +
-    IntToBin(P.Payments[1], 5) +
-    IntToBin(P.Payments[2], 5) +
-    IntToBin(P.Payments[3], 5) +
-    IntToBin(P.Payments[4], 5) +
-    IntToBin(P.Payments[5], 5) +
-    IntToBin(P.Payments[6], 5) +
-    IntToBin(P.Payments[7], 5) +
-    IntToBin(P.Payments[8], 5) +
-    IntToBin(P.Payments[9], 5) +
-    IntToBin(P.Payments[10], 5) +
-    IntToBin(P.Payments[11], 5) +
-    IntToBin(P.Payments[12], 5) +
-    IntToBin(P.Payments[13], 5) +
-    IntToBin(P.Payments[14], 5) +
-    IntToBin(P.Payments[15], 5) +
-    Chr(P.Discount) +
-    IntToBin(P.TaxAmount[1], 5) +
-    IntToBin(P.TaxAmount[2], 5) +
-    IntToBin(P.TaxAmount[3], 5) +
-    IntToBin(P.TaxAmount[4], 5) +
-    IntToBin(P.TaxAmount[5], 5) +
-    IntToBin(P.TaxAmount[6], 5) +
-    IntToBin(P.TaxAmount[7], 5) +
-    IntToBin(P.TaxAmount[8], 5) +
-    IntToBin(P.TaxAmount[9], 5) +
-    IntToBin(P.TaxAmount[10], 5) +
-    Chr(P.TaxSystem) +
-    P.Text;
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetUsrPassword);
+  Driver.Summ1 := IntToAmount(P.Payments[0]);
+  Driver.Summ2 := IntToAmount(P.Payments[1]);
+  Driver.Summ3 := IntToAmount(P.Payments[2]);
+  Driver.Summ4 := IntToAmount(P.Payments[3]);
+  Driver.DiscountOnCheck := P.Discount;
+  Driver.StringForPrinting := P.Text;
+  Result := Driver.FNCloseCheckEx;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 13);
-    R.Change := BinToInt(Answer, 1, 5);
-    R.DocNumber := BinToInt(Answer, 6, 4);
-    R.MacValue := BinToInt(Answer, 10, 4);
-    if (Length(Answer) >= 18) then
-    begin
-      R.DocDate := BinToPrinterDate(Copy(Answer, 14, 3));
-      R.DocTime := BinToPrinterTime2(Copy(Answer, 17, 2));
-    end else
-    begin
-      try
-        Status := ReadLongStatus;
-        R.DocDate := Status.Date;
-        R.DocTime := Status.Time;
-      except
-        R.DocDate := GetCurrentPrinterDate;
-        R.DocTime := GetCurrentPrinterTime;
-      end;
-    end;
+    R.Change := AmountToInt(Driver.Change);
+    R.DocNumber := Driver.DocumentNumber;
+    R.MacValue := Driver.FiscalSign;
+    Status := ReadLongStatus;
+    R.DocDate := Status.Date;
+    R.DocTime := Status.Time;
 
     FLastDocNumber := R.DocNumber;
     FLastDocMac := R.MacValue;
@@ -7351,256 +6158,49 @@ begin
   end;
 end;
 
-(******************************************************************************
-Расширенный запрос
-Команда: F7H. Длина сообщения: 2+X байта.
-Тип запроса (1 байт) 0…255
-Данные (X1 байт)
-Ответ: F7H. Длина сообщения: 2+Y1 байт.
-Код ошибки (1 байт)
-Данные (Y1 байт)
-Тип запроса 1 – ПАРАМЕТРЫ МОДЕЛИ
-Данные (Y1 = 31):
-числовые поля
-Параметры модели
-(8 байт)
-Битовое поле (назначение бит):
-0 – Весовой датчик контрольной ленты
-1 – Весовой датчик чековой ленты
-2 – Оптический датчик контрольной ленты
-3 – Оптический датчик чековой ленты
-4 – Датчик крышки
-5 – Рычаг термоголовки контрольной ленты
-6 – Рычаг термоголовки чековой ленты
-7 – Верхний датчик подкладного документа
-8 – Нижний датчик подкладного документа
-9 – Презентер поддерживается
-10 – Поддержка команд работы с презентером
-11 – Флаг заполнения ЭКЛЗ
-12 – ЭКЛЗ поддерживается
-13 – Отрезчик поддерживается
-14 – Состояние ДЯ как датчик бумаги в презентере
-15 – Датчик денежного ящика
-16 – Датчик бумаги на входе в презентер
-17 – Датчик бумаги на выходе из презентера
-Спецификация
-82
-18 – Купюроприемник поддерживается
-19 – Клавиатура НИ поддерживается
-20 – Контрольная лента поддерживается
-21 – Подкладной документ поддерживается
-22 – Поддержка команд нефискального документа
-23 – Поддержка протокола Кассового Ядра (cashcore)
-24 – Ведущие нули в ИНН
-25 – Ведущие нули в РНМ
-26 – Переворачивать байты при печати линии
-27 – Блокировка ККТ по неверному паролю налогового инспектора
-28 – Поддержка альтернативного нижнего уровня протокола ККТ
-29 – Поддержка переноса строк символом '\n' (код 10) в командах печати
-строк 12H, 17H, 2FH
-30 – Поддержка переноса строк номером шрифта (коды 1…9) в команде
-печати строк 2FH
-31 – Поддержка переноса строк символом '\n' (код 10) в фискальных
-командах 80H…87H, 8AH, 8BH
-32 – Поддержка переноса строк номером шрифта (коды 1…9) в
-фискальных командах 80H…87H, 8AH, 8BH
-33 – Права "СТАРШИЙ КАССИР" (28) на снятие отчетов: X,
-операционных регистров, по отделам, по налогам, по кассирам,
-почасового, по товарам
-34 – Поддержка Бит 3 "слип чек" в командах печати: строк 12H, 17H, 2FH,
-расширенной графики 4DH, C3H, графической линии C5H; поддержка
-поля "результат последней печати" в команде 10H короткого запроса
-состояния ККТ
-35 – Поддержка блочной загрузки графики в команде C4H
-36 – Поддержка команды 6BH "Возврат названия ошибоки"
-37 – Поддержка флагов печати для команд печати расширенной графики
-C3H и печати графической линии C5H
-38 – Зарезервировано
-39 – Поддержка МФП
-40 – Поддержка ЭКЛЗ5
-41 – Печать графики с масштабированием (команда 4FH)
-42 – Загрузка и печать графики-512 (команды 4DH, 4EH)
-43…63 – Зарезервированы
-- Ширина печати шрифтом 1 (1 байт)
-  0 – запросить командой 26H "Прочитать параметры шрифта"; 1…255
-- Ширина печати шрифтом 2 (1 байт)
-  0 – запросить командой 26H "Прочитать параметры шрифта"; 1…255
-- Номер первой печатаемой линии в графике (1 байт)
-  0, 1, 2
-- Количество цифр в ИНН (1 байт)
-  12, 13, 14
-- Количество цифр в РНМ (1 байт)
-  8, 10
-- Количество цифр в длинном РНМ (1 байт)
-  0 – длинный РНМ не поддерживается; 8, 14
-- Количество цифр в длинном заводском номере (1 байт)
-  0 – длинный заводской номер не поддерживается; 10, 12, 14
-- Пароль налогового инспектора по умолчанию (4 байта)
-  00000000…99999999
-- Пароль сист.админа по умолчанию (4 байта)
-  00000000…99999999
-- Номер таблицы "BLUETOOTH БЕСПРОВОДНОЙ МОДУЛЬ" настроек Bluetooth (1 байт)
-  0 – таблица не поддерживается; 1…255
-- Номер поля "НАЧИСЛЕНИЕ НАЛОГОВ" (1 байт)
-  0 – поле не поддерживается; 1…255
-- Максимальная длина команды (N/LEN16)(2 байта)
-  0 – по умолчанию; >>1…65535
-- Ширина произвольной графической линии в байтах (печать
-  одномерного штрих-кода) (1 байт)
-  40 – для узких принтеров; 64, 72 – для широких принтеров
-- Ширина графической линии в буфере графики-512 (1 байт)
-  0 – поле не поддерживается; 64
-- Количество линий в буфере графики-512 (2 байта)
-  0 – поле не поддерживается
-
-*******************************************************************************)
-
 function TFiscalPrinterDriver.ReadParameters2(
   var R: TPrinterParameters2): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$F7#$01;
-  Result := ExecuteData(Command, Answer);
-  if Result = 0 then
-  begin
-    CheckMinLength(Answer, 8);
-    FillChar(R, Sizeof(R), 0);
-    R.FlagsValue := BinToInt(Answer, 1, 8);
-    R.Flags.CapJrnNearEndSensor := TestBit(R.FlagsValue, 0);      // 0 – Весовой датчик контрольной ленты
-    R.Flags.CapRecNearEndSensor := TestBit(R.FlagsValue, 1);      // 1 – Весовой датчик чековой ленты
-    R.Flags.CapJrnEmptySensor := TestBit(R.FlagsValue, 2);        // 2 – Оптический датчик контрольной ленты
-    R.Flags.CapRecEmptySensor := TestBit(R.FlagsValue, 3);        // 3 – Оптический датчик чековой ленты
-    R.Flags.CapCoverSensor := TestBit(R.FlagsValue, 4);           // 4 – Датчик крышки
-    R.Flags.CapJrnLeverSensor := TestBit(R.FlagsValue, 5);        // 5 – Рычаг термоголовки контрольной ленты
-    R.Flags.CapRecLeverSensor := TestBit(R.FlagsValue, 6);        // 6 – Рычаг термоголовки чековой ленты
-    R.Flags.CapSlpNearEndSensor := TestBit(R.FlagsValue, 7);      // 7 – Верхний датчик подкладного документа
-    R.Flags.CapSlpEmptySensor := TestBit(R.FlagsValue, 8);        // 8 – Нижний датчик подкладного документа
-    R.Flags.CapPresenter := TestBit(R.FlagsValue, 9);             // 9 – Презентер поддерживается
-    R.Flags.CapPresenterCommands := TestBit(R.FlagsValue, 10);    // 10 – Поддержка команд работы с презентером
-    R.Flags.CapEJNearFull := TestBit(R.FlagsValue, 11);           // 11 – Флаг заполнения ЭКЛЗ
-    R.Flags.CapEJ := TestBit(R.FlagsValue, 12);                   // 12 – ЭКЛЗ поддерживается
-    R.Flags.CapCutter := TestBit(R.FlagsValue, 13);               // 13 – Отрезчик поддерживается
-    R.Flags.CapDrawerStateAsPaper := TestBit(R.FlagsValue, 14);   // 14 – Состояние ДЯ как датчик бумаги в презентере
-    R.Flags.CapDrawerSensor := TestBit(R.FlagsValue, 15);         // 15 – Датчик денежного ящика
-    R.Flags.CapPrsInSensor := TestBit(R.FlagsValue, 16);          // 16 – Датчик бумаги на входе в презентер
-    R.Flags.CapPrsOutSensor := TestBit(R.FlagsValue, 17);         // 17 – Датчик бумаги на выходе из презентера
-    R.Flags.CapBillAcceptor := TestBit(R.FlagsValue, 18);         // 18 – Купюроприемник поддерживается
-    R.Flags.CapTaxKeyPad := TestBit(R.FlagsValue, 19);            // 19 – Клавиатура НИ поддерживается
-    R.Flags.CapJrnPresent := TestBit(R.FlagsValue, 20);           // 20 – Контрольная лента поддерживается
-    R.Flags.CapSlpPresent := TestBit(R.FlagsValue, 21);           // 21 – Подкладной документ поддерживается
-    R.Flags.CapNonfiscalDoc := TestBit(R.FlagsValue, 22);         // 22 – Поддержка команд нефискального документа
-    R.Flags.CapCashCore := TestBit(R.FlagsValue, 23);             // 23 – Поддержка протокола Кассового Ядра (cashcore)
-    R.Flags.CapInnLeadingZero := TestBit(R.FlagsValue, 24);       // 24 – Ведущие нули в ИНН
-    R.Flags.CapRnmLeadingZero := TestBit(R.FlagsValue, 25);       // 25 – Ведущие нули в РНМ
-    R.Flags.SwapGraphicsLine := TestBit(R.FlagsValue, 26);        // 26 – Переворачивать байты при печати линии
-    R.Flags.CapTaxPasswordLock := TestBit(R.FlagsValue, 27);      // 27 – Блокировка ККТ по неверному паролю налогового инспектора
-    R.Flags.CapProtocol2 := TestBit(R.FlagsValue, 28);            // 28 – Поддержка альтернативного нижнего уровня протокола ККТ
-    R.Flags.CapLFInPrintText := TestBit(R.FlagsValue, 29);        // 29 – Поддержка переноса строк символом '\n' (код 10) в командах печати строк 12H, 17H, 2FH
-    R.Flags.CapFontInPrintText := TestBit(R.FlagsValue, 30);      // 30 – Поддержка переноса строк номером шрифта (коды 1…9) в команде печати строк 2FH
-    R.Flags.CapLFInFiscalCommands := TestBit(R.FlagsValue, 31);   // 31 – Поддержка переноса строк символом '\n' (код 10) в фискальных командах 80H…87H, 8AH, 8BH
-    R.Flags.CapFontInFiscalCommands := TestBit(R.FlagsValue, 32); // 32 – Поддержка переноса строк номером шрифта (коды 1…9) в фискальных командах 80H…87H, 8AH, 8BH
-    R.Flags.CapTopCashierReports := TestBit(R.FlagsValue, 33);    // 33 – Права "СТАРШИЙ КАССИР" (28) на снятие отчетов: X, операционных регистров, по отделам, по налогам, по кассирам, почасового, по товарам
-    R.Flags.CapSlpInPrintCommands := TestBit(R.FlagsValue, 34);   // 34 – Поддержка Бит 3 "слип чек" в командах печати: строк 12H, 17H, 2FH,расширенной графики 4DH, C3H, графической линии C5H; поддержка
-    R.Flags.CapGraphicsC4 := TestBit(R.FlagsValue, 35);           // 35 – Поддержка блочной загрузки графики в команде C4H
-    R.Flags.CapCommand6B := TestBit(R.FlagsValue, 36);            // 36 – Поддержка команды 6BH "Возврат названия ошибоки"
-    R.Flags.CapFlagsGraphicsEx := TestBit(R.FlagsValue, 37);      // 37 – Поддержка флагов печати для команд печати расширенной графики C3H и печати графической линии C5H
-    R.Flags.CapMFP := TestBit(R.FlagsValue, 39);                  // 39 – Поддержка МФП
-    R.Flags.CapEJ5 := TestBit(R.FlagsValue, 40);                  // 40 – Поддержка ЭКЛЗ5
-    R.Flags.CapScaleGraphics := TestBit(R.FlagsValue, 41);        // 41 – Печать графики с масштабированием (команда 4FH)
-    R.Flags.CapGraphics512 := TestBit(R.FlagsValue, 42);          // 42 – Загрузка и печать графики-512 (команды 4DH, 4EH)
-
-    if Length(Answer) < 9 then Exit;
-    R.Font1Width := Ord(Answer[9]);
-    if Length(Answer) < 10 then Exit;
-    R.Font2Width := Ord(Answer[10]);
-    if Length(Answer) < 11 then Exit;
-    R.GraphicsStartLine := Ord(Answer[11]);
-    if Length(Answer) < 12 then Exit;
-    R.InnDigits := Ord(Answer[12]);
-    if Length(Answer) < 13 then Exit;
-    R.RnmDigits := Ord(Answer[13]);
-    if Length(Answer) < 14 then Exit;
-    R.LongRnmDigits := Ord(Answer[14]);
-    if Length(Answer) < 15 then Exit;
-    R.LongSerialDigits := Ord(Answer[15]);
-    if Length(Answer) < 19 then Exit;
-    R.DefTaxPassword := BinToInt(Answer, 16, 4);
-    if Length(Answer) < 23 then Exit;
-    R.DefSysPassword := BinToInt(Answer, 20, 4);
-    if Length(Answer) < 24 then Exit;
-    R.BluetoothTable := Ord(Answer[24]);
-    if Length(Answer) < 25 then Exit;
-    R.TaxFieldNumber := Ord(Answer[25]);
-    if Length(Answer) < 27 then Exit;
-    R.MaxCommandLength := BinToInt(Answer, 26, 2);
-    if Length(Answer) < 28 then Exit;
-    R.GraphicsWidthInBytes := Ord(Answer[28]);
-    if Length(Answer) < 29 then Exit;
-    R.Graphics512WidthInBytes := Ord(Answer[29]);
-    if Length(Answer) < 31 then Exit;
-    R.Graphics512MaxHeight := BinToInt(Answer, 30, 2);
-  end;
+  FillChar(R, Sizeof(R), 0);
+  EnsureConnected;
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(******************************************************************************
-  Сформировать отчёт о регистрации ККТ
-
-  Код команды FF06h . Длина сообщения: 40 байт.
-  Пароль системного администратора: 4 байта
-  ИНН : 12 байт ASCII
-  Регистрационный номер ККТ: 20 байт ASCII
-  Код налогообложения: 1 байт
-  Режим работы: 1 байт
-
-  Ответ: FF06h Длина сообщения: 9 байт.
-  Код ошибки: 1 байт
-  Номер ФД: 4 байта
-  Фискальный признак: 4 байта
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSFiscalization(const P: TFSFiscalization;
   var R: TFDDocument): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$06 +
-    IntToBin(GetSysPassword, 4) +
-    AddTrailingSpaces(P.TaxID, 12) +
-    AddTrailingSpaces(P.RegID, 20) +
-    Chr(P.TaxCode) +
-    Chr(P.WorkMode);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.INN := P.TaxID;
+  Driver.RNM := P.RegID;
+  Driver.TaxType := P.TaxCode;
+  Driver.WorkMode := P.WorkMode;
+  CheckDriver(Driver.FNBeginFiscalization);
+  Result := Driver.FNFiscalization;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 8);
-    R.DocNumber := BinToInt(Answer, 1, 4);
-    R.DocMac := BinToInt(Answer, 5, 4);
+    R.DocNumber := Driver.DocumentNumber;
+    R.DocMac := Driver.FiscalSign;
   end;
 end;
 
 function TFiscalPrinterDriver.FSReFiscalization(const P: TFSReFiscalization;
   var R: TFDDocument): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$34 +
-    IntToBin(GetSysPassword, 4) +
-    AddTrailingSpaces(P.TaxID, 12) +
-    AddTrailingSpaces(P.RegID, 20) +
-    Chr(P.TaxCode) +
-    Chr(P.WorkMode) +
-    Chr(P.ReasonCode);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(GetSysPassword);
+  Driver.INN := P.TaxID;
+  Driver.RNM := P.RegID;
+  Driver.TaxType := P.TaxCode;
+  Driver.WorkMode := P.WorkMode;
+  Driver.RegistrationReasonCode := P.ReasonCode;
+  Result := Driver.FNFiscalization;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 8);
-    R.DocNumber := BinToInt(Answer, 1, 4);
-    R.DocMac := BinToInt(Answer, 5, 4);
+    R.DocNumber := Driver.DocumentNumber;
+    R.DocMac := Driver.FiscalSign;
   end;
 end;
 
@@ -7677,62 +6277,35 @@ begin
   PrintText(PRINTER_STATION_REC, ReadFSDocument(Number));
 end;
 
-(*
-Запросить фискальный документ в TLV формате
-Код команды FF3Аh . Длина сообщения: 10 байт.
-  Пароль системного администратора: 4 байта
-  Номер фискального документа: 4 байта
-Ответ: FF3Аh Длина сообщения: 5 байт.
-  Код ошибки: 1 байт
-  Тип фискального документа: 2 байта STLV
-  Длина фискального документа: 2 байта
-*)
-
 function TFiscalPrinterDriver.FSReadDocument(var P: TFSReadDocument): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$3A + IntToBin(P.Password, 4) + IntToBin(P.Number, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(P.Password);
+  Driver.DocumentNumber := P.Number;
+  Result := Driver.FNRequestFiscalDocumentTLV;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 4);
-    P.DocType := BinToInt(Answer, 1, 2);
-    P.DocLength := BinToInt(Answer, 3, 2);
+    P.DocType := Driver.DocumentType;
+    P.DocLength := Driver.DataLength;
   end;
 end;
 
-(*
-Чтение TLV фискального документа
-Код команды FF3Bh . Длина сообщения: 6 байт.
-  Пароль системного администратора: 4 байта
-Ответ: FF3Bh Длина сообщения: 1+N байт.
-  Код ошибки:1 байт
-  TLV структура: N байт
-
-*)
-
 function TFiscalPrinterDriver.FSReadDocData(var P: TFSReadDocData): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$3B + IntToBin(P.Password, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(P.Password);
+  Result := Driver.FNReadFiscalDocumentTLV;
   if Result = 0 then
   begin
-    P.TLVData := Answer;
+    P.TLVData := AnsiString(Driver.TagValueStr);
   end;
 end;
 
 function TFiscalPrinterDriver.FSStartOpenDay: Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$41 + IntToBin(FSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Result := Driver.FNBeginOpenSession;
 end;
 
 procedure TFiscalPrinterDriver.EkmCheckBarcode(const Barcode: TGS1Barcode);
@@ -7927,7 +6500,6 @@ begin
           end;
 
         21:
-          // Проверка на формат 'СС-ЦЦЦЦЦЦ-ССССССССССС'
           if IsMatch(Barcode, '\w{2}-\d{6}-\w{11}') then
             BarcodeType := KTN_RF;
 
@@ -7964,8 +6536,6 @@ end;
 function TFiscalPrinterDriver.FSWriteTLVOperation(const AData: AnsiString): Integer;
 var
   Data: AnsiString;
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
   Result := 0;
   Data := FilterTLV(AData);
@@ -7974,25 +6544,17 @@ begin
   if Length(Data) > 249 then
     raiseException(_('TLV data length too big'));
 
-  Command := #$FF#$4D + IntToBin(FSysPassword, 4) + Copy(Data, 1, 249);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Driver.TLVDataHex := StrToHex(Copy(Data, 1, 249));
+  Result := Driver.FNSendTLVOperation;
 end;
 
-(*
-Начать формирование чека коррекции
-Код команды FF35h . Длина сообщения: 6 байт.
-Пароль системного администратора: 4 байта
-Ответ: FF35h Длина сообщения: 1 байт.
-Код ошибки: 1 байт
-*)
-
 function TFiscalPrinterDriver.FSStartCorrectionReceipt: Integer;
-var
-  Command: AnsiString;
-  Answer: AnsiString;
 begin
-  Command := #$FF#$35 + IntToBin(FSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Result := Driver.FNBeginCorrectionReceipt;
 end;
 
 function TFiscalPrinterDriver.GetLastDocNumber: Int64;
@@ -8058,578 +6620,204 @@ begin
   Result := LastMacValue;
 end;
 
-(******************************************************************************
-  Проверка маркированного товара
-
-  Код команды 	FF61h. Длина сообщения: 10+X+Y байт.
-  Пароль оператора (4 байта)
-  Входные данные (4+X+Y байт)
-
-  Состав входных данных:
-
-  Смещение	Длина	Параметр	Значение
-  0	1 байт	Планируемый статус	Тег 2003
-  1	1 байт	Режим обработки	Тег 2102 (сейчас всегда "0")
-  2	1 байт	Длина кода маркировки (КМ) в байтах (X)	Полная длина КМ
-  3	1 байт	Длина списка TLV в байтах	Полная длина списка TLV
-  4	X байт	КМ	Сам КМ, как он был прочитан сканером
-  4+X	Y байт	Список TLV	Если планируется частичное выбытие маркированного
-            товара (согласно с тегом 2003), то необходимо сформировать буфер
-            из тегов 2108 (мера) и 1023 (количество) и передать его здесь
-
-  Ответ:		FF61h. Длина сообщения: 9+X байт.
-  Код ошибки (1 байт)
-  Результат проверки (6+N байт)
-
-  Состав данных результата проверки:
-
-  Смещение	Длина	Параметр	Значение	Примечание
-  0	1 байт	Статус локальной проверки	Тег 2004
-  1	1 байт	Причина, по которой не была проведена локальная проверка
-  2	1 байт	Распознанный тип КМ	Тег 2100
-  3	1 байт	Длина дополнительных параметров	Длина данных, идущих далее
-            Если автономный режим или если сервер не ответил в течение таймаута, то "0"
-  4	1 байт	Код ответа ФН на команду онлайн-проверки
-            В соответствии и вводом ошибки ФН	Если 0x20, то в следующем байте
-            возвращается причина в соответствии с Примечанием 2 ниже
-  5	1 байт	Результат проверки КМ	Тег 2106	Только если сервер ответил без ошибок
-  6	N байт	Список реквизитов ответа сервера	TLV List	Только если сервер ответил без ошибок
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.FSCheckItemCode(P: TFSCheckItemCode;
   var R: TFSCheckItemResult): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
   P.CMData := CorrectGS1(P.CMData);
-  Command := #$FF#$61 + IntToBin(FSysPassword, 4) +
-    Chr(P.ItemStatus) + Chr(P.ProcessMode) +
-    Chr(Length(P.CMData)) + Chr(Length(P.TLVData)) +
-    P.CMData + P.TLVData;
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Driver.ItemStatus := P.ItemStatus;
+  Driver.BarcodeHex := StrToHex(P.CMData);
+  Driver.TLVDataHex := StrToHex(P.TLVData);
+  Result := Driver.FNCheckItemBarcode;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 4);
-    R.LocalCheckResult := Ord(Answer[1]);
-    R.LocalCheckError := Ord(Answer[2]);
-    R.SymbolicType := Ord(Answer[3]);
-    R.DataLength := Ord(Answer[4]);
-    if R.DataLength > 1 then
-    begin
-      R.FSResultCode := Ord(Answer[5]);
-      R.ServerCheckStatus := Ord(Answer[6]);
-      R.ServerTLVData := Copy(Answer, 7, Length(Answer));
-    end;
+    R.LocalCheckResult := 0;
+    R.LocalCheckError := 0;
+    R.SymbolicType := Driver.MarkingType;
+    R.DataLength := 0;
+    R.FSResultCode := 0;
+    R.ServerCheckStatus := Driver.KMServerCheckingStatus;
+    R.ServerTLVData := AnsiString(Driver.TagValueStr);
   end;
 end;
-
-(******************************************************************************
-
-  Синхронизировать регистры со счётчиком ФН
-
-  Код команды 	FF62h. Длина сообщения: 6 байт.
-    Пароль системного администратора (4 байта)
-
-  Ответ: 		FF62h. Длина сообщения: 3 байта.
-      Код ошибки (1 байт)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSSyncRegisters: Integer;
-var
-  Command: AnsiString;
 begin
-  Command := #$FF#$62 + IntToBin(FSysPassword, 4);
-  Result := ExecuteData(Command);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Result := Driver.FNCountersSync;
 end;
 
-
-(******************************************************************************
-
-  Запрос ресурса свободной памяти в ФН
-
-  Код команды 	FF63h. Длина сообщения: 6 байт.
-  Пароль системного администратора (4 байта)
-
-  Ответ: 		FF63h. Длина сообщения: 11 байт.
-  Код ошибки (1 байт)
-  Ресурс данных 5 летнего хранения 1 (4 байта)
-  Ресурс данных 30 дневного хранения 2 (4 байта)
-  Ресурс для хранения уведомлений о реализации маркированного товара3 (1 байт)
-  Примечание:
-  1 - Ориентировочное количество документов, которые можно создать в ФН.
-  2 - Размер свободной области (в килобайтах) для записи документов 30 дней хранения.
-      После 30 дней работы значение может колебаться на постоянном уровне.
-  3 - Процент заполнения области хранения уведомлений о реализации маркированных
-      товаров для ОИСМ. Параметр не возвращается если ФН зарегистрирован в
-      режиме без поддержки работы с маркированным товарами.
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.FSReadMemory(var R: TFSReadMemoryResult): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$63 + IntToBin(FSysPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Result := Driver.FNGetFreeMemoryResource;
   if Result = 0 then
   begin
-    R.FreeDocCount := BinToInt(Answer, 1, 4);
-    R.FreeMemorySizeInKB := BinToInt(Answer, 5, 4);
-    R.UsedMCTicketStorageInPercents := BinToInt(Answer, 5, 4);
+    R.FreeDocCount := Driver.FN5YearResource;
+    R.FreeMemorySizeInKB := Driver.FreeMemorySize;
+    R.UsedMCTicketStorageInPercents := Driver.FNMarkingFillPercentage;
   end;
 end;
 
-(******************************************************************************
-
-  Передача в ФН TLV из буфера
-
-  Код команды 	FF64h. Длина сообщения: 6 байт.
-  Пароль системного администратора (4 байта)
-
-  Ответ: 		FF64h. Длина сообщения: 3 байта.
-  Код ошибки (1 байт)
-  Примечание:
-  Позволяет передать в ФН предварительно загруженную в буфер TLV структуру.
-  Позволяет передать TLV длиннее 250 байт. Буфер тот же что и для проверки маркировки.
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.FSWriteTLVFromBuffer: Integer;
-var
-  Command: AnsiString;
 begin
-  Command := #$FF#$64 + IntToBin(FSysPassword, 4);
-  Result := ExecuteData(Command);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(******************************************************************************
-
-  Получить случайную последовательность
-
-  Код команды 	FF65h. Длина сообщения: 6 байт.
-  Пароль оператора (4 байта)
-
-  Ответ: 		FF65h. Длина сообщения: 19 байт.
-  Код ошибки (1 байт)
-  Данные (16 байт)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSRandomData(var Data: AnsiString): Integer;
-var
-  Command: AnsiString;
 begin
-  Command := #$FF#$65 + IntToBin(FSysPassword, 4);
-  Result := ExecuteData(Command, Data);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Data := '';
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(******************************************************************************
-  Авторизоваться
-  Код команды 	FF66h. Длина сообщения: 22 байта.
-  Пароль оператора (4 байта)
-  Данные для авторизации (16 байт)
-
-  Ответ: 		FF66h. Длина сообщения: 3 байта.
-  Код ошибки (1 байт)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSAuthorize(const DataToAuthorize: AnsiString): Integer;
-var
-  Command: AnsiString;
 begin
-  Command := #$FF#$66 + IntToBin(FSysPassword, 4) + Copy(DataToAuthorize, 1, 16);
-  Result := ExecuteData(Command);
+  EnsureConnected;
+  SetDriverPassword(FSysPassword);
+  Result := ERROR_COMMAND_NOT_SUPPORTED;
+  FResultCode := Result;
+  FResultText := GetErrorText(Result);
 end;
-
-(******************************************************************************
-
-  Привязка маркированного товара к позиции
-
-  Код команды 	FF67h. Длина сообщения: 7+N байт.
-  Пароль оператора (4 байта)
-  Длина кода маркировки (1 байт)
-  Данные маркировки (N байт)
-  Признак ОСУ (1 байт) 1 Объемно-сортовой учет (ОСУ)
-
-  Ответ: 		FF67h. Длина сообщения: 6+(6+N)4 байт.
-  Код ошибки (1 байт)
-  Распознанный тип кода (2 байта) 2
-  Тип Data Matrix (1 байт) 3
-  0 - КМ 88
-  1 - КМ симметричный
-  2 - КМ Табачный
-  3 - КМ 44
-  0 xFF- GS-1 без маркировки
-  Результат проверки (6+N байт)4 может отсутствовать (см. Примечание 1)
-
-  Примечание:
-  1 - Может отсутствовать. Для реализации позиции по ОСУ надо передать значение 0xFF.
-  2 - Таблица допустимых значений:
-  Тип кода	Значение
-  EAN8	0x45 0x08
-  EAN13	0x45 0x0D
-  ITF14	0x49 0x0E
-  GS-1 Data Matrix		0x44 0x4D
-  RF метка меховых изделий	0x52 0x46
-  ЕГАИС-3	0xC5 0x14
-  ЕГАИС-3	0xC5 0x1E
-  ОСУ EAN8		0x4F 0x08
-  ОСУ EAN13	0x4F 0x0D
-  ОСУ GTIN ITF14	0x4F 0x0E
-  Нераспознанный код	0x00 0x00
-  3 - Поле имеет смысл только если код распознан как GS-1 Data Matrix, в противном случае принимает значение 0.
-  4 - В случае если код маркировки не проверялся ранее командой FF61h "Проверка маркированного товара", ККТ сама её подаст и добывит ответ на неё к ответу на команду FF67h.
-
-
-  Состав данных результата проверки:
-
-  Смещение	Длина	Параметр	Значение	Примечание
-  0	1 байт	Статус локальной проверки	Тег 2004
-  1	1 байт	Причина, по которой не была проведена локальная проверка	См. Примечание 2 ниже
-  2	1 байт	Распознанный тип КМ	Тег 2100
-  3	1 байт	Длина дополнительных параметров	Длина данных, идущих далее	Если автономный режим, то "0"
-  4	1 байт	Код ответа ФН на команду онлайн-проверки	В соответствии и вводом ошибки ФН	Если 0x20, то в следующем байте возвращается причина в соответствии с Примечанием 3 ниже
-  Значение 0xFF, если сервер не ответил в течение таймаута.
-  5	1 байт	Результат проверки КМ	Тег 2106	Только если сервер ответил без ошибок
-  6	N байт	Список реквизитов ответа сервера	TLV List	Только если сервер ответил без ошибок
-
-******************************************************************************)
-
 
 function TFiscalPrinterDriver.FSBindItemCode(P: TFSBindItemCode;
   var R: TFSBindItemCodeResult): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
   P.Code := CorrectGS1(P.Code);
-  Command := #$FF#$67 + IntToBin(FUsrPassword, 4) + Chr(Length(P.Code)) + P.Code;
-  if P.IsAccounted then
-    Command := Command + #$FF;
-
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Driver.BarcodeHex := StrToHex(P.Code);
+  Driver.MarkingOnly := P.IsAccounted;
+  Result := Driver.FNBindMarkingItem;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 3);
-    R.ItemCode := BinToInt(Answer, 1, 2);
-    R.CodeType := BinToInt(Answer, 3, 1);
-    if Length(Answer) >= 7 then
-    begin
-      R.CheckResult.LocalCheckResult := Ord(Answer[4]);
-      R.CheckResult.LocalCheckError := Ord(Answer[5]);
-      R.CheckResult.SymbolicType := Ord(Answer[6]);
-      R.CheckResult.DataLength := Ord(Answer[7]);
-      if R.CheckResult.DataLength > 1 then
-      begin
-        R.CheckResult.FSResultCode := Ord(Answer[8]);
-        R.CheckResult.ServerCheckStatus := Ord(Answer[9]);
-        R.CheckResult.ServerTLVData := Copy(Answer, 10, Length(Answer));
-      end;
-    end;
+    R.ItemCode := Driver.MarkingType;
+    R.CodeType := Driver.MarkingTypeEx;
+    R.CheckResult.LocalCheckResult := 0;
+    R.CheckResult.LocalCheckError := 0;
+    R.CheckResult.SymbolicType := Driver.MarkingType;
+    R.CheckResult.DataLength := 0;
+    R.CheckResult.FSResultCode := 0;
+    R.CheckResult.ServerCheckStatus := Driver.KMServerCheckingStatus;
+    R.CheckResult.ServerTLVData := AnsiString(Driver.TagValueStr);
   end;
 end;
-
-(******************************************************************************
-
-  Получить состояние по передаче уведомлений о реализации маркированных товаров
-  Код команды 	FF68h. Длина сообщения: 6 байт.
-  Пароль оператора (4 байта)
-  Ответ:		FF68h. Длина сообщения: 13 байт.
-  Код ошибки (1 байт)
-
-  Наименование	Тип	Длина	Описание
-  Состояние по передачи уведомлений	Byte	1	0 - нет активного обмена;
-  1 - начато чтение уведомления;
-  2 - ожидание квитанции на уведомление;
-  Количество уведомлений в очереди	Uint16, LE	2	0, если на все уведомления была получена квитанция
-  Номер текущего уведомления	Uint32, LE	4	Номер уведомления для передачи, или уведомления, на которое ожидается квитанция
-  Дата и время текущего уведомления	DATE_TIME	5	0, если на все уведомления получена квитанция
-  Процент заполнения области хранения уведомлений	Byte	1
-
-  Код ошибки (1 байт) может принимать следующие значения:
-  Код ответа	Описание	Комментарий (действия ККТ)
-
-  00h	Нет ошибки
-
-  02h	Неверное состояние ФН	ФН был активирован в автономном режиме или уже
-      начато чтение уведомления и состояние по передаче уведомлений имеет
-      значение "1" - "начато чтение уведомления": необходимо завершить или
-      отменить начатое чтение уведомления
-
-  32h	Запрещена работа с маркированными товарами	При регистрации ФН не был
-      указан признак работы с маркированными товарами
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSReadTicketStatus(var R: TFSTicketStatus): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$68 + IntToBin(FUsrPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNGetKMServerExchangeStatus;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 13);
-    R.TicketStatus := BinToInt(Answer, 1, 1);
-    R.TicketCount := BinToInt(Answer, 2, 2);
-    R.TicketNumber := BinToInt(Answer, 4, 4);
-    R.TicketDate := BinToPrinterDateTime2(Copy(Answer, 8, 5));
-    R.TicketStorageUsageInPercents := Ord(Answer[13]);
+    R.TicketStatus := Driver.KMServerCheckingStatus;
+    R.TicketCount := Driver.DocumentCount;
+    R.TicketNumber := Driver.LastDocumentNumber;
+    R.TicketDate := DateTimeToPrinterDateTime(Driver.ECRDate);
+    R.TicketStorageUsageInPercents := Driver.FNMarkingFillPercentage;
   end;
 end;
 
-(******************************************************************************
-
-  Принять или отвергнуть введенный код маркировки FF69H
-
-  Код команды FF69h. Длина сообщения: 7 байт.
-  Пароль оператора: 4 байта
-  Решение : 1 байт. 0 - отвергнуть, 1 - принять, 2 - очистить буфер КМ
-  Команду необходимо подавать после проверки каждого КМ.
-
-  Ответ: FF69h	    Длина сообщения: 1 байт.
-  Код ошибки: 1 байт
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.FSAcceptItemCode(Action: Integer): Integer;
-var
-  Command: AnsiString;
 begin
-  Command := #$FF#$69 + IntToBin(FUsrPassword, 4) + Chr(Action);
-  Result := ExecuteData(Command);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  if Action = 2 then
+    Result := Driver.FNMarkingClearBuffer
+  else
+    Result := Driver.FNAcceptMarkingCode;
 end;
 
 function TFiscalPrinterDriver.FSClearMCCheckResults: Integer;
 begin
-  Result := FSAcceptItemCode(2);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNMarkingClearBuffer;
 end;
-
-
-(******************************************************************************
-
-  Запрос статуса по работе с кодами маркировки
-
-  Код команды 	FF70h. Длина сообщения: 6 байт.
-  Пароль оператора (4 байта)
-
-  Ответ:		FF70h. Длина сообщения: 11 байт.
-  Код ошибки (1 байт)
-  Статус работы с кодами маркировки (8 байт)
-
-  Наименование	Тип	Длина	Описание
-  Состояние по проверке КМ	Byte	1	0 - Таблица проверки КМ переполнена
-    1 - Нет КМ на проверке
-    2 - Передан КМ в команде B1h
-    3 - Сформирован запрос о коде маркировки при помощи команды B5h
-    4 - Получен и передан в ФН ответ на запрос при помощи команды B6h
-  Состояние по формированию уведомления о реализации маркированного товара	Byte	1
-    0 - Уведомление о реализации маркированного товара не формируется
-    1 - Начато формирование уведомления о реализации маркированного товара
-    2 - Формирование уведомлений заблокировано из-за переполнения области временного хранения
-  Флаги разрешения команд работы с КМ	Byte	1	См. таблицу "Флаги разрешения команд работы с КМ" ниже
-  Количество сохранённых результатов проверки КМ	Byte	1
-  Количество КМ, результаты проверки которых сохранены в ФН командой B2h c кодом "1"
-  Количество КМ, включенных в уведомление о реализации маркированного товара	Byte	1
-  Предупреждение о заполнении области хранения уведомлений о реализации маркированного товара	Byte	1
-    В этом параметре ФН информирует ККТ о заполнении области хранения уведомлений о реализации маркированного товара.
-    Возможные следующие значения параметра:
-    0 - Область заполнена менее чем на 50%
-    1 - Область заполнена от 50 до 80%
-    2 - Область заполнена от 80 до 90%
-    3 - Область заполнена более чем на 90%
-    4 - Область полностью заполнена, формирование новых уведомлений невозможно
-  Количество уведомлений в очереди	Uint16, LE	2
-    Количество неподтверждённых или невыгруженных уведомлений о реализации маркированного товара
-  Флаги разрешения команд работы с КМ
-
-  Бит 7	Бит 6	Бит 5	Бит 4	Бит 3	Бит 2	Бит 1	Бит 0	Код разрешенной команды
-  0	0	0	0	0	0	0	1	B1h
-  0	0	0	0	0	0	1	0	B2h
-  0	0	0	0	0	1	0	0	B3h
-  0	0	0	0	1	0	0	0	B5h
-  0	0	0	1	0	0	0	0	B6h
-  0	0	1	0	0	0	0	0	B7h с дополнительным кодом 1
-  0	1	0	0	0	0	0	0	B7h с дополнительным кодом 2
-  1	0	0	0	0	0	0	0	B7h с дополнительным кодом 3
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSReadMarkStatus(var R: TFSMarkStatus): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$70 + IntToBin(FUsrPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNGetMarkingCodeWorkStatus;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 8);
-    R.MarkCheckStatus := Ord(Answer[1]);
-    R.TicketStatus := Ord(Answer[2]);
-    R.CommandFlags := Ord(Answer[3]);
-    R.MCSavedCount := Ord(Answer[4]);
-    R.MCTicketCount := Ord(Answer[5]);
-    R.TicketStorageStatus := Ord(Answer[6]);
-    R.TicketCount := BinToInt(Answer, 7, 2);
+    R.MarkCheckStatus := Driver.KMServerCheckingStatus;
+    R.TicketStatus := 0;
+    R.CommandFlags := 0;
+    R.MCSavedCount := Driver.MCCheckResultSavedCount;
+    R.MCTicketCount := Driver.DocumentCount;
+    R.TicketStorageStatus := Driver.FNMarkingFillPercentage;
+    R.TicketCount := Driver.DocumentCount;
   end;
 end;
-
-(******************************************************************************
-
-  Начать выгрузку уведомлений о реализации маркированных товаров (в автономном режиме)
-
-  Код команды 	FF71h. Длина сообщения: 6 байт.
-  Пароль оператора (4 байта)
-
-  Ответ:		FF71h. Длина сообщения: 11 байт.
-  Код ошибки (1 байт)
-  Общее число уведомлений (2 байта)
-  Номер первого уведомления (4 байта)
-  Размер первого уведомления (2 байта)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSStartReadTickets(var R: TFSTicketParams): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$71 + IntToBin(FUsrPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNGetKMServerExchangeStatus;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 8);
-    R.TicketCount := BinToInt(Answer, 1, 2);
-    R.FirstTicketNumber := BinToInt(Answer, 3, 4);
-    R.FirstTicketSize := BinToInt(Answer, 7, 2);
+    R.TicketCount := Driver.DocumentCount;
+    R.FirstTicketNumber := Driver.LastDocumentNumber;
+    R.FirstTicketSize := Driver.DataLength;
   end;
 end;
-
-(******************************************************************************
-
-  Прочитать блок уведомления (в автономном режиме)
-
-  Код команды 	FF72h. Длина сообщения: 6 байт.
-  Пароль оператора: 4 байта
-
-  Ответ:		FF72h. Длина сообщения: 11+N байт.
-  Код ошибки (1 байт)
-  Номер текущего уведомления (4 байта)
-  Полный размер текущего уведомления (2 байта)
-  Смещение от начала текущего уведомления (2 байта)
-  Блок данных (N байт)
-
-  Примечание:
-  ККТ выполняет поблочное чтение всех доступных уведомлений
-  (максимально ККТ может прочитать блок 128 байт).
-  Следует вызывать команду до получения ошибки "Нет данных" или на основании
-  общего числа уведомлений, полученного подачей команды FF71h.
-  Допускается прочитать лишь часть уведомлений и подтвердить их.
-  В любой момент до подтверждения чтения можно вызвать команду FF71h и
-  начать чтение неподтвержденных уведомлений заново.
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSReadNextTicket(var R: TFSTicketData): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$72 + IntToBin(FUsrPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNReadNotificationBlock;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 8);
-    R.Number := BinToInt(Answer, 1, 4);
-    R.Size := BinToInt(Answer, 5, 2);
-    R.Offset := BinToInt(Answer, 7, 2);
-    R.Data := Copy(Answer, 9, Length(Answer));
+    R.Number := Driver.DocumentNumber;
+    R.Size := Driver.DataLength;
+    R.Offset := 0;
+    R.Data := AnsiString(Driver.DataBlock);
   end;
 end;
-
-(******************************************************************************
-
-  Подтвердить выгрузку уведомления (в автономном режиме)
-
-  Код команды 	FF73h. Длина сообщения: 14 байт.
-  Пароль оператора (4 байта)
-  Номер уведомления (4 байта) получается из ответа на команду FF72h
-  CRC16 (4 байта) контрольная сумма уведомления
-
-  Ответ:		FF73h. Длина сообщения: 3 байта.
-  Код ошибки (1 байт)
-
-******************************************************************************)
 
 function TFiscalPrinterDriver.FSConfirmTicket(const P: TFSTicketNumber): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$73 + IntToBin(FUsrPassword, 4) +
-    IntToBin(P.Number, 4) + IntToBin(P.Crc16, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Driver.DocumentNumber := P.Number;
+  Driver.FiscalSign := P.Crc16;
+  Result := Driver.FNConfirmNotificationRead;
 end;
 
-(******************************************************************************
-
-  Запрос исполнения ФН
-
-  Код команды 	FF74h. Длина сообщения: 6 байт.
-  Пароль оператора (4 байта)
-
-  Ответ:		FF74h. Длина сообщения: 51 байт.
-  Код ошибки (1 байт)
-  Строка исполнения ФН  (48 байт)  ASCII
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.FSReadDeviceInfo(var R: string): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$74 + IntToBin(FUsrPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNGetImplementation;
   if Result = 0 then
   begin
-    R := Answer;
+    R := Driver.FNImplementation;
   end;
 end;
 
-(******************************************************************************
-
-  Запрос общего размера данных документа в ФН
-
-  Код команды 	FF75h. Длина сообщения: 14 байт.
-  Пароль оператора (4 байта)
-  Ответ:		FF75h. Длина сообщения: 11 байт.
-  Код ошибки (1 байт)
-  Размер в байтах текущего документа для ОФД ( 4 байта)
-  Размер в байтах текущего уведомления о реализации маркированных товаров для ОИСМ ( 4 байта)
-
-******************************************************************************)
-
 function TFiscalPrinterDriver.FSReadDocSize(var R: TFSDocSize): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FF#$75 + IntToBin(FUsrPassword, 4);
-  Result := ExecuteData(Command, Answer);
+  EnsureConnected;
+  SetDriverPassword(FUsrPassword);
+  Result := Driver.FNGetFreeMemoryResource;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 8);
-    R.DocSize := BinToInt(Answer, 1, 4);
-    R.TicketSize := BinToInt(Answer, 5, 4);
+    R.DocSize := Driver.FreeMemorySize;
+    R.TicketSize := Driver.DataLength;
   end;
 end;
 

@@ -355,12 +355,8 @@ type
     function GetLine(const Text: WideString; MinLength, MaxLength: Integer): WideString; overload;
     function FieldToInt(FieldInfo: TPrinterFieldRec; const Value: WideString): Integer;
     function ReadFieldInfo(Table, Field: Byte; var R: TPrinterFieldRec): Integer;
-    function Execute(const Data: AnsiString): AnsiString;
     function ExecuteStream(Stream: TBinStream): Integer;
-    function ExecutePrinterCommand(Command: TPrinterCommand): Integer;
     function ExecuteData(const Data: AnsiString; var RxData: AnsiString): Integer;
-    function ExecuteCommand(var Command: TCommandRec): Integer;
-    function SendCommand(var Command: TCommandRec): Integer;
     function GetModel: TPrinterModelRec;
     function GetOnCommand: TCommandEvent;
     function GetTables: TDeviceTables;

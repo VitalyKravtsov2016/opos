@@ -16,7 +16,7 @@ type
   { TfmFptrConnection }
 
   TfmFptrConnection = class(TFptrPage)
-    gbConenctionParams: TTntGroupBox;
+    gbConenction: TTntGroupBox;
     lblComPort: TTntLabel;
     lblBaudRate: TTntLabel;
     lblByteTimeout: TTntLabel;
@@ -42,7 +42,7 @@ type
     lblPrinterProtocol: TTntLabel;
     cbPrinterProtocol: TTntComboBox;
     cbMaxRetryCount: TTntComboBox;
-    GroupBox1: TTntGroupBox;
+    gbPolling: TTntGroupBox;
     lblPropertyUpdateMode: TTntLabel;
     cbPropertyUpdateMode: TTntComboBox;
     sePollInterval: TSpinEdit;
@@ -55,6 +55,8 @@ type
     cbCCOType: TTntComboBox;
     lblModel: TTntLabel;
     cbModel: TTntComboBox;
+    lblDriverType: TTntLabel;
+    cbDriverType: TTntComboBox;
     procedure FormCreate(Sender: TObject);
   private
     FModels: TPrinterModels;
@@ -129,6 +131,7 @@ var
 begin
   UpdateModels;
   cbConnectionType.ItemIndex := Parameters.ConnectionType;
+  cbDriverType.ItemIndex := Parameters.DriverType;
   cbPrinterProtocol.ItemIndex := Parameters.PrinterProtocol;
   edtRemoteHost.Text := Parameters.RemoteHost;
   seRemotePort.Value := Parameters.RemotePort;
@@ -154,6 +157,7 @@ end;
 procedure TfmFptrConnection.UpdateObject;
 begin
   Parameters.ConnectionType := cbConnectionType.ItemIndex;
+  Parameters.DriverType := cbDriverType.ItemIndex;
   Parameters.PrinterProtocol := cbPrinterProtocol.ItemIndex;
   Parameters.RemoteHost := edtRemoteHost.Text;
   Parameters.RemotePort := seRemotePort.Value;

@@ -220,7 +220,11 @@ uses
   duLogFile in 'Units\duLogFile.pas',
   RegExpr in '..\..\Source\Shared\RegExpr.pas',
   MockPrinterConnection in 'Units\MockPrinterConnection.pas',
-  duFiscalPrinter in 'Units\duFiscalPrinter.pas';
+  duFiscalPrinter in 'Units\duFiscalPrinter.pas',
+  FiscalPrinterDevice in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',
+  untDriver in '..\..\Source\Shared\untDriver.pas',
+  DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
+  BinUtils in '..\..\Source\Shared\BinUtils.pas';
 
 {$R *.RES}
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}

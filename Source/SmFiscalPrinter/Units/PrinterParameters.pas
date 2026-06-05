@@ -13,6 +13,13 @@ uses
 
 const
   /////////////////////////////////////////////////////////////////////////////
+  // DriverType constants
+
+  DriverTypeInternal      = 0;
+  DriverTypeShtrihDriver  = 1;
+  DefDriverType = DriverTypeInternal;
+
+  /////////////////////////////////////////////////////////////////////////////
   // ItemTextMode constants
 
   ItemTextModeNone  = 0; // Item text not changed
@@ -577,6 +584,7 @@ type
     ValidTimeDiffInSecs: Integer;
     UsePrintHeaderParameter: Boolean;
     WebKassaEnabled: Boolean;
+    DriverType: Integer;
   public
     constructor Create(ALogger: ILogFile);
     destructor Destroy; override;
@@ -831,6 +839,7 @@ begin
   RemoteHost := DefRemoteHost;
   RemotePort := DefRemotePort;
   ConnectionType := DefConnectionType;
+  DriverType := DefDriverType;
   HeaderPrinted := DefHeaderPrinted;
   PayTypes.Clear;
   for i := 0 to 15 do

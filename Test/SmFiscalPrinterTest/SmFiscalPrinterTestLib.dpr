@@ -210,7 +210,11 @@ uses
   TranslationUtil in '..\..\Source\SmFiscalPrinter\Units\TranslationUtil.pas',
   LangUtils in '..\..\Source\Shared\LangUtils.pas',
   RegExpr in '..\..\Source\Shared\RegExpr.pas',
-  MockPrinterConnection in 'Units\MockPrinterConnection.pas';
+  MockPrinterConnection in 'Units\MockPrinterConnection.pas',
+  FiscalPrinterDevice in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',
+  untDriver in '..\..\Source\Shared\untDriver.pas',
+  DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
+  BinUtils in '..\..\Source\Shared\BinUtils.pas';
 
 {$R *.RES}
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}
