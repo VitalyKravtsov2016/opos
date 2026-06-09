@@ -950,12 +950,12 @@ begin
   FRetalix.Free;
 
   FPrinter := APrinter;
-  FOposDevice := TOposServiceDevice19.Create(FPrinter.Device.Context.Logger);
+  FOposDevice := TOposServiceDevice19.Create(FPrinter.Context.Logger);
   FOposDevice.ErrorEventEnabled := False;
-  FCommandDefs := TCommandDefs.Create(FPrinter.Device.Context.Logger);
-  FDIOHandlers := TDIOHandlers.Create(FPrinter.Device.Context);
-  FRetalix := TRetalix.Create(FPrinter.Device.Context.MalinaParams.RetalixDBPath,
-    FPrinter.Device.Context);
+  FCommandDefs := TCommandDefs.Create(FPrinter.Context.Logger);
+  FDIOHandlers := TDIOHandlers.Create(FPrinter.Context);
+  FRetalix := TRetalix.Create(FPrinter.Context.MalinaParams.RetalixDBPath,
+    FPrinter.Context);
   FMonitoring := TMonitoringServer.Create;
 
   InternalInit;
@@ -973,6 +973,7 @@ begin
     FPrinter.AddStatusLink(FStatusLink);
     FPrinter.AddConnectLink(FConnectLink);
     Printer.Open(DeviceName);
+
     FOposDevice.Open(DeviceClass, DeviceName, GetEventInterface(pDispatch));
 
     Logger.Debug(Logger.Separator);

@@ -30,6 +30,7 @@ type
   TFiscalPrinterDriver = class(TInterfacedObject, IFiscalPrinterDevice)
   private
     FDriver: TDriver;
+    FContext: TDriverContext;
     FDriverConnected: Boolean;
     property Driver: TDriver read FDriver;
     procedure SetPrintFlags(Flags: Byte);
@@ -44,12 +45,13 @@ type
     procedure MapLongStatusFromDriver(var Status: TLongPrinterStatus);
     procedure MapShortStatusFromDriver(var Status: TShortPrinterStatus);
     procedure SetPrinterStatusFromDriver;
+
+    property Context: TDriverContext read FContext;
   protected
     function ReceiptClose22(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
   public
     FFFDVersion: TFFDVersion;
-    FContext: TDriverContext;
     FCapSubtotalRound: Boolean;
     FCapDiscount: Boolean;
     FCapBarLine: Boolean;
@@ -243,7 +245,7 @@ type
   protected
     function GetMaxGraphicsWidthInBytes: Integer;
   public
-    constructor Create;
+    constructor Create(AContext: TDriverContext);
     destructor Destroy; override;
 
     procedure Lock;
@@ -647,15 +649,15 @@ end;
 
 { TFiscalPrinterDriver }
 
-constructor TFiscalPrinterDriver.Create;
+constructor TFiscalPrinterDriver.Create(AContext: TDriverContext);
 begin
   inherited Create;
+  FContext := AContext;
   FDriver := TDriver.Create(nil);
   FDriverConnected := False;
   SetLength(FTaxInfo, 4);
   FTLVItems := TStringList.Create;
   FSTLVTag := TTLV.Create(nil);
-  FContext := TDriverContext.Create;
   FLogger := TClassLogger.Create('TFiscalPrinterDriver', FContext.Logger);
   FLock := TCriticalSection.Create;
   FFields := TPrinterFields.Create;
@@ -686,7 +688,6 @@ begin
   FLogger.Free;
   FStatistics.Free;
   FFilter.Free;
-  FContext.Free;
   FSTLVTag.Free;
   FTLVItems.Free;
   FDriver.Free;

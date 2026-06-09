@@ -548,6 +548,7 @@ type
 
   ISharedPrinter = interface
     ['{91F29940-3969-474C-B6E5-6237FE2FC34C}']
+    function GetContext: TDriverContext;
     procedure Close;
     procedure Open(const DeviceName: WideString);
     procedure ReleaseDevice;
@@ -653,6 +654,7 @@ type
     property DeviceName: WideString read GetDeviceName write SetDeviceName;
     property Connection: IPrinterConnection read GetConnection write SetConnection;
     property Parameters: TPrinterParameters read GetParameters;
+    property Context: TDriverContext read GetContext;
   end;
 
   { ISharedPrinterFactory }

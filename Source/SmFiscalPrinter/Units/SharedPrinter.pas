@@ -17,7 +17,7 @@ uses
   PayType, DebugUtils, ByteUtils, DriverTypes, NotifyThread, NotifyLink,
   PrinterParameters, PrinterParametersX, DriverError, DirectIOAPI,
   ReceiptReportFilter, EscFilter, SerialPort, SocketPort, PrinterPort,
-  WException, TntSysUtils, gnugettext;
+  WException, TntSysUtils, gnugettext, DriverContext;
 
 type
   { TSharedPrinter }
@@ -54,10 +54,12 @@ type
     FFilter: IFiscalPrinterFilter;
     FDevice: IFiscalPrinterDevice;
     FConnection: IPrinterConnection;
+    FContext: TDriverContext;
 
     procedure Lock;
     procedure Unlock;
     procedure SearchDevice;
+    function GetContext: TDriverContext;
     function GetPrintWidth: Integer;
     function GetPrintWidthInDots: Integer;
     function SearchBaudRate(PortNumber: Integer): Boolean;
@@ -99,6 +101,8 @@ type
     function CreateProtocol(Port: IPrinterPort): IPrinterConnection;
     procedure DevicePrinterStatus(Sender: TObject);
     procedure PingProc(Sender: TObject);
+ public
+    property Context: TDriverContext read FContext;
   public
     constructor Create(const ADeviceName: WideString);
     destructor Destroy; override;
@@ -266,6 +270,7 @@ end;
 constructor TSharedPrinter.Create(const ADeviceName: WideString);
 begin
   inherited Create;
+  FContext := TDriverContext.Create;
   FDeviceName := ADeviceName;
   FSemaphore := TOposSemaphore.Create;
   FStatusLinks := TNotifyLinks.Create;
@@ -302,6 +307,7 @@ begin
   FDevice := nil;
   FStatusLinks.Free;
   FConnectLinks.Free;
+  FContext.Free;
   inherited Destroy;
   ODS('TSharedPrinter.Destroy.1');
 end;
@@ -311,9 +317,9 @@ begin
   if FDevice = nil then
   begin
     if Parameters.DriverType = DriverTypeInternal then
-      FDevice := TFiscalPrinterDevice.Create
+      FDevice := TFiscalPrinterDevice.Create(Context)
     else
-      FDevice := TFiscalPrinterDriver.Create;
+      FDevice := TFiscalPrinterDriver.Create(Context);
 
     FDevice.OnConnect := DeviceConnect;
     FDevice.OnDisconnect := DeviceDisconnect;
@@ -1318,7 +1324,7 @@ end;
 
 function TSharedPrinter.GetParameters: TPrinterParameters;
 begin
-  Result := FDevice.Parameters;
+  Result := FContext.Parameters;
 end;
 
 function TSharedPrinter.GetLogger: ILogFile;
@@ -1392,6 +1398,11 @@ procedure TSharedPrinter.StopPing;
 begin
   FPingThread.Free;
   FPingThread := nil;
+end;
+
+function TSharedPrinter.GetContext: TDriverContext;
+begin
+  Result := FContext;
 end;
 
 initialization

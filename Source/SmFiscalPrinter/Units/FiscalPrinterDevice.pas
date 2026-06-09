@@ -228,7 +228,7 @@ type
   protected
     function GetMaxGraphicsWidthInBytes: Integer;
   public
-    constructor Create;
+    constructor Create(AContext: TDriverContext);
     destructor Destroy; override;
 
     procedure Lock;
@@ -836,13 +836,13 @@ end;
 
 { TFiscalPrinterDevice }
 
-constructor TFiscalPrinterDevice.Create;
+constructor TFiscalPrinterDevice.Create(AContext: TDriverContext);
 begin
   inherited Create;
+  FContext := AContext;
   SetLength(FTaxInfo, 4);
   FTLVItems := TStringList.Create;
   FSTLVTag := TTLV.Create(nil);
-  FContext := TDriverContext.Create;
   FLogger := TClassLogger.Create('TFiscalPrinterDevice', FContext.Logger);
   FLock := TCriticalSection.Create;
   FFields := TPrinterFields.Create;
@@ -867,7 +867,6 @@ begin
   FLogger.Free;
   FStatistics.Free;
   FFilter.Free;
-  FContext.Free;
   FSTLVTag.Free;
   FTLVItems.Free;
   inherited Destroy;
