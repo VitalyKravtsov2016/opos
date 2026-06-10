@@ -15,9 +15,9 @@ type
 
   TMockPrinterConnection2 = class(TMock, IPrinterConnection)
   public
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     procedure ReleaseDevice;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure OpenPort;
     procedure ClosePort;
     procedure OpenReceipt(Password: Integer);
     procedure CloseReceipt;
@@ -28,9 +28,9 @@ implementation
 
 { TMockPrinterConnection2 }
 
-procedure TMockPrinterConnection2.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TMockPrinterConnection2.ClaimDevice(Timeout: Integer);
 begin
-  AddCall('ClaimDevice').WithParams([PortNumber, Timeout]);
+  AddCall('ClaimDevice').WithParams([Timeout]);
 end;
 
 procedure TMockPrinterConnection2.ClosePort;
@@ -43,9 +43,9 @@ begin
   AddCall('CloseReceipt');
 end;
 
-procedure TMockPrinterConnection2.OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TMockPrinterConnection2.OpenPort;
 begin
-  AddCall('OpenPort').WithParams([PortNumber, BaudRate, ByteTimeout]);
+  AddCall('OpenPort');
 end;
 
 procedure TMockPrinterConnection2.OpenReceipt(Password: Integer);

@@ -9,7 +9,7 @@ uses
   IdTCPClient,
   // This
   PrinterConnection, DriverError, StringUtils, FptrServerLib_TLB, VSysUtils,
-  LogFile, TntSysUtils, WException;
+  LogFile, TntSysUtils, WException, PrinterParameters;
 
 type
   { TTCPConnection }
@@ -20,39 +20,39 @@ type
     FRemoteHost: AnsiString;
     FRemotePort: Integer;
     FConnection: TIdTCPClient;
+    FParams: TPrinterParameters;
 
     procedure Connect;
     function SendCommand(const Command: AnsiString): AnsiString;
     procedure DoConnect;
     procedure DoDisconnect;
+
     property Logger: ILogFile read FLogger;
+    property Params: TPrinterParameters read FParams;
   public
-    constructor Create(const ARemoteHost: AnsiString;
-      ARemotePort: Integer; APortNumber, ABaudRate, AByteTimeout: Integer;
-      ALogger: ILogFile);
+    constructor Create(ALogger: ILogFile; AParams: TPrinterParameters);
     destructor Destroy; override;
 
     procedure ClosePort;
     procedure ReleaseDevice;
     procedure CloseReceipt;
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     procedure OpenReceipt(Password: Integer);
     function Send(Timeout: Integer; const Data: AnsiString): AnsiString;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure OpenPort;
   end;
 
 implementation
 
 { TTCPConnection }
 
-constructor TTCPConnection.Create(const ARemoteHost: AnsiString;
-  ARemotePort: Integer; APortNumber, ABaudRate, AByteTimeout: Integer;
-  ALogger: ILogFile);
+constructor TTCPConnection.Create(ALogger: ILogFile; AParams: TPrinterParameters);
 begin
   inherited Create;
   FLogger := ALogger;
-  FRemoteHost := ARemoteHost;
-  FRemotePort := ARemotePort;
+  FParams := AParams;
+  FRemoteHost := AParams.RemoteHost;
+  FRemotePort := AParams.RemotePort;
   FConnection := TIdTCPClient.Create(nil);
   FConnection.ReadTimeout := 5000;
 end;
@@ -115,11 +115,11 @@ begin
   Result := TrimRight(FConnection.LastCmdResult.Text.Text);
 end;
 
-procedure TTCPConnection.OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TTCPConnection.OpenPort;
 var
   Command: AnsiString;
 begin
-  Command := Tnt_WideFormat('OPENPORT %d %d', [BaudRate, ByteTimeout]);
+  Command := Tnt_WideFormat('OPENPORT %d %d', [Params.BaudRate, Params.ByteTimeout]);
   SendCommand(Command);
 end;
 
@@ -146,9 +146,9 @@ begin
   SendCommand('CLOSERECEIPT');
 end;
 
-procedure TTCPConnection.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TTCPConnection.ClaimDevice(Timeout: Integer);
 begin
-  SendCommand(Format('CLAIM %d %d', [PortNumber, Timeout]));
+  SendCommand(Format('CLAIM %d %d', [Params.PortNumber, Timeout]));
 end;
 
 procedure TTCPConnection.ReleaseDevice;

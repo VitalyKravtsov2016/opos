@@ -32,6 +32,7 @@ type
     FDriver: TDriver;
     FContext: TDriverContext;
     FDriverConnected: Boolean;
+  public
     property Driver: TDriver read FDriver;
     procedure SetPrintFlags(Flags: Byte);
     function IntToAmount(Value: Int64): Currency;
@@ -39,17 +40,15 @@ type
     function AmountToInt(Value: Currency): Int64;
     function GetDepartment(ADepartment: Integer): Integer;
     procedure ApplyDriverConnection;
-    procedure EnsureConnected;
     procedure CheckDriver(Code: Integer);
     procedure SetDriverPassword(Password: DWORD);
     procedure MapLongStatusFromDriver(var Status: TLongPrinterStatus);
     procedure MapShortStatusFromDriver(var Status: TShortPrinterStatus);
     procedure SetPrinterStatusFromDriver;
-
-    property Context: TDriverContext read FContext;
   protected
     function ReceiptClose22(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
+    property Context: TDriverContext read FContext;
   public
     FFFDVersion: TFFDVersion;
     FCapSubtotalRound: Boolean;
@@ -263,7 +262,7 @@ type
     procedure SetSysPassword(const Value: DWORD);
     procedure SetTaxPassword(const Value: DWORD);
     procedure SetUsrPassword(const Value: DWORD);
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure OpenPort;
 
     function Beep: Integer;
     function GetDumpBlock: TDumpBlock;
@@ -426,9 +425,9 @@ type
 
     procedure ClosePort;
     procedure Close;
-    procedure Open(AConnection: IPrinterConnection);
+    procedure Open;
     procedure ReleaseDevice;
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     function CapGraphics: Boolean;
     function CapShortEcrStatus: Boolean;
     function CapPrintStringFont: Boolean;
@@ -791,13 +790,14 @@ begin
   end;
 end;
 
-procedure TFiscalPrinterDriver.EnsureConnected;
+procedure TFiscalPrinterDriver.Connect;
 begin
-  ApplyDriverConnection;
   if not FDriverConnected then
   begin
+    ApplyDriverConnection;
     CheckDriver(Driver.Connect);
     FDriverConnected := True;
+
     FIsOnline := True;
     if Assigned(FOnConnect) then
       FOnConnect(Self);
@@ -1364,7 +1364,7 @@ procedure TFiscalPrinterDriver.CashIn(Amount: Int64);
 begin
   FLogger.Debug(Format('CashIn(%d)', [Amount]));
   FFilter.BeforeCashIn;
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.Summ1 := IntToAmount(Amount);
   CheckDriver(Driver.CashIncome);
@@ -1375,7 +1375,7 @@ procedure TFiscalPrinterDriver.CashOut(Amount: Int64);
 begin
   FLogger.Debug(Format('CashOut(%d)', [Amount]));
   FFilter.BeforeCashOut;
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.Summ1 := IntToAmount(Amount);
   CheckDriver(Driver.CashOutcome);
@@ -1385,7 +1385,7 @@ end;
 function TFiscalPrinterDriver.StartDump(DeviceCode: Integer): Integer;
 begin
   FLogger.Debug(Format('StartDump(%d)', [DeviceCode]));
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetTaxPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -1395,14 +1395,14 @@ end;
 function TFiscalPrinterDriver.GetDumpBlock: TDumpBlock;
 begin
   FillChar(Result, SizeOf(Result), 0);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetTaxPassword);
   Check(ERROR_COMMAND_NOT_SUPPORTED);
 end;
 
 procedure TFiscalPrinterDriver.StopDump;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetTaxPassword);
 end;
 
@@ -1411,7 +1411,7 @@ function TFiscalPrinterDriver.LongFisc(NewPassword: DWORD;
 begin
   FLogger.Debug(Format('LongFisc(%d,%d,%d)',
     [NewPassword, PrinterID, FiscalID]));
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetTaxPassword);
   Driver.NewPasswordTI := NewPassword;
   Driver.RNM := IntToStr(PrinterID);
@@ -1426,7 +1426,7 @@ end;
 procedure TFiscalPrinterDriver.SetLongSerial(Serial: Int64);
 begin
   FLogger.Debug(Format('SetLongSerial(%d)', [Serial]));
-  EnsureConnected;
+  Connect;
   SetDriverPassword(0);
   Driver.SerialNumber := IntToStr(Serial);
   CheckDriver(Driver.SetLongSerialNumber);
@@ -1449,7 +1449,7 @@ end;
 
 function TFiscalPrinterDriver.ReadShortStatus2(Password: Integer): TShortPrinterStatus;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(Password);
   CheckDriver(Driver.GetShortECRStatus);
   MapShortStatusFromDriver(Result);
@@ -1458,7 +1458,7 @@ end;
 
 function TFiscalPrinterDriver.ReadShortStatus: TShortPrinterStatus;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   CheckDriver(Driver.GetShortECRStatus);
   MapShortStatusFromDriver(Result);
@@ -1468,7 +1468,7 @@ end;
 
 function TFiscalPrinterDriver.ReadLongStatus: TLongPrinterStatus;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   CheckDriver(Driver.GetECRStatus);
   MapLongStatusFromDriver(Result);
@@ -1505,8 +1505,6 @@ end;
 
 function TFiscalPrinterDriver.SetPortParams(Port: Byte;
   const PortParams: TPortParams): Integer;
-var
-  Stream: TBinStream;
 begin
   FLogger.Debug(Format('SetPortParams(%d,%d,%d)',
     [Port, PortParams.BaudRate, PortParams.Timeout]));
@@ -1561,6 +1559,7 @@ end;
 
 function TFiscalPrinterDriver.OpenFiscalDay: Boolean;
 begin
+  Result := True;
 end;
 
 procedure TFiscalPrinterDriver.OpenDay;
@@ -1710,9 +1709,6 @@ end;
 
 function TFiscalPrinterDriver.ReadOperatingReg(ID: Byte;
   var R: TOperRegisterRec): Integer;
-var
-  Data: AnsiString;
-  Command: AnsiString;
 begin
   FLogger.Debug(Format('ReadOperatingRegister(%d)', [ID]));
 
@@ -1742,6 +1738,7 @@ end;
 function TFiscalPrinterDriver.ReadLicense: Int64;
 begin
   { !!! }
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.DoWriteTable(
@@ -2067,6 +2064,7 @@ end;
 function TFiscalPrinterDriver.ReadFMTotals(Flags: Byte; var R: TFMTotals): Integer;
 begin
   FLogger.Debug(Format('ReadFMTotals(%d)', [Flags]));
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.ReadFMLastRecordDate: TFMRecordDate;
@@ -2123,20 +2121,24 @@ end;
 function TFiscalPrinterDriver.SlipOperation(Params: TSlipOperation;
   Operation: TPriceReg): Integer;
 begin
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.SlipStdOperation(LineNumber: Byte;
   Operation: TPriceReg): Integer;
 begin
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.SlipDiscount(Params: TSlipDiscountParams;
   Discount: TSlipDiscount): Integer;
 begin
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.SlipStdDiscount(Discount: TSlipDiscount): Integer;
 begin
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.SlipClose(Params: TCloseReceiptParams): TCloseReceiptResult;
@@ -2267,8 +2269,6 @@ end;
 
 function TFiscalPrinterDriver.ReceiptClose(const P: TCloseReceiptParams;
   var R: TCloseReceiptResult): Integer;
-var
-  Stream: TBinStream;
 begin
   WriteTLVItems;
   FFilter.BeforeCloseReceipt;
@@ -2310,6 +2310,7 @@ end;
 function TFiscalPrinterDriver.ReceiptDiscount2(
   Operation: TReceiptDiscount2): Integer;
 begin
+  Result := 0;
 end;
 
 function TFiscalPrinterDriver.ReceiptCharge(
@@ -2375,13 +2376,13 @@ end;
 function TFiscalPrinterDriver.GetSubtotal: Int64;
 begin
   Driver.Check(Driver.CheckSubTotal);
-  
+  Result := AmountToInt(Driver.Summ1);
 end;
 
 function TFiscalPrinterDriver.ReceiptStornoDiscount(
   Operation: TAmountOperation): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.Summ1 := IntToAmount(Operation.Amount);
   Driver.Tax1 := Operation.Tax1;
@@ -2413,7 +2414,7 @@ end;
 function TFiscalPrinterDriver.ReceiptStornoCharge(
   Operation: TAmountOperation): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.Summ1 := IntToAmount(Operation.Amount);
   Driver.Tax1 := Operation.Tax1;
@@ -2438,7 +2439,7 @@ end;
 
 function TFiscalPrinterDriver.PrintReceiptCopy: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Result := Driver.RepeatDocument;
 end;
@@ -2461,7 +2462,7 @@ end;
 
 function TFiscalPrinterDriver.OpenReceipt(ReceiptType: Byte): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := ReceiptType;
   Result := Driver.OpenCheck;
@@ -2483,7 +2484,7 @@ end;
 
 function TFiscalPrinterDriver.ContinuePrint: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Result := Driver.ContinuePrint;
 end;
@@ -2504,7 +2505,7 @@ end;
 
 function TFiscalPrinterDriver.LoadGraphics1(Line: Byte; Data: AnsiString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.LineNumber := Line;
   Driver.LineDataHex := StrToHex(GetDataBlock(Data, 40, 40));
@@ -2532,7 +2533,7 @@ end;
 
 function TFiscalPrinterDriver.PrintGraphics1(Line1, Line2: Byte): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.FirstLineNumber := Line1;
   Driver.LastLineNumber := Line2;
@@ -2556,7 +2557,7 @@ end;
 
 function TFiscalPrinterDriver.PrintBarcode(const Barcode: WideString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.BarCode := Barcode;
   Result := Driver.PrintBarCode;
@@ -2578,7 +2579,7 @@ end;
 
 function TFiscalPrinterDriver.PrintGraphics2(Line1, Line2: Word): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.FirstLineNumber := Line1;
   Driver.LastLineNumber := Line2;
@@ -2603,7 +2604,7 @@ end;
 
 function TFiscalPrinterDriver.LoadGraphics2(Line: Word; Data: AnsiString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.LineNumber := Line;
   Driver.LineDataHex := StrToHex(GetDataBlock(Data, 40, 40));
@@ -2633,8 +2634,7 @@ end;
 function TFiscalPrinterDriver.PrintGraphicsLine(Height: Word; Flags: Byte;
   Data: WideString): Integer;
 begin
-  Flags := GetPrintFlags(Flags);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.LineNumber := Height;
   Driver.LineDataHex := StrToHex(AnsiString(Data));
@@ -2665,7 +2665,7 @@ end;
 
 function TFiscalPrinterDriver.ReadDeviceMetrics: TDeviceMetrics;
 begin
-  EnsureConnected;
+  Connect;
   CheckDriver(Driver.GetDeviceMetrics);
   Result.DeviceType := Driver.UMajorType;
   Result.DeviceSubType := Driver.UMinorType;
@@ -2960,7 +2960,7 @@ end;
 function TFiscalPrinterDriver.GetEJSesssionResult(Number: Word;
   var Text: WideString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.SessionNumber := Number;
   Result := Driver.GetEKLZSessionTotal;
@@ -2969,7 +2969,7 @@ end;
 
 function TFiscalPrinterDriver.ReadEJActivation(var Line: WideString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.EKLZActivizationResult;
   Line := TrimRight(Driver.EKLZData);
@@ -2989,7 +2989,7 @@ end;
 
 function TFiscalPrinterDriver.GetEJReportLine(var Line: WideString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.GetEKLZCode2Report;
   Line := TrimRight(Driver.EKLZData);
@@ -3008,7 +3008,7 @@ end;
 
 function TFiscalPrinterDriver.EJReportStop: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.EKLZInterrupt;
 end;
@@ -3043,7 +3043,7 @@ end;
 
 function TFiscalPrinterDriver.GetEJStatus1(var Status: TEJStatus1): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.GetEKLZCode1Report;
   if Result = 0 then
@@ -3084,7 +3084,7 @@ end;
 procedure TFiscalPrinterDriver.EJTotalsReportDate(
   const Parameters: TDateReport);
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.ReportType := Parameters.ReportType <> 0;
   Driver.FirstSessionDate := PrinterDateToDate(Parameters.Date1);
@@ -3109,7 +3109,7 @@ end;
 procedure TFiscalPrinterDriver.EJTotalsReportNumber(
   const Parameters: TNumberReport);
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.ReportType := Parameters.ReportType <> 0;
   Driver.FirstSessionNumber := Parameters.Number1;
@@ -3345,26 +3345,21 @@ begin
   FDeviceTables := Value;
 end;
 
-procedure TFiscalPrinterDriver.OpenPort(
-  PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TFiscalPrinterDriver.OpenPort;
 begin
-  Logger.Debug(Format('OpenPort(COM%d, %d, %d)', [PortNumber, BaudRate, ByteTimeout]));
-  ApplyDriverConnection;
-  Driver.ComNumber := PortNumber;
-  Driver.BaudRate := BaudRate;
-  Driver.Timeout := ByteTimeout;
-  if FDriverConnected then
+  Logger.Debug(Format('OpenPort(COM%d, %d, %d)', [
+    GetParameters.PortNumber, GetParameters.BaudRate, GetParameters.ByteTimeout]));
+
+  if not FDriverConnected then
   begin
-    Driver.Disconnect;
-    FDriverConnected := False;
+    ApplyDriverConnection;
+    CheckDriver(Driver.Connect2);
   end;
-  EnsureConnected;
 end;
 
-procedure TFiscalPrinterDriver.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TFiscalPrinterDriver.ClaimDevice(Timeout: Integer);
 begin
-  EnsureConnected;
-  CheckDriver(Driver.LockPort);
+  OpenPort;
 end;
 
 procedure TFiscalPrinterDriver.ReleaseDevice;
@@ -3380,9 +3375,8 @@ begin
   FIsOnline := False;
 end;
 
-procedure TFiscalPrinterDriver.Open(AConnection: IPrinterConnection);
+procedure TFiscalPrinterDriver.Open;
 begin
-  FConnection := AConnection;
   ApplyDriverConnection;
 end;
 
@@ -3490,7 +3484,7 @@ end;
 
 procedure TFiscalPrinterDriver.PrintJournal(DayNumber: Integer);
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.SessionNumber := DayNumber;
   CheckDriver(Driver.EKLZJournalOnSessionNumber);
@@ -3559,7 +3553,7 @@ end;
 function TFiscalPrinterDriver.ReadEJDocument(MACNumber: Integer;
   var Line: WideString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.KPKNumber := MACNumber;
   Result := Driver.GetEKLZDocument;
@@ -3923,7 +3917,7 @@ begin
     LastLine := LastLine - 1;
   end;
 
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.FirstLineNumber := P.FirstLine;
   Driver.LastLineNumber := LastLine;
@@ -4783,7 +4777,7 @@ begin
       Inc(RowCount);
       if Row >= Bitmap.Height then Break;
     end;
-    EnsureConnected;
+    Connect;
     SetDriverPassword(GetUsrPassword);
     Driver.LineLength := LineLength;
     Driver.FirstLineNumber := StartLine;
@@ -4863,11 +4857,6 @@ begin
   if FFFDVersion = TFFDVersion(-1) then
     FFFDVersion := IntToFFDVersion(ReadTableInt(17,1,17));
   Result := FFFDVersion;
-end;
-
-procedure TFiscalPrinterDriver.Connect;
-begin
-  GetDeviceMetrics;
 end;
 
 procedure TFiscalPrinterDriver.UpdateInfo;
@@ -5124,7 +5113,7 @@ end;
 
 function TFiscalPrinterDriver.LoadBarcode2D(const Data: TBarcode2DData): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.BlockType := Data.BlockType;
   Driver.BlockNumber := Data.BlockNumber;
@@ -5134,7 +5123,7 @@ end;
 
 function TFiscalPrinterDriver.PrintBarcode2D(const Barcode: TBarcode2D): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.BarcodeType := Barcode.BarcodeType;
   Driver.BarcodeDataLength := Barcode.DataLength;
@@ -5152,7 +5141,7 @@ begin
   if Length(Data) > 64 then
     raiseException(_('Image data length > 64 bytes'));
 
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.LineLength := Length(Data);
   Driver.FirstLineNumber := Line;
@@ -5164,7 +5153,7 @@ end;
 
 function TFiscalPrinterDriver.LoadGraphics3(const P: TLoadGraphics3): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.LineLength := Length(P.Data);
   Driver.FirstLineNumber := P.FirstLineNum;
@@ -5188,7 +5177,7 @@ end;
 
 function TFiscalPrinterDriver.PrintGraphics3(const P: TPrintGraphics3): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.FirstLineNumber := P.FirstLine;
   Driver.LastLineNumber := P.LastLine;
@@ -5237,7 +5226,7 @@ begin
   Data := FilterTLV(TLVData);
   if Length(Data) = 0 then Exit;
 
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.TLVDataHex := StrToHex(Copy(Data, 1, 250));
   Result := Driver.FNSendTLV;
@@ -5246,7 +5235,7 @@ end;
 function TFiscalPrinterDriver.FSSale(P: TFSSale): Integer;
 begin
   P.Text := PrintItemText(P.Text);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := Abs(P.RecType);
   Driver.Quantity := Abs(P.Quantity);
@@ -5262,7 +5251,7 @@ end;
 function TFiscalPrinterDriver.FSSale2(P: TFSSale2): Integer;
 begin
   P.Text := PrintItemText(P.Text);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := Abs(P.RecType);
   Driver.Quantity := Abs(P.Quantity);
@@ -5279,7 +5268,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadRegTag(var R: TFSReadRegTagCommand): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.TagNumber := R.TagID;
   Result := Driver.FNReadFiscalDocumentTLV;
@@ -5291,7 +5280,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadState(var R: TFSState): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNGetStatus;
   if Result = 0 then
@@ -5311,14 +5300,14 @@ end;
 
 function TFiscalPrinterDriver.FSCancelDocument: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNCancelDocument;
 end;
 
 function TFiscalPrinterDriver.FSReadStatus(var R: TFSStatus): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNGetFreeMemoryResource;
   if Result = 0 then
@@ -5396,7 +5385,7 @@ function TFiscalPrinterDriver.FSFindDocument(DocNumber: Integer;
   end;
 
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.DocumentNumber := DocNumber;
   Result := Driver.FNFindDocument;
@@ -5445,7 +5434,7 @@ end;
 function TFiscalPrinterDriver.FSReadBlock(const P: TFSBlockRequest;
   var Block: AnsiString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Block := '';
   Result := ERROR_COMMAND_NOT_SUPPORTED;
@@ -5456,7 +5445,7 @@ end;
 function TFiscalPrinterDriver.FSStartWrite(DataSize: Word;
   var BlockSize: Byte): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   BlockSize := 0;
   Result := ERROR_COMMAND_NOT_SUPPORTED;
@@ -5466,7 +5455,7 @@ end;
 
 function TFiscalPrinterDriver.FSWriteBlock(const Block: TFSBlock): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -5550,7 +5539,7 @@ end;
 
 function TFiscalPrinterDriver.FSPrintCalcReport(var R: TFSCalcReport): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNBuildCalculationStateReport;
   if Result = 0 then
@@ -5576,7 +5565,7 @@ function TFiscalPrinterDriver.FSReadCommStatus(
   end;
 
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNGetInfoExchangeStatus;
   if Result = 0 then
@@ -5592,7 +5581,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadExpiration(var R: TCommandFF03): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNGetExpirationTime;
   if Result = 0 then
@@ -5605,7 +5594,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadFiscalResult(var R: TFSFiscalResult): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := Driver.FNGetFiscalizationResult;
   if Result = 0 then
@@ -5622,7 +5611,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadTicket(var R: TFSTicket): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.DocumentNumber := R.Number;
   Result := Driver.FNGetOFDTicketByDocNumber;
@@ -5815,7 +5804,7 @@ function TFiscalPrinterDriver.FSReadTotals(var R: TFMTotals): Integer;
 begin
   FLogger.Debug('FSReadTotals');
   FillChar(R, SizeOf(R), 0);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -5826,7 +5815,7 @@ function TFiscalPrinterDriver.FSReadCorrectionTotals(var R: TFMTotals): Integer;
 begin
   FLogger.Debug('FSReadCorrectionTotals');
   FillChar(R, SizeOf(R), 0);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -5839,7 +5828,7 @@ begin
   FLogger.Debug(Format('FSReadTotalsByPayType(%d)', [RecType]));
   CheckParam(RecType, 1, 4, 'RecType');
   FillChar(R, SizeOf(R), 0);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -5922,7 +5911,7 @@ function TFiscalPrinterDriver.FSPrintCorrectionReceipt(
   var Command: TFSCorrectionReceipt): Integer;
 begin
   OpenFiscalDay;
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.Summ1 := IntToAmount(Command.Total);
   Driver.CorrectionType := Command.RecType;
@@ -5940,7 +5929,7 @@ function TFiscalPrinterDriver.FSPrintCorrectionReceipt2(
   var Data: TFSCorrectionReceipt2): Integer;
 begin
   OpenFiscalDay;
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.CorrectionType := Data.CorrectionType;
   Driver.PaymentTypeSign := Data.CalculationSign;
@@ -6061,7 +6050,7 @@ end;
 function TFiscalPrinterDriver.ReadLoaderVersion(var Version: WideString): Integer;
 begin
   Version := '';
-  EnsureConnected;
+  Connect;
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
   FResultText := GetErrorText(Result);
@@ -6081,8 +6070,6 @@ function TFiscalPrinterDriver.ReceiptClose22(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 var
-  Command: AnsiString;
-  Answer: AnsiString;
   Status: TLongPrinterStatus;
 const
   SInvalidDiscountValue =  'Invalid discount value, %d. Valid discount value is [0..99].';
@@ -6093,7 +6080,7 @@ begin
     RaiseIllegalError(Format(SInvalidDiscountValue, [P.Discount]));
 
   FLastDocTotal := GetSubtotal;
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.Summ1 := IntToAmount(P.Payments[0]);
   Driver.Summ2 := IntToAmount(P.Payments[1]);
@@ -6122,8 +6109,6 @@ function TFiscalPrinterDriver.ReceiptClose3(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 var
-  Command: AnsiString;
-  Answer: AnsiString;
   Status: TLongPrinterStatus;
 const
   SInvalidDiscountValue =  'Invalid discount value, %d. Valid discount value is [0..99].';
@@ -6134,7 +6119,7 @@ begin
     RaiseIllegalError(Format(SInvalidDiscountValue, [P.Discount]));
 
   FLastDocTotal := GetSubtotal;
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetUsrPassword);
   Driver.Summ1 := IntToAmount(P.Payments[0]);
   Driver.Summ2 := IntToAmount(P.Payments[1]);
@@ -6163,7 +6148,7 @@ function TFiscalPrinterDriver.ReadParameters2(
   var R: TPrinterParameters2): Integer;
 begin
   FillChar(R, Sizeof(R), 0);
-  EnsureConnected;
+  Connect;
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
   FResultText := GetErrorText(Result);
@@ -6172,7 +6157,7 @@ end;
 function TFiscalPrinterDriver.FSFiscalization(const P: TFSFiscalization;
   var R: TFDDocument): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.INN := P.TaxID;
   Driver.RNM := P.RegID;
@@ -6190,7 +6175,7 @@ end;
 function TFiscalPrinterDriver.FSReFiscalization(const P: TFSReFiscalization;
   var R: TFDDocument): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(GetSysPassword);
   Driver.INN := P.TaxID;
   Driver.RNM := P.RegID;
@@ -6280,7 +6265,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadDocument(var P: TFSReadDocument): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(P.Password);
   Driver.DocumentNumber := P.Number;
   Result := Driver.FNRequestFiscalDocumentTLV;
@@ -6293,7 +6278,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadDocData(var P: TFSReadDocData): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(P.Password);
   Result := Driver.FNReadFiscalDocumentTLV;
   if Result = 0 then
@@ -6304,7 +6289,7 @@ end;
 
 function TFiscalPrinterDriver.FSStartOpenDay: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Result := Driver.FNBeginOpenSession;
 end;
@@ -6545,7 +6530,7 @@ begin
   if Length(Data) > 249 then
     raiseException(_('TLV data length too big'));
 
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Driver.TLVDataHex := StrToHex(Copy(Data, 1, 249));
   Result := Driver.FNSendTLVOperation;
@@ -6553,7 +6538,7 @@ end;
 
 function TFiscalPrinterDriver.FSStartCorrectionReceipt: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Result := Driver.FNBeginCorrectionReceipt;
 end;
@@ -6625,7 +6610,7 @@ function TFiscalPrinterDriver.FSCheckItemCode(P: TFSCheckItemCode;
   var R: TFSCheckItemResult): Integer;
 begin
   P.CMData := CorrectGS1(P.CMData);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Driver.ItemStatus := P.ItemStatus;
   Driver.BarcodeHex := StrToHex(P.CMData);
@@ -6645,14 +6630,14 @@ end;
 
 function TFiscalPrinterDriver.FSSyncRegisters: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Result := Driver.FNCountersSync;
 end;
 
 function TFiscalPrinterDriver.FSReadMemory(var R: TFSReadMemoryResult): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Result := Driver.FNGetFreeMemoryResource;
   if Result = 0 then
@@ -6665,7 +6650,7 @@ end;
 
 function TFiscalPrinterDriver.FSWriteTLVFromBuffer: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -6674,7 +6659,7 @@ end;
 
 function TFiscalPrinterDriver.FSRandomData(var Data: AnsiString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Data := '';
   Result := ERROR_COMMAND_NOT_SUPPORTED;
@@ -6684,7 +6669,7 @@ end;
 
 function TFiscalPrinterDriver.FSAuthorize(const DataToAuthorize: AnsiString): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FSysPassword);
   Result := ERROR_COMMAND_NOT_SUPPORTED;
   FResultCode := Result;
@@ -6695,7 +6680,7 @@ function TFiscalPrinterDriver.FSBindItemCode(P: TFSBindItemCode;
   var R: TFSBindItemCodeResult): Integer;
 begin
   P.Code := CorrectGS1(P.Code);
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Driver.BarcodeHex := StrToHex(P.Code);
   Driver.MarkingOnly := P.IsAccounted;
@@ -6716,7 +6701,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadTicketStatus(var R: TFSTicketStatus): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNGetKMServerExchangeStatus;
   if Result = 0 then
@@ -6731,7 +6716,7 @@ end;
 
 function TFiscalPrinterDriver.FSAcceptItemCode(Action: Integer): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   if Action = 2 then
     Result := Driver.FNMarkingClearBuffer
@@ -6741,14 +6726,14 @@ end;
 
 function TFiscalPrinterDriver.FSClearMCCheckResults: Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNMarkingClearBuffer;
 end;
 
 function TFiscalPrinterDriver.FSReadMarkStatus(var R: TFSMarkStatus): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNGetMarkingCodeWorkStatus;
   if Result = 0 then
@@ -6765,7 +6750,7 @@ end;
 
 function TFiscalPrinterDriver.FSStartReadTickets(var R: TFSTicketParams): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNGetKMServerExchangeStatus;
   if Result = 0 then
@@ -6778,7 +6763,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadNextTicket(var R: TFSTicketData): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNReadNotificationBlock;
   if Result = 0 then
@@ -6792,7 +6777,7 @@ end;
 
 function TFiscalPrinterDriver.FSConfirmTicket(const P: TFSTicketNumber): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Driver.DocumentNumber := P.Number;
   Driver.FiscalSign := P.Crc16;
@@ -6801,7 +6786,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadDeviceInfo(var R: string): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNGetImplementation;
   if Result = 0 then
@@ -6812,7 +6797,7 @@ end;
 
 function TFiscalPrinterDriver.FSReadDocSize(var R: TFSDocSize): Integer;
 begin
-  EnsureConnected;
+  Connect;
   SetDriverPassword(FUsrPassword);
   Result := Driver.FNGetFreeMemoryResource;
   if Result = 0 then

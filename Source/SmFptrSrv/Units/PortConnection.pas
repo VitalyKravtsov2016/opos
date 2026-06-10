@@ -7,7 +7,8 @@ Uses
   Forms, Windows, Classes, Registry, SysUtils, SyncObjs, ExtCtrls,
   // This
   PrinterConnection, PrinterProtocol1, SerialPort, SrvParams, FiscalPrinterTypes,
-  FiscalPrinterDevice, OposSemaphore, PrinterTypes, LogFile, PrinterPort;
+  FiscalPrinterDevice, OposSemaphore, PrinterTypes, LogFile, PrinterPort,
+  DriverContext;
 
 type
   TPort = class;
@@ -343,7 +344,7 @@ end;
 
 procedure TPort.OpenPort(BaudRate, Timeout: Integer);
 begin
-  FConnection.OpenPort(PortNumber, BaudRate, Timeout);
+  FConnection.OpenPort;
 
   ResetTimer;
   Timer.Enabled := Params.AutoPortClose;
@@ -447,11 +448,13 @@ end;
 
 procedure TPort.CancelReceipt;
 var
+  Context: TDriverContext;
   Device: IFiscalPrinterDevice;
 begin
-  Device := TFiscalPrinterDevice.Create;
+  Context := TDriverContext.Create;
+  Device := TFiscalPrinterDevice.Create(Context, FConnection);
   try
-    Device.Open(FConnection);
+    Device.Open;
     if IsReceiptOpened(Device) then
     begin
       Device.ReceiptCancel;
@@ -459,6 +462,7 @@ begin
     end;
   finally
     Device := nil;
+    Context.Free;
   end;
 end;
 

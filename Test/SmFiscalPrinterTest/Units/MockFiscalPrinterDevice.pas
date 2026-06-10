@@ -203,9 +203,9 @@ type
 
     procedure ClosePort;
     procedure ReleaseDevice;
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
-    procedure Open(AConnection: IPrinterConnection);
+    procedure ClaimDevice(Timeout: Integer);
+    procedure OpenPort;
+    procedure Open;
     procedure Close;
     procedure UpdateModel;
     function CapGraphics: Boolean;
@@ -1128,12 +1128,12 @@ begin
 
 end;
 
-procedure TMockFiscalPrinterDevice.Open(AConnection: IPrinterConnection);
+procedure TMockFiscalPrinterDevice.Open;
 begin
 
 end;
 
-procedure TMockFiscalPrinterDevice.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TMockFiscalPrinterDevice.ClaimDevice(Timeout: Integer);
 begin
 
 end;
@@ -1153,8 +1153,7 @@ begin
   Result := False;
 end;
 
-procedure TMockFiscalPrinterDevice.OpenPort(PortNumber, BaudRate,
-  ByteTimeout: Integer);
+procedure TMockFiscalPrinterDevice.OpenPort;
 begin
 
 end;

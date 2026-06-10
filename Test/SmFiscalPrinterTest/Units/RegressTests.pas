@@ -92,7 +92,6 @@ begin
   FConnection := TMockPrinterConnection.Create;
   SPrinter := SharedPrinter.GetPrinter(DeviceName);
   SPrinter.Device := FDevice;
-  SPrinter.Connection := FConnection;
 
   FPrinter := TFiscalPrinterImpl.Create(nil);
   FPrinter.SetPrinter(SPrinter);

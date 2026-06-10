@@ -8,11 +8,11 @@ type
   IPrinterConnection = interface
   ['{81688FC8-17A2-4529-ACC9-9FA61B85081A}']
 
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     procedure ReleaseDevice;
 
     procedure ClosePort;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure OpenPort;
 
     procedure OpenReceipt(Password: Integer);
     procedure CloseReceipt;

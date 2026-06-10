@@ -28,7 +28,6 @@ type
     FSynchronized: Boolean;
     FParams: TPrinterParameters;
 
-
     property Port: IPrinterPort read FPort;
     property Logger: ILogFile read FLogger;
     function DeStuffing(const AStr: AnsiString;
@@ -54,13 +53,13 @@ type
 
     procedure Sync;
     // IPrinterConnection
+    procedure OpenPort;
     procedure ClosePort;
     procedure ReleaseDevice;
     procedure CloseReceipt;
     procedure OpenReceipt(Password: Integer);
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     function Send(Timeout: Integer; const Data: AnsiString): AnsiString;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
   end;
 
 implementation
@@ -393,14 +392,14 @@ begin
   Port.Close;
 end;
 
-procedure TPrinterProtocol2.OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TPrinterProtocol2.OpenPort;
 begin
-  Port.BaudRate := BaudRate;
-  Port.Timeout := ByteTimeout;
+  Port.BaudRate := FParams.BaudRate;
+  Port.Timeout := FParams.ByteTimeout;
   Port.Open;
 end;
 
-procedure TPrinterProtocol2.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TPrinterProtocol2.ClaimDevice(Timeout: Integer);
 begin
 
 end;

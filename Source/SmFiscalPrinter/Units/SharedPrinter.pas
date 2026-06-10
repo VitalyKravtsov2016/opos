@@ -53,22 +53,17 @@ type
 
     FFilter: IFiscalPrinterFilter;
     FDevice: IFiscalPrinterDevice;
-    FConnection: IPrinterConnection;
     FContext: TDriverContext;
 
     procedure Lock;
     procedure Unlock;
-    procedure SearchDevice;
     function GetContext: TDriverContext;
     function GetPrintWidth: Integer;
     function GetPrintWidthInDots: Integer;
-    function SearchBaudRate(PortNumber: Integer): Boolean;
-    function ConnectDevice(PortNumber, BaudRate: Integer): Boolean;
 
     procedure ReadTables;
     function ReadRecFormatItem(Row: Integer): TRecFormatItem;
     function ReadRecFormatTable: TRecFormatTable;
-    function CreateConnection: IPrinterConnection;
     function GetDeviceName: WideString;
     function GetCheckTotal: Boolean;
     procedure SetCheckTotal(const Value: Boolean);
@@ -101,6 +96,7 @@ type
     function CreateProtocol(Port: IPrinterPort): IPrinterConnection;
     procedure DevicePrinterStatus(Sender: TObject);
     procedure PingProc(Sender: TObject);
+    function CreateConnection: IPrinterConnection;
  public
     property Context: TDriverContext read FContext;
   public
@@ -178,8 +174,6 @@ type
     procedure ClaimPrinter(Timeout: Integer);
     function GetPrinterSemaphoreName: WideString;
     procedure SetDevice(Value: IFiscalPrinterDevice);
-    function GetConnection: IPrinterConnection;
-    procedure SetConnection(const Value: IPrinterConnection);
     function GetParameters: TPrinterParameters;
     procedure StartPing;
     procedure StopPing;
@@ -303,7 +297,6 @@ begin
   FTrailer.Free;
   FEscFilter.Free;
   FSemaphore.Free;
-  FConnection := nil;
   FDevice := nil;
   FStatusLinks.Free;
   FConnectLinks.Free;
@@ -317,7 +310,7 @@ begin
   if FDevice = nil then
   begin
     if Parameters.DriverType = DriverTypeInternal then
-      FDevice := TFiscalPrinterDevice.Create(Context)
+      FDevice := TFiscalPrinterDevice.Create(Context, CreateConnection)
     else
       FDevice := TFiscalPrinterDriver.Create(Context);
 
@@ -435,13 +428,7 @@ begin
         Parameters.ByteTimeout);
 
     ConnectionTypeTCP:
-      Result := TTCPConnection.Create(
-        Parameters.RemoteHost,
-        Parameters.RemotePort,
-        Parameters.PortNumber,
-        Parameters.BaudRate,
-        Parameters.ByteTimeout,
-        Logger);
+      Result := TTCPConnection.Create(Logger, Parameters);
 
     ConnectionTypeSocket:
     begin
@@ -457,7 +444,6 @@ procedure TSharedPrinter.Close;
 begin
   try
     FOpened := False;
-    FConnection := nil;
     Device.Close;
   except
     on E: Exception do
@@ -581,126 +567,6 @@ begin
   FLock.Leave;
 end;
 
-function TSharedPrinter.SearchBaudRate(PortNumber: Integer): Boolean;
-var
-  i: Integer;
-  ByteTimeout: Integer;
-  MaxRetryCount: Integer;
-begin
-  Logger.Debug('TSharedPrinter.SearchBaudRate');
-
-  Result := False;
-  MaxRetryCount := Parameters.MaxRetryCount;
-  ByteTimeout := Parameters.ByteTimeout;
-  Parameters.MaxRetryCount := 1;
-  Parameters.ByteTimeout := 200;
-  try
-    for i := Low(PrinterBaudRates) to High(PrinterBaudRates) do
-    begin
-      if PrinterBaudRates[i] <> Parameters.BaudRate then
-      begin
-        Result := ConnectDevice(PortNumber, PrinterBaudRates[i]);
-        if Result then Break;
-      end;
-    end;
-  finally
-    Parameters.ByteTimeout := ByteTimeout;
-    Parameters.MaxRetryCount := MaxRetryCount;
-  end;
-end;
-
-function TSharedPrinter.ConnectDevice(
-  PortNumber, BaudRate: Integer): Boolean;
-var
-  PortParams: TPortParams;
-  PrinterBaudRate: Integer;
-begin
-  Logger.Debug('TSharedPrinter.ConnectDevice');
-
-  PrinterBaudRate := BaudRate;
-  try
-    Device.OpenPort(PortNumber, BaudRate, Parameters.ByteTimeout);
-    FLongPrinterStatus := Device.ReadLongStatus;
-    // check if port supports baudrate
-    if BaudRate <> Parameters.BaudRate then
-    begin
-      try
-        Device.OpenPort(PortNumber, Parameters.BaudRate, Parameters.ByteTimeout);
-        // Baudrate supported - use it
-        PrinterBaudRate := Parameters.BaudRate;
-      except
-        // Selected baudrate is not supported in the system/hardware
-        // Use baudrate on wich printer was found
-        PrinterBaudRate := BaudRate;
-      end;
-      Device.OpenPort(PortNumber, BaudRate, Parameters.ByteTimeout);
-    end;
-    // always set port parameters
-    if FLongPrinterStatus.PortNumber = 0 then
-    begin
-      PortParams.BaudRate := PrinterBaudRate;
-      PortParams.Timeout := Parameters.DeviceByteTimeout;
-      if Device.SetPortParams(FLongPrinterStatus.PortNumber, PortParams) = 0 then
-      begin
-        if BaudRate <> PrinterBaudRate then
-        begin
-          // To ensure that last ACK is delivered
-          Sleep(100);
-          Device.OpenPort(PortNumber, PrinterBaudRate, Parameters.ByteTimeout);
-          Device.ReadPrinterStatus;
-        end;
-      end;
-    end;
-    Result := True;
-  except
-    on E: ECommunicationError do
-    begin
-      Logger.Error('ConnectDevice', E);
-      Result := False;
-    end;
-  end;
-end;
-
-procedure TSharedPrinter.SearchDevice;
-var
-  i: Integer;
-  Ports: TTntStringList;
-  PortNumber: Integer;
-begin
-  if ConnectDevice(Parameters.PortNumber, Parameters.BaudRate) then Exit;
-
-  if Parameters.IsLocalConnection then
-  begin
-    if Parameters.SearchByPortEnabled then
-    begin
-      Ports := TTntStringList.Create;
-      try
-        TSerialPorts.GetSystemPorts(Ports);
-        for i := 0 to Ports.Count-1 do
-        begin
-          PortNumber := Integer(Ports.Objects[i]);
-          if Parameters.SearchByBaudRateEnabled then
-          begin
-            if SearchBaudRate(PortNumber) then Exit;
-          end else
-          begin
-            if ConnectDevice(PortNumber, Parameters.BaudRate) then Exit;
-          end;
-        end;
-      finally
-        Ports.Free;
-      end;
-    end else
-    begin
-      if Parameters.SearchByBaudRateEnabled then
-      begin
-        if SearchBaudRate(Parameters.PortNumber) then Exit;
-      end;
-    end;
-  end;
-  RaiseOposException(OPOS_E_NOHARDWARE, _('No connection'));
-end;
-
 function TSharedPrinter.ReadRecFormatItem(Row: Integer): TRecFormatItem;
 begin
   Result.Line := Device.ReadTableInt(PRINTER_TABLE_RECFORMAT, Row, 1);
@@ -754,7 +620,6 @@ begin
     Inc(FConnectCount);
     if FConnected then Exit;
 
-    SearchDevice;
     FDeviceMetrics := Device.GetDeviceMetrics;
     if Device.ReadPrinterStatus.Flags.EJPresent then
     begin
@@ -977,8 +842,7 @@ end;
 
 procedure TSharedPrinter.ClaimDevice(Timeout: Integer);
 begin
-  Device.Open(GetConnection);
-  Device.ClaimDevice(Parameters.PortNumber, Timeout);
+  Device.ClaimDevice(Timeout);
 end;
 
 procedure TSharedPrinter.ReleaseDevice;
@@ -1308,18 +1172,6 @@ end;
 procedure TSharedPrinter.ReleasePrinter;
 begin
   FSemaphore.Release;
-end;
-
-function TSharedPrinter.GetConnection: IPrinterConnection;
-begin
-  if FConnection = nil then
-    FConnection := CreateConnection;
-  Result := FConnection;
-end;
-
-procedure TSharedPrinter.SetConnection(const Value: IPrinterConnection);
-begin
-  FConnection := Value;
 end;
 
 function TSharedPrinter.GetParameters: TPrinterParameters;

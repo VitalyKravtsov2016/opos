@@ -30,13 +30,13 @@ type
       APortNumber, ABaudRate, AByteTimeout: Integer);
     destructor Destroy; override;
 
+    procedure OpenPort;
     procedure ClosePort;
     procedure ReleaseDevice;
     procedure CloseReceipt;
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     procedure OpenReceipt(Password: Integer);
     function Send(Timeout: Integer; const Data: AnsiString): AnsiString;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
   end;
 
 implementation
@@ -80,9 +80,11 @@ begin
   Result := FDriver;
 end;
 
-procedure TDCOMConnection.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TDCOMConnection.ClaimDevice(Timeout: Integer);
 begin
-  Check(Driver.ClaimDevice(PortNumber, Timeout));
+
+
+  Check(Driver.ClaimDevice(FPortNumber, Timeout));
 end;
 
 procedure TDCOMConnection.ReleaseDevice;
@@ -100,9 +102,9 @@ begin
   Check(Driver.CloseReceipt);
 end;
 
-procedure TDCOMConnection.OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TDCOMConnection.OpenPort;
 begin
-  Check(Driver.OpenPort(BaudRate, ByteTimeout));
+  Check(Driver.OpenPort(FBaudRate, FByteTimeout));
 end;
 
 procedure TDCOMConnection.OpenReceipt(Password: Integer);

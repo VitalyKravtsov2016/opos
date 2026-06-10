@@ -10,9 +10,9 @@ type
 
   TMockPrinterConnection = class(TInterfacedObject, IPrinterConnection)
   private
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     procedure ReleaseDevice;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure OpenPort;
     procedure ClosePort;
     procedure OpenReceipt(Password: Integer);
     procedure CloseReceipt;
@@ -23,7 +23,7 @@ implementation
 
 { TMockPrinterConnection }
 
-procedure TMockPrinterConnection.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TMockPrinterConnection.ClaimDevice(Timeout: Integer);
 begin
 
 end;
@@ -38,7 +38,7 @@ begin
 
 end;
 
-procedure TMockPrinterConnection.OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TMockPrinterConnection.OpenPort;
 begin
 
 end;

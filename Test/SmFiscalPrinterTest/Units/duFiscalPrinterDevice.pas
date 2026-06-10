@@ -8,13 +8,14 @@ uses
   // DUnit
   TestFramework, FiscalPrinterDevice, Opos, OPOSException, OposFptr,
   DriverError, StringUtils, PrinterTypes, MockPrinterConnection2,
-  DirectIOAPI;
+  DirectIOAPI, DriverContext;
 
 type
   { TFiscalPrinterDeviceTest }
 
   TFiscalPrinterDeviceTest = class(TTestCase)
   private
+    Context: TDriverContext;
     Device: TFiscalPrinterDevice;
     Connection: TMockPrinterConnection2;
     procedure CheckErrorCode(Code: Integer);
@@ -45,15 +46,16 @@ implementation
 
 procedure TFiscalPrinterDeviceTest.Setup;
 begin
-  Device := TFiscalPrinterDevice.Create;
+  Context := TDriverContext.Create;
   Connection := TMockPrinterConnection2.Create;
-  Device.Connection := Connection;
+  Device := TFiscalPrinterDevice.Create(Context, Connection);
 end;
 
 procedure TFiscalPrinterDeviceTest.TearDown;
 begin
   Device.Free;
   Connection.Free;
+  Context.Free;
 end;
 
 procedure TFiscalPrinterDeviceTest.CheckErrorCode(Code: Integer);

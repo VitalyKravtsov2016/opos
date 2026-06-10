@@ -25,7 +25,6 @@ type
     FDriver: ToleFiscalPrinter;
     FPrinter: TFiscalPrinterImpl;
     FDevice: TTextFiscalPrinterDevice;
-    FConnection: TMockPrinterConnection;
 
     procedure EmptyTest;
     procedure ClaimDevice;
@@ -44,6 +43,8 @@ type
 
     procedure CheckCapJrnEmptySensor; // !!
     procedure CheckFiscalReceipt1;
+    procedure CheckRefundReceipt;
+    procedure CheckRefundReceipt2;
   published
     procedure OpenDevice;
     // common properties
@@ -253,8 +254,6 @@ type
     procedure TestEncoding;
     procedure CheckGetTax;
     procedure CheckNonFiscal;
-    procedure CheckRefundReceipt;
-    procedure CheckRefundReceipt2;
     procedure CheckCorrectReceiptDateTime;
     procedure CheckIsDigits;
 
@@ -289,10 +288,8 @@ begin
   Model.NumTrailerLines := 0;
   FDevice.Model := Model;
 
-  FConnection := TMockPrinterConnection.Create;
   SPrinter := SharedPrinter.GetPrinter(DeviceName);
   SPrinter.Device := FDevice;
-  SPrinter.Connection := FConnection;
 
   FPrinter := TFiscalPrinterImpl.Create(nil);
   FPrinter.SetPrinter(SPrinter);

@@ -45,9 +45,9 @@ type
     procedure ReleaseDevice;
     procedure CloseReceipt;
     procedure OpenReceipt(Password: Integer);
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
     function Send(Timeout: Integer; const Data: AnsiString): AnsiString;
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure OpenPort;
   end;
 
   { TPrinterFrame }
@@ -297,14 +297,12 @@ begin
   Port.Close;
 end;
 
-procedure TPrinterProtocol1.OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+procedure TPrinterProtocol1.OpenPort;
 begin
-  Port.BaudRate := BaudRate;
-  Port.Timeout := ByteTimeout;
   Port.Open;
 end;
 
-procedure TPrinterProtocol1.ClaimDevice(PortNumber, Timeout: Integer);
+procedure TPrinterProtocol1.ClaimDevice(Timeout: Integer);
 begin
   { !!! }
 end;

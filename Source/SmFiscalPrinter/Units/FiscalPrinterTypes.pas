@@ -367,10 +367,10 @@ type
     procedure ClosePort;
     procedure ReleaseDevice;
     procedure Close;
-    procedure Open(AConnection: IPrinterConnection);
+    procedure Open;
     procedure SetTables(const Value: TDeviceTables);
-    procedure ClaimDevice(PortNumber, Timeout: Integer);
-    procedure OpenPort(PortNumber, BaudRate, ByteTimeout: Integer);
+    procedure ClaimDevice(Timeout: Integer);
+    procedure OpenPort;
     procedure PrintText(const Data: TTextRec); overload;
     procedure PrintText(Station: Integer; const Text: WideString); overload;
     procedure WriteParameter(ParamID, ValueID: Integer);
@@ -628,8 +628,6 @@ type
     procedure ClaimPrinter(Timeout: Integer);
     function GetPrinterSemaphoreName: WideString;
     procedure SetDevice(Value: IFiscalPrinterDevice);
-    function GetConnection: IPrinterConnection;
-    procedure SetConnection(const Value: IPrinterConnection);
     procedure SetDeviceName(const Value: WideString);
     function GetParameters: TPrinterParameters;
     procedure StartPing;
@@ -652,7 +650,6 @@ type
     property EJStatus1: TEJStatus1 read GetEJStatus1;
     property EJActivation: TEJActivation read GetEJActivation;
     property DeviceName: WideString read GetDeviceName write SetDeviceName;
-    property Connection: IPrinterConnection read GetConnection write SetConnection;
     property Parameters: TPrinterParameters read GetParameters;
     property Context: TDriverContext read GetContext;
   end;

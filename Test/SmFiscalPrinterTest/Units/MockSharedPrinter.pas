@@ -5,7 +5,7 @@ interface
 uses
   // This
   SharedPrinterInterface, PrinterTypes, FiscalPrinterTypes, PrinterParameters,
-  FixedStrings, NotifyLink, PrinterConnection;
+  FixedStrings, NotifyLink, PrinterConnection, DriverContext;
 
 type
   { TMockSharedPrinter }
@@ -118,6 +118,7 @@ type
     procedure SetDeviceName(const Value: WideString);
     procedure StartPing;
     procedure StopPing;
+    function GetContext: TDriverContext;
 
     property DeviceName: WideString read GetDeviceName;
     property Header: TFixedStrings read GetHeader;
@@ -635,6 +636,11 @@ end;
 procedure TMockSharedPrinter.StopPing;
 begin
 
+end;
+
+function TMockSharedPrinter.GetContext: TDriverContext;
+begin
+  Result := Device.Context;
 end;
 
 end.
