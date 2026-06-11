@@ -447,7 +447,8 @@ See http://www.suigeneris.org/want/ for details.
 
   <target name="release" depends="clean,prepare,Test-SmFiscalPrinter,test-smscale,OposConfigTest,OposTestTest,Compile-OposConfig,Compile-OposTest,Compile-SmFptrSrv,compile-smscale,Compile-SmFiscalPrinter,sign,makesetup,finalclean"/>
   <target name="release_norename" depends="clean,prepare,Test-SmFiscalPrinter,test-smscale,OposConfigTest,OposTestTest,Compile-OposConfig,Compile-OposTest,Compile-SmFptrSrv,compile-smscale,Compile-SmFiscalPrinter,sign,makesetup_norename,finalclean"/>
-  <target name="buildns" depends="clean,prepare,Test-SmFiscalPrinter,test-smscale,OposConfigTest,OposTestTest,Compile-OposConfig,Compile-OposTest,Compile-SmFptrSrv,compile-smscale,Compile-SmFiscalPrinter,makesetupns,finalclean"/>
+  <target name="buildnold" depends="clean,prepare,Test-SmFiscalPrinter,test-smscale,OposConfigTest,OposTestTest,Compile-OposConfig,Compile-OposTest,Compile-SmFptrSrv,compile-smscale,Compile-SmFiscalPrinter,makesetupns,finalclean"/>
+  <target name="buildns" depends="clean,prepare,Compile-OposConfig,Compile-OposTest,Compile-SmFptrSrv,compile-smscale,Compile-SmFiscalPrinter,makesetupns,finalclean"/>
   
   
   

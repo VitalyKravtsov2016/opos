@@ -423,7 +423,7 @@ type
   TDumpBlock = packed record
     DeviceCode: Byte;
     BlockNumber: Word;
-    BlockData: array [0..31] of byte;
+    BlockData: AnsiString;
   end;
 
   { TPrinterDate }
