@@ -1733,16 +1733,14 @@ begin
   FLogger.Debug(Format('ReadTableBin(%d,%d,%d)',
     [Table, Row, Field]));
 
-
   Driver.TableNumber := Table;
   Driver.RowNumber := Row;
   Driver.FieldNumber := Field;
-  Driver.Check(Driver.GetFieldStruct);
   Driver.Check(Driver.ReadTable);
   if Driver.FieldType then
     Result := Driver.ValueOfFieldString
   else
-    Result := IntToStr(Driver.ValueOfFieldInteger);
+    Result := IntToBin(Driver.ValueOfFieldInteger, Driver.FieldSize);
 end;
 
 procedure TFiscalPrinterDriver.SetPointPosition(PointPosition: Byte);
@@ -2724,23 +2722,30 @@ begin
 end;
 
 function TFiscalPrinterDriver.ReadTableInt(Table, Row, Field: Integer): Integer;
-var
-  Data: AnsiString;
-  FieldInfo: TPrinterFieldRec;
 begin
-  FieldInfo := ReadFieldStructure(Table, Field);
-  Data := ReadTableBin(Table, Row, Field);
-  Result := FieldToInt(FieldInfo, Data);
+  FLogger.Debug(Format('ReadTableInt(%d,%d,%d)',
+    [Table, Row, Field]));
+
+  Result := 0;
+  Driver.TableNumber := Table;
+  Driver.RowNumber := Row;
+  Driver.FieldNumber := Field;
+  Driver.Check(Driver.ReadTable);
+  if not Driver.FieldType then
+    Result := Driver.ValueOfFieldInteger;
 end;
 
 function TFiscalPrinterDriver.ReadTableStr(Table, Row, Field: Integer): WideString;
-var
-  Data: AnsiString;
-  FieldInfo: TPrinterFieldRec;
 begin
-  FieldInfo := ReadFieldStructure(Table, Field);
-  Data := ReadTableBin(Table, Row, Field);
-  Result := FieldToStr(FieldInfo, Data);
+  Result := '';
+  Driver.TableNumber := Table;
+  Driver.RowNumber := Row;
+  Driver.FieldNumber := Field;
+  Driver.Check(Driver.ReadTable);
+  if Driver.FieldType then
+    Result := Driver.ValueOfFieldString
+  else
+    Result := IntToStr(Driver.ValueOfFieldInteger);
 end;
 
 (*******************************************************************************
