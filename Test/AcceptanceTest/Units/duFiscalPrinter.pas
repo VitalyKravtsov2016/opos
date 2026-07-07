@@ -15,7 +15,7 @@ uses
   Opos, OposFptr, OposFptrUtils, OposFiscalPrinter_1_11_Lib_TLB, OPOSException,
   // This
   PrinterParameters, PrinterParametersX, DirectIOAPI, SMFiscalPrinter, FileUtils,
-  SmFiscalPrinterLib_TLB;
+  SmFiscalPrinterLib_TLB, SMCashDrawer, DrvFRLib_TLB;
 
 type
   { TFiscalPrinterTest }
@@ -23,6 +23,7 @@ type
   TFiscalPrinterTest = class(TTestCase)
   private
     FDeviceName: string;
+    FDrawer: TSMCashDrawer;
     FDriver: TSMFiscalPrinter;
 
     procedure DeleteLogFiles;
@@ -46,15 +47,20 @@ type
     procedure PrintSalesReceipt(Total: Currency);
     procedure ReadReceiptDetails;
     procedure WriteReceiptDetails;
+
+    property Drawer: TSMCashDrawer read FDrawer;
+    property Driver: TSMFiscalPrinter read FDriver;
   protected
     procedure Setup; override;
     procedure TearDown; override;
-    property Driver: TSMFiscalPrinter read FDriver;
+
   published
     procedure ExecuteLogFiles;
     procedure CheckSalesReceipt;
     procedure CheckRefundReceipt;
     procedure CheckRefundReceipt2;
+
+    procedure CheckClaimPrinterAndDrawer;
   end;
 
 implementation
@@ -70,11 +76,13 @@ var
 
 procedure TFiscalPrinterTest.Setup;
 begin
+  FDrawer := TSMCashDrawer.Create;
   FDriver := TSMFiscalPrinter.Create;
 end;
 
 procedure TFiscalPrinterTest.TearDown;
 begin
+  FDrawer.Free;
   FDriver.Free;
 end;
 
@@ -592,6 +600,18 @@ begin
   ReadReceiptDetails;
   PrintSalesReceipt(30); // Receipt 3
   PrintRefundReceipt2(20); // Refund receipt
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+// В драйвре ФР должен быть настроен правильный порт
+
+procedure TFiscalPrinterTest.CheckClaimPrinterAndDrawer;
+begin
+  CheckResult(Driver.Open(DeviceName));
+  CheckResult(Driver.ClaimDevice(100));
+
+  CheckResult(Drawer.Open(DeviceName));
+  CheckResult(Drawer.ClaimDevice(100));
 end;
 
 initialization

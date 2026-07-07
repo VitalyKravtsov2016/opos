@@ -32,6 +32,7 @@ type
     FCapStatusMultiDrawerDetect: Boolean;
     FParameters: TCashDrawerParameters;
     FOposDevice: TOposServiceDevice19;
+    FLogger: ILogFile;
 
     procedure Lock;
     procedure UnLock;
@@ -111,8 +112,10 @@ begin
   FLock := TCriticalSection.Create;
   FStatusLink := TNotifyLink.Create;
   FStatusLink.OnChange := StatusChanged;
-  FPrinter := SharedPrinter.GetPrinter('');
-  InternalInit;
+  FLogger := TLogFile.Create;
+  FLogger.Enabled := False;
+
+  //FPrinter := SharedPrinter.GetPrinter(''); !!!
 end;
 
 destructor ToleCashDrawer.Destroy;
@@ -251,12 +254,15 @@ function ToleCashDrawer.DoOpen(const DeviceClass, DeviceName: WideString;
   const pDispatch: IDispatch): Integer;
 begin
   try
-    OposDevice.Open(DeviceClass, DeviceName, GetEventInterface(pDispatch));
     LoadParameters(DeviceName);
+    InternalInit;
+    OposDevice.Open(DeviceClass, DeviceName, GetEventInterface(pDispatch));
 
     FPrinter := SharedPrinter.GetPrinter(Parameters.FptrDeviceName);
-    FPrinter.AddStatusLink(FStatusLink);
-    FPrinter.Open(Parameters.FptrDeviceName);
+    FLogger := Device.Context.Logger;
+
+    Printer.AddStatusLink(FStatusLink);
+    Printer.Open(Parameters.FptrDeviceName);
 
     Logger.Debug(Logger.Separator);
     Logger.Debug('  LOG START');
@@ -767,7 +773,7 @@ end;
 
 function ToleCashDrawer.GetLogger: ILogFile;
 begin
-  Result := FPrinter.Device.Context.Logger;
+  Result := FLogger;
 end;
 
 function ToleCashDrawer.GetParameters: TCashDrawerParameters;

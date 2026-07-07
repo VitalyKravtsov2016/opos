@@ -203,6 +203,7 @@ type
     property Logger: ILogFile read GetLogger;
   end;
 
+function GetPrintersCount: Integer;
 function GetPrinter(const DeviceName: WideString): ISharedPrinter;
 
 implementation

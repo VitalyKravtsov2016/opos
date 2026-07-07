@@ -33,7 +33,10 @@ uses
   SmFiscalPrinterLib_TLB in '..\..\Source\SmFiscalPrinter\SmFiscalPrinterLib_TLB.pas',
   OposFiscalPrinter_1_12_Lib_TLB in '..\..\Source\Opos\OposFiscalPrinter_1_12_Lib_TLB.pas',
   OposFiscalPrinter_1_13_Lib_TLB in '..\..\Source\Opos\OposFiscalPrinter_1_13_Lib_TLB.pas',
-  RegExpr in '..\..\Source\Shared\RegExpr.pas';
+  RegExpr in '..\..\Source\Shared\RegExpr.pas',
+  SMCashDrawer in '..\..\Source\Opos\SMCashDrawer.pas',
+  DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
+  OposCashDrawerIntf in '..\..\Source\Opos\OposCashDrawerIntf.pas';
 
 {$R *.RES}
 

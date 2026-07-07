@@ -133,10 +133,10 @@ function TTextReceipt.GetVatText(VatInfo: Integer): WideString;
 begin
   Result := '';
   case VatInfo of
-    1: Result := '_А';
-    2: Result := '_Б';
-    3: Result := '_В';
-    4: Result := '_Г';
+    1: Result := '_пїЅ';
+    2: Result := '_пїЅ';
+    3: Result := '_пїЅ';
+    4: Result := '_пїЅ';
   end;
 end;
 
@@ -412,7 +412,7 @@ end;
 procedure TTextReceipt.CheckDiscountAmount(Amount: Int64);
 begin
   if Amount > FTotal then
-    RaiseExtendedError(OPOS_EFPTR_NEGATIVE_TOTAL, _('Отрицательный итог чека'));
+    RaiseExtendedError(OPOS_EFPTR_NEGATIVE_TOTAL, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ'));
 end;
 
 procedure TTextReceipt.SubtotalDiscount(const Description: WideString;

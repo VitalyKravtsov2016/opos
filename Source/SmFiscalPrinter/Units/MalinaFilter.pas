@@ -157,11 +157,11 @@ end;
 procedure TMalinaFilter.AfterZReport;
 begin
   if not Params.RosneftAddTextEnabled then Exit;
-  Printer.PrintLines('яейжхъ', IntToStr(Params.RosneftItemDepartment));
-  PrintAmount('опхундю', FItemCount.Sale, FTotals.Sale);
-  PrintAmount('пюяундю', FItemCount.Buy, FTotals.Buy);
-  PrintAmount('бнгбп.опхундю', FItemCount.RetSale, FTotals.RetSale);
-  PrintAmount('бнгбп.пюяундю', FItemCount.RetBuy, FTotals.RetBuy);
+  Printer.PrintLines('О©╫О©╫О©╫О©╫О©╫О©╫', IntToStr(Params.RosneftItemDepartment));
+  PrintAmount('О©╫О©╫О©╫О©╫О©╫О©╫О©╫', FItemCount.Sale, FTotals.Sale);
+  PrintAmount('О©╫О©╫О©╫О©╫О©╫О©╫О©╫', FItemCount.Buy, FTotals.Buy);
+  PrintAmount('О©╫О©╫О©╫О©╫О©╫.О©╫О©╫О©╫О©╫О©╫О©╫О©╫', FItemCount.RetSale, FTotals.RetSale);
+  PrintAmount('О©╫О©╫О©╫О©╫О©╫.О©╫О©╫О©╫О©╫О©╫О©╫О©╫', FItemCount.RetBuy, FTotals.RetBuy);
 end;
 
 function TMalinaFilter.GetParameters: TPrinterParameters;

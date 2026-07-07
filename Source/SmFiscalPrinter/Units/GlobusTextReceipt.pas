@@ -156,10 +156,10 @@ begin
   if Parameters.RFShowTaxLetters then
   begin
     case VatInfo of
-      1: Result := '_А';
-      2: Result := '_Б';
-      3: Result := '_В';
-      4: Result := '_Г';
+      1: Result := '_пїЅ';
+      2: Result := '_пїЅ';
+      3: Result := '_пїЅ';
+      4: Result := '_пїЅ';
     end;
   end;
 end;
@@ -296,7 +296,7 @@ end;
 procedure TGlobusTextReceipt.CheckDiscountAmount(Amount: Int64);
 begin
   if Amount > FTotal then
-    RaiseExtendedError(OPOS_EFPTR_NEGATIVE_TOTAL, _('Отрицательный итог чека'));
+    RaiseExtendedError(OPOS_EFPTR_NEGATIVE_TOTAL, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ'));
 end;
 
 procedure TGlobusTextReceipt.PrintDiscount(const Description: WideString;
@@ -369,7 +369,7 @@ begin
       PrintCharge(Description, ItemAmount, VatInfo);
     end;
   else
-    RaiseOposException(OPOS_E_ILLEGAL, _('Неверное значение параметра AdjustmentType'));
+    RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ AdjustmentType'));
   end;
 end;
 
@@ -574,7 +574,7 @@ begin
   // Check payment code
   PayCode := Printer.GetPayCode(Description);
   if not (PayCode in [0..3]) then
-    raiseOposException(OPOS_E_ILLEGAL, _('Неверный код типа оплаты'));
+    raiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ'));
 
   PayAmount := Printer.CurrencyToInt(Payment);
   if Parameters.CorrectCashlessAmount and IsCashlessPayCode(PayCode) and ((PayAmount + GetPayment) > FTotal) then
@@ -680,11 +680,11 @@ var
   Line: WideString;
 begin
   Printer.WaitForPrinting;
-  Printer.PrintDocHeader('ПРОДАЖА', Parameters.ZeroReceiptNumber);
+  Printer.PrintDocHeader('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ', Parameters.ZeroReceiptNumber);
   Parameters.ZeroReceiptNumber := Parameters.ZeroReceiptNumber + 1;
   Printer.WaitForPrinting;
 
-  Line := Printer.FormatBoldLines('ИТОГО', '=0');
+  Line := Printer.FormatBoldLines('пїЅпїЅпїЅпїЅпїЅ', '=0');
   Printer.PrintBoldString(Printer.Station, Line);
   Printer.WaitForPrinting;
 end;

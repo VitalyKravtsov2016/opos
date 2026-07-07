@@ -66,7 +66,7 @@ implementation
 
 function GetTaxLetter(Tax: Integer): WideString;
 const
-  TaxLetter = 'ÀÁÂÃ';
+  TaxLetter = 'ï¿½ï¿½ï¿½ï¿½';
 begin
   Result := '';
   if Tax in [1..4] then

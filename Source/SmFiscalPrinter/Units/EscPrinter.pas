@@ -132,7 +132,7 @@ end;
 
 procedure InvalidCommand;
 begin
-  raiseError(_('Команда не поддерживается'));
+  raiseError(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
 end;
 
 function ValidLength(const Data: AnsiString; MinLength: Integer): Boolean;
@@ -143,7 +143,7 @@ end;
 procedure CheckLength(const Data: AnsiString; MinLength: Integer);
 begin
 	if not ValidLength(Data, MinLength) then
-    raiseError(_('Неверная длина команды'));
+    raiseError(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
 end;
 
 { TEscPrinter }
@@ -255,7 +255,7 @@ end;
 procedure TEscBarcode.SetHRIPosition(const Value: Integer);
 begin
   if not (Value in [0..3]) then
-    raiseExceptionFmt(_('Неверное значение положения текста (%d). Должно быть 0..3'),
+    raiseExceptionFmt(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (%d). пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 0..3'),
     [Value]);
 
   FHRIPosition := Value;
@@ -264,7 +264,7 @@ end;
 procedure TEscBarcode.SetFontType(const Value: Integer);
 begin
   if not (Value in [0..1]) then
-    raiseExceptionFmt(_('Неверное значение типа шрифта (%d). Должно быть 0..1'),
+    raiseExceptionFmt(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (%d). пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 0..1'),
     [Value]);
 
   FFontType := Value;
@@ -273,7 +273,7 @@ end;
 procedure TEscBarcode.SetLineWidth(const Value: Integer);
 begin
   if not(Value in [1..6]) then
-    raiseExceptionFmt(_('Неверное значение ширины шрих-кода (%d). Должно быть 1..6'),
+    raiseExceptionFmt(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (%d). пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 1..6'),
     [Value]);
 
   FLineWidth := Value;
@@ -282,7 +282,7 @@ end;
 procedure TEscBarcode.SetHeight(const Value: Integer);
 begin
   if not(Value in [0..255]) then
-    raiseExceptionFmt(_('Неверное значение высоты шрих-кода (%d). Должно быть 1..255'),
+    raiseExceptionFmt(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (%d). пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 1..255'),
     [Value]);
 
   FHeight := Value;

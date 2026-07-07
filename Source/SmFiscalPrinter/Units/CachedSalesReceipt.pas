@@ -560,7 +560,7 @@ begin
   // Check payment code
   PayCode := Printer.GetPayCode(Description);
   if not (PayCode in [0..16]) then
-    raiseOposException(OPOS_E_ILLEGAL, _('Неверный код типа оплаты'));
+    raiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ'));
 
   //
   Subtotal := Printer.GetSubtotal;
