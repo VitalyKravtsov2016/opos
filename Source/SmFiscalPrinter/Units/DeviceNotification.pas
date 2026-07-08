@@ -36,10 +36,20 @@ type
 
 implementation
 
+{ TDeviceNotification }
+
+constructor TDeviceNotification.Create(ALogger: ILogFile);
+begin
+  inherited Create;
+  FWnd := Classes.AllocateHWND(WndProc);
+  FLogger := ALogger;
+end;
+
 destructor TDeviceNotification.Destroy;
 begin
   Uninstall;
   Classes.DeallocateHWND(FWnd);
+  FLogger := nil;
   inherited Destroy;
 end;
 
@@ -79,13 +89,6 @@ begin
     UnregisterDeviceNotification(FNotification);
     FNotification := nil;
   end;
-end;
-
-constructor TDeviceNotification.Create(ALogger: ILogFile);
-begin
-  inherited Create;
-  FWnd := Classes.AllocateHWND(WndProc);
-  FLogger := ALogger;
 end;
 
 end.

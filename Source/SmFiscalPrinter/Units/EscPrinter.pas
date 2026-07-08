@@ -86,6 +86,7 @@ type
   public
     constructor Create(APrinter: ISharedPrinter);
     destructor Destroy; override;
+
     procedure Print;
 
     property Data: AnsiString read FData write FData;

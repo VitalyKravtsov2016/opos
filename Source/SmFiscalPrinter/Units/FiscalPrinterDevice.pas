@@ -871,6 +871,7 @@ begin
   FFilter.Free;
   FSTLVTag.Free;
   FTLVItems.Free;
+  FConnection := nil;
   inherited Destroy;
 end;
 
@@ -979,7 +980,7 @@ procedure TFiscalPrinterDevice.LoadModels;
 var
   Reader: TXmlModelReader;
 begin
-  Reader := TXmlModelReader.Create(FModels);
+  Reader := TXmlModelReader.Create(FModels, Logger);
   try
     Reader.Load(GetModelsFileName);
   except
@@ -1094,7 +1095,7 @@ procedure TFiscalPrinterDevice.SaveModels;
 var
   Reader: TXmlModelReader;
 begin
-  Reader := TXmlModelReader.Create(FModels);
+  Reader := TXmlModelReader.Create(FModels, Logger);
   try
     //ReadModelParameters;
     Reader.SetDefaults;

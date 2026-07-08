@@ -82,6 +82,8 @@ end;
 
 destructor TPrinterProtocol1.Destroy;
 begin
+  FPort := nil;
+  FLogger := nil;
   inherited Destroy;
 end;
 

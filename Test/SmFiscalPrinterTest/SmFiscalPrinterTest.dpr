@@ -216,7 +216,7 @@ uses
   BaseForm in '..\..\Source\Shared\BaseForm.pas',
   TranslationUtil in '..\..\Source\SmFiscalPrinter\Units\TranslationUtil.pas',
   LangUtils in '..\..\Source\Shared\LangUtils.pas',
-  duSharedPrinter in 'Units\duSharedPrinter.pas',
+  duCashDrawer in 'Units\duCashDrawer.pas',
   duLogFile in 'Units\duLogFile.pas',
   RegExpr in '..\..\Source\Shared\RegExpr.pas',
   MockPrinterConnection in 'Units\MockPrinterConnection.pas',
@@ -225,7 +225,8 @@ uses
   untDriver in '..\..\Source\Shared\untDriver.pas',
   DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
   BinUtils in '..\..\Source\Shared\BinUtils.pas',
-  duBitUtils in 'Units\duBitUtils.pas';
+  duBitUtils in 'Units\duBitUtils.pas',
+  duSharedPrinter in 'Units\duSharedPrinter.pas';
 
 {$R *.RES}
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}

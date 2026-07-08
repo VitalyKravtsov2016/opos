@@ -14,7 +14,7 @@ uses
   untDriver,
   PrinterTypes, BinStream, StringUtils,
   SerialPort, PrinterTable, LogFile, ByteUtils, FiscalPrinterTypes,
-  DeviceTables, PrinterModel, XmlModelReader, PrinterConnection,
+  DeviceTables, PrinterModel, XmlModelReader, 
   CommunicationError, VersionInfo, DefaultModel, DriverTypes,
   TableParameter, DebugUtils, ClassLogger, DriverError,
   FiscalPrinterStatistics, ParameterValue, EJReportParser,
@@ -85,7 +85,6 @@ type
     FOnPrinterStatus: TNotifyEvent;
     FBeforeCommand: TCommandEvent;
     FDeviceTables: TDeviceTables;
-    FConnection: IPrinterConnection;
     FValidDeviceMetrics: Boolean;
     FDeviceMetrics: TDeviceMetrics;
     FLock: TCriticalSection;
@@ -538,7 +537,6 @@ type
     property Model: TPrinterModelRec read GetModel;
     property ResultText: WideString read GetResultText;
     property ResultCode: Integer read GetResultCode;
-    property Connection: IPrinterConnection read FConnection write FConnection;
     property CapFiscalStorage: Boolean read GetCapFiscalStorage write SetCapFiscalStorage;
     property DiscountMode: Integer read GetDiscountMode;
     property CapReceiptDiscount: Boolean read GetCapReceiptDiscount;
@@ -685,7 +683,6 @@ begin
   FFields.Free;
   FTables.Free;
   FModels.Free;
-  FConnection := nil;
   FLogger.Free;
   FStatistics.Free;
   FFilter.Free;
@@ -953,7 +950,7 @@ procedure TFiscalPrinterDriver.LoadModels;
 var
   Reader: TXmlModelReader;
 begin
-  Reader := TXmlModelReader.Create(FModels);
+  Reader := TXmlModelReader.Create(FModels, Logger);
   try
     Reader.Load(GetModelsFileName);
   except
@@ -1068,7 +1065,7 @@ procedure TFiscalPrinterDriver.SaveModels;
 var
   Reader: TXmlModelReader;
 begin
-  Reader := TXmlModelReader.Create(FModels);
+  Reader := TXmlModelReader.Create(FModels, Logger);
   try
     //ReadModelParameters;
     Reader.SetDefaults;
@@ -3347,7 +3344,6 @@ end;
 procedure TFiscalPrinterDriver.Close;
 begin
   Disconnect;
-  FConnection := nil;
   FIsOnline := False;
 end;
 

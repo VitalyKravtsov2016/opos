@@ -27,7 +27,8 @@ type
     property Logger: ILogFile read FLogger;
     property Models: TPrinterModels read FModels;
   public
-    constructor Create(AModels: TPrinterModels);
+    constructor Create(AModels: TPrinterModels; ALogger: ILogFile);
+    destructor Destroy; override;
 
     procedure SetDefaults;
     procedure Save(const FileName: WideString);
@@ -57,7 +58,7 @@ procedure LoadModels(AModels: TPrinterModels; const FileName: WideString; Logger
 var
   Reader: TXmlModelReader;
 begin
-  Reader := TXmlModelReader.Create(AModels);
+  Reader := TXmlModelReader.Create(AModels, Logger);
   try
     Reader.Load(FileName);
   except
@@ -71,7 +72,7 @@ procedure SaveModels(AModels: TPrinterModels; const FileName: WideString; Logger
 var
   Writer: TXmlModelReader;
 begin
-  Writer := TXmlModelReader.Create(AModels);
+  Writer := TXmlModelReader.Create(AModels, Logger);
   try
     Writer.Save(FileName);
   except
@@ -83,10 +84,17 @@ end;
 
 { TXmlModelReader }
 
-constructor TXmlModelReader.Create(AModels: TPrinterModels);
+constructor TXmlModelReader.Create(AModels: TPrinterModels; ALogger: ILogFile);
 begin
   inherited Create;
   FModels := AModels;
+  FLogger := ALogger;
+end;
+
+destructor TXmlModelReader.Destroy;
+begin
+  FLogger := nil;
+  inherited Destroy;
 end;
 
 procedure TXmlModelReader.Save(const FileName: WideString);

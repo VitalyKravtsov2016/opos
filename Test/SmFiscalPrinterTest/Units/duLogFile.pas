@@ -10,7 +10,7 @@ uses
   // Tnt
   TntClasses,
   // This
-  LogFile, FileUtils;
+  LogFile, FileUtils, DriverContext;
 
 type
   { TLogFileTest }
@@ -22,6 +22,8 @@ type
     procedure CheckMaxCount;
     procedure CheckDeleteFile;
     procedure CheckException;
+    procedure CheckDestroy;
+    procedure DriverContext;
   end;
 
 implementation
@@ -187,6 +189,53 @@ begin
     I := 10/I;
   except
   end;
+end;
+
+procedure TLogFileTest.CheckDestroy;
+var
+  Data: string;
+  FileName: string;
+  Logger: ILogFile;
+  LoggerObj: TLogFile;
+begin
+  LoggerObj := TLogFile.Create;
+  Logger := LoggerObj;
+  FileName := LoggerObj.FileName;
+  if FileExists(FileName) then
+    Check(DeleteFile(FileName), 'DeleteFile.0');
+  try
+    Logger.Enabled := True;
+    Logger.DeviceName := 'Device1';
+    Logger.Write('Test');
+  finally
+    Logger := nil;
+  end;
+
+  Data := ReadFileData(FileName);
+  CheckEquals('Test', Data, 'ReadFileData');
+  Check(DeleteFile(FileName), 'DeleteFile.1');
+end;
+
+procedure TLogFileTest.DriverContext;
+var
+  FileName: string;
+  Context: TDriverContext;
+begin
+  Context := TDriverContext.Create;
+  try
+    FileName := Context.Logger.FileName;
+    if FileExists(FileName) then
+      Check(DeleteFile(FileName), 'DeleteFile.0');
+
+    Context.Logger.Enabled := True;
+    Context.Logger.DeviceName := 'Device1';
+    Context.Logger.Write('Test');
+  finally
+    Context.Free;
+  end;
+
+  CheckEquals('Test', ReadFileData(FileName), 'ReadFileData');
+  Check(DeleteFile(FileName), 'DeleteFile.1');
 end;
 
 initialization

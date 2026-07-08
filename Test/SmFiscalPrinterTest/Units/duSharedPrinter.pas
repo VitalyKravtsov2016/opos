@@ -9,7 +9,7 @@ uses
   TestFramework,
   // This
   SharedPrinter, FiscalPrinterTypes, oleCashDrawer, SmFiscalPrinterLib_TLB,
-  CashDrawerParameters, LogFile, oleFiscalPrinter;
+  CashDrawerParameters, LogFile, oleFiscalPrinter, FileUtils;
 
 type
   { TSharedPrinterTest }
@@ -20,6 +20,7 @@ type
     procedure TestCashDrawer;
     procedure TestFiscalPrinter;
     procedure TestCashDrawer2;
+    procedure TestLogger;
   end;
 
 implementation
@@ -117,6 +118,27 @@ begin
   Printer1 := nil;
   Printer2 := nil;
   CheckEquals(0, GetPrintersCount, 'GetPrintersCount <> 0');
+end;
+
+procedure TSharedPrinterTest.TestLogger;
+var
+  FileName: string;
+  Printer: ISharedPrinter;
+begin
+  Printer := TSharedPrinter.Create('DeviceName');
+  try
+    FileName := Printer.Context.Logger.FileName;
+    if FileExists(FileName) then
+      Check(DeleteFile(FileName), 'DeleteFile.0');
+
+    Printer.Context.Logger.Enabled := True;
+    Printer.Context.Logger.DeviceName := 'Device1';
+    Printer.Context.Logger.Write('Test');
+  finally
+    Printer := nil;
+  end;
+  CheckEquals('Test', ReadFileData(FileName), 'ReadFileData');
+  Check(DeleteFile(FileName), 'DeleteFile.1');
 end;
 
 initialization

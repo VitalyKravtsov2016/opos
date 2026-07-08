@@ -774,6 +774,7 @@ end;
 
 destructor TPrinterParameters.Destroy;
 begin
+  FLogger := nil;
   FPayTypes.Free;
   FVatCodes.Free;
   inherited Destroy;

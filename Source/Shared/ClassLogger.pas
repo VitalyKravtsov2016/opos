@@ -20,6 +20,7 @@ type
     property Logger: ILogFile read FLogger;
   public
     constructor Create(AClassName: WideString; ALogger: ILogFile);
+    destructor Destroy; override;
 
     procedure Info(const Data: WideString); overload;
     procedure Debug(const Data: WideString); overload;
@@ -43,6 +44,12 @@ begin
   inherited Create;
   FLogger := ALogger;
   FClassName := AClassName;
+end;
+
+destructor TClassLogger.Destroy;
+begin
+  FLogger := nil;
+  inherited Destroy;
 end;
 
 function TClassLogger.GetData(const Data: WideString): WideString;

@@ -35,6 +35,8 @@ type
     property Logger: ILogFile read FLogger;
   public
     constructor Create(ALogger: ILogFile);
+    destructor Destroy; override;
+
     procedure SetDefaults;
     procedure Load(const DeviceName: WideString);
     procedure Save(const DeviceName: WideString);
@@ -141,6 +143,12 @@ constructor TCashDrawerParameters.Create(ALogger: ILogFile);
 begin
   inherited Create;
   FLogger := ALogger;
+end;
+
+destructor TCashDrawerParameters.Destroy;
+begin
+  FLogger := nil;
+  inherited Destroy;
 end;
 
 end.

@@ -91,6 +91,7 @@ begin
   Close;
   FLock.Free;
   FConnection.Free;
+  FLogger := nil;
   inherited Destroy;
 end;
 

@@ -25,9 +25,6 @@ type
     procedure Unlock;
     function GetLock: TCriticalSection;
     function GetDriver: TFiscalPrinterImpl;
-
-    property Logger: ILogFile read GetLogger;
-    property Driver: TFiscalPrinterImpl read GetDriver;
   public
     constructor Create(ADriver: TFiscalPrinterImpl);
     destructor Destroy; override;
@@ -339,6 +336,8 @@ type
       UnitAmount: Currency;
       const AUnitName: WideString): Integer; safecall;
 
+    property Logger: ILogFile read GetLogger;
+    property Driver: TFiscalPrinterImpl read GetDriver;
     property OpenResult: Integer read Get_OpenResult;
   end;
 
