@@ -773,6 +773,17 @@ end;
 
 procedure TFiscalPrinterDriver.DoConnect;
 begin
+  if FDriverConnected then
+    Exit;
+
+  Driver.ConnectionType := DrvFRConnectionLocal;
+  Driver.ComNumber := Parameters.PortNumber;
+  Driver.BaudRate := Parameters.BaudRate;
+  Driver.Timeout := Parameters.ByteTimeout;
+  Driver.Password := Integer(GetUsrPassword);
+  Driver.PointPosition := True; // 2 decimal places
+  if Parameters.ModelID >= 0 then
+    Driver.ModelID := Parameters.ModelID;
 end;
 
 procedure VersionChars(const Version: WideString; var Hi, Lo: Char);
@@ -1744,7 +1755,8 @@ procedure TFiscalPrinterDriver.SetPointPosition(PointPosition: Byte);
 begin
   FLogger.Debug(Format('SetPointPosition(%d)',
     [PointPosition]));
-  { !!! }
+  Driver.PointPosition := PointPosition <> 0;
+  Driver.Check(Driver.SetPointPosition);
 end;
 
 procedure TFiscalPrinterDriver.SetTime(const Time: TPrinterTime);
@@ -2423,11 +2435,16 @@ end;
 ******************************************************************************)
 
 function TFiscalPrinterDriver.OpenReceipt(ReceiptType: Byte): Integer;
+var
+  Answer: AnsiString;
 begin
   DoConnect;
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := ReceiptType;
   Result := Driver.OpenCheck;
+  // Fallback when DrvFR reports OpenCheck unsupported for FN model
+  if Result <> 0 then
+    Result := ExecuteData(#$8D + IntToBin(GetUsrPassword, 4) + Chr(ReceiptType), Answer);
   if Result = 0 then
     FFilter.OpenReceipt(ReceiptType);
 end;
@@ -3321,7 +3338,13 @@ begin
 
   if not FPortOpened then
   begin
-    CheckDriver(Driver.Connect2);
+    DoConnect;
+    // Connect2 auto-probes model/baud; Connect uses explicit port settings
+    if Parameters.SearchByBaudRateEnabled or Parameters.SearchByPortEnabled then
+      CheckDriver(Driver.Connect2)
+    else
+      CheckDriver(Driver.Connect);
+    FDriverConnected := True;
     FPortOpened := True;
   end;
 end;
@@ -6742,6 +6765,7 @@ begin
   P.Code := CorrectGS1(P.Code);
   DoConnect;
   SetDriverPassword(FUsrPassword);
+  Driver.Barcode := P.Code;
   Driver.BarcodeHex := StrToHex(P.Code);
   Driver.MarkingOnly := P.IsAccounted;
   Result := Driver.FNBindMarkingItem;

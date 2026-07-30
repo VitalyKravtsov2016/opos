@@ -226,7 +226,12 @@ uses
   DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
   BinUtils in '..\..\Source\Shared\BinUtils.pas',
   duBitUtils in 'Units\duBitUtils.pas',
-  duSharedPrinter in 'Units\duSharedPrinter.pas';
+  duSharedPrinter in 'Units\duSharedPrinter.pas',
+  FiscalPrinterDriverRR in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDriverRR.pas',
+  untDriverRR in '..\..\Source\Shared\untDriverRR.pas',
+  KKTDrvLib_TLB in '..\..\Source\Shared\KKTDrvLib_TLB.pas',
+  FiscalPrinterEmulator in '..\AcceptanceTest\Units\FiscalPrinterEmulator.pas',
+  duMarkedReceiptDrivers in '..\AcceptanceTest\Units\duMarkedReceiptDrivers.pas';
 
 {$R *.RES}
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}

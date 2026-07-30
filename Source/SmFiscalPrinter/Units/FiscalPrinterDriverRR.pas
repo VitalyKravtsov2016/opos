@@ -773,6 +773,18 @@ end;
 
 procedure TFiscalPrinterDriverRR.DoConnect;
 begin
+  if FDriverConnected then
+    Exit;
+
+  Driver.ConnectionType := DrvFRConnectionLocal;
+  Driver.ComNumber := Parameters.PortNumber;
+  Driver.BaudRate := Parameters.BaudRate;
+  Driver.Timeout := Parameters.ByteTimeout;
+  Driver.Password := Integer(GetUsrPassword);
+  // False: amounts as integer kopecks (matches FiscalPrinterDevice wire format)
+  Driver.PointPosition := False;
+  if Parameters.ModelID >= 0 then
+    Driver.ModelID := Parameters.ModelID;
 end;
 
 procedure VersionChars(const Version: WideString; var Hi, Lo: Char);
@@ -1744,7 +1756,8 @@ procedure TFiscalPrinterDriverRR.SetPointPosition(PointPosition: Byte);
 begin
   FLogger.Debug(Format('SetPointPosition(%d)',
     [PointPosition]));
-  { !!! }
+  Driver.PointPosition := PointPosition <> 0;
+  Driver.Check(Driver.SetPointPosition);
 end;
 
 procedure TFiscalPrinterDriverRR.SetTime(const Time: TPrinterTime);
@@ -2423,11 +2436,17 @@ end;
 ******************************************************************************)
 
 function TFiscalPrinterDriverRR.OpenReceipt(ReceiptType: Byte): Integer;
+var
+  Answer: AnsiString;
 begin
   DoConnect;
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := ReceiptType;
   Result := Driver.OpenCheck;
+  // Some KKTDrv builds report OpenCheck unsupported for FN models;
+  // fall back to classic 8Dh so protocol matches FiscalPrinterDevice.
+  if Result <> 0 then
+    Result := ExecuteData(#$8D + IntToBin(GetUsrPassword, 4) + Chr(ReceiptType), Answer);
   if Result = 0 then
     FFilter.OpenReceipt(ReceiptType);
 end;
@@ -3321,7 +3340,13 @@ begin
 
   if not FPortOpened then
   begin
-    CheckDriver(Driver.Connect2);
+    DoConnect;
+    // Connect2 auto-probes model/baud; Connect uses explicit port settings
+    if Parameters.SearchByBaudRateEnabled or Parameters.SearchByPortEnabled then
+      CheckDriver(Driver.Connect2)
+    else
+      CheckDriver(Driver.Connect);
+    FDriverConnected := True;
     FPortOpened := True;
   end;
 end;
@@ -5248,9 +5273,11 @@ begin
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := Abs(P.RecType);
   Driver.Quantity := Abs(P.Quantity);
-  Driver.Price := IntToAmount(Abs(P.Price));
-  Driver.Summ1 := IntToAmount(Abs(P.Total));
-  Driver.TaxValue := IntToAmount(Abs(P.TaxAmount));
+  // Pass kopecks as Currency integer part when PointPosition=False
+  Driver.Price := Abs(P.Price);
+  Driver.Summ1 := Abs(P.Total);
+  Driver.Summ1Enabled := True;
+  Driver.TaxValue := Abs(P.TaxAmount);
   Driver.TaxValueEnabled := True;
   Driver.Tax1 := Abs(P.Tax);
   Driver.Department := P.Department;
@@ -6054,29 +6081,29 @@ function TFiscalPrinterDriverRR.ReceiptClose22(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 begin
-  Driver.Summ1 := IntToAmount(P.Payments[0]);
-  Driver.Summ2 := IntToAmount(P.Payments[1]);
-  Driver.Summ3 := IntToAmount(P.Payments[2]);
-  Driver.Summ4 := IntToAmount(P.Payments[3]);
-  Driver.Summ5 := IntToAmount(P.Payments[4]);
-  Driver.Summ6 := IntToAmount(P.Payments[5]);
-  Driver.Summ7 := IntToAmount(P.Payments[6]);
-  Driver.Summ8 := IntToAmount(P.Payments[7]);
-  Driver.Summ9 := IntToAmount(P.Payments[8]);
-  Driver.Summ10 := IntToAmount(P.Payments[9]);
-  Driver.Summ11 := IntToAmount(P.Payments[10]);
-  Driver.Summ12 := IntToAmount(P.Payments[11]);
-  Driver.Summ13 := IntToAmount(P.Payments[12]);
-  Driver.Summ14 := IntToAmount(P.Payments[13]);
-  Driver.Summ15 := IntToAmount(P.Payments[14]);
-  Driver.Summ16 := IntToAmount(P.Payments[15]);
+  Driver.Summ1 := Abs(P.Payments[0]);
+  Driver.Summ2 := Abs(P.Payments[1]);
+  Driver.Summ3 := Abs(P.Payments[2]);
+  Driver.Summ4 := Abs(P.Payments[3]);
+  Driver.Summ5 := Abs(P.Payments[4]);
+  Driver.Summ6 := Abs(P.Payments[5]);
+  Driver.Summ7 := Abs(P.Payments[6]);
+  Driver.Summ8 := Abs(P.Payments[7]);
+  Driver.Summ9 := Abs(P.Payments[8]);
+  Driver.Summ10 := Abs(P.Payments[9]);
+  Driver.Summ11 := Abs(P.Payments[10]);
+  Driver.Summ12 := Abs(P.Payments[11]);
+  Driver.Summ13 := Abs(P.Payments[12]);
+  Driver.Summ14 := Abs(P.Payments[13]);
+  Driver.Summ15 := Abs(P.Payments[14]);
+  Driver.Summ16 := Abs(P.Payments[15]);
   Driver.RoundingSumm := P.Discount;
-  Driver.TaxValue1 := IntToAmount(P.TaxAmount[1]);
-  Driver.TaxValue2 := IntToAmount(P.TaxAmount[2]);
-  Driver.TaxValue3 := IntToAmount(P.TaxAmount[3]);
-  Driver.TaxValue4 := IntToAmount(P.TaxAmount[4]);
-  Driver.TaxValue5 := IntToAmount(P.TaxAmount[5]);
-  Driver.TaxValue6 := IntToAmount(P.TaxAmount[6]);
+  Driver.TaxValue1 := Abs(P.TaxAmount[1]);
+  Driver.TaxValue2 := Abs(P.TaxAmount[2]);
+  Driver.TaxValue3 := Abs(P.TaxAmount[3]);
+  Driver.TaxValue4 := Abs(P.TaxAmount[4]);
+  Driver.TaxValue5 := Abs(P.TaxAmount[5]);
+  Driver.TaxValue6 := Abs(P.TaxAmount[6]);
   Driver.TaxType := P.TaxSystem;
   Driver.StringForPrinting := P.Text;
   Result := Driver.FNCloseCheckEx;
@@ -6738,24 +6765,37 @@ end;
 
 function TFiscalPrinterDriverRR.FSBindItemCode(P: TFSBindItemCode;
   var R: TFSBindItemCodeResult): Integer;
+var
+  Answer: AnsiString;
+  Command: AnsiString;
 begin
+  // Send FF67 directly (same wire format as FiscalPrinterDevice).
+  // FNBindMarkingItem uses DD+short FF67 and breaks TX log parity.
   P.Code := CorrectGS1(P.Code);
   DoConnect;
   SetDriverPassword(FUsrPassword);
-  Driver.BarcodeHex := StrToHex(P.Code);
-  Driver.MarkingOnly := P.IsAccounted;
-  Result := Driver.FNBindMarkingItem;
+  Command := #$FF#$67 + IntToBin(FUsrPassword, 4) + Chr(Length(P.Code)) + P.Code;
+  if P.IsAccounted then
+    Command := Command + #$FF;
+  Result := ExecuteData(Command, Answer);
   if Result = 0 then
   begin
-    R.ItemCode := Driver.MarkingType;
-    R.CodeType := Driver.MarkingTypeEx;
-    R.CheckResult.LocalCheckResult := 0;
-    R.CheckResult.LocalCheckError := 0;
-    R.CheckResult.SymbolicType := Driver.MarkingType;
-    R.CheckResult.DataLength := 0;
-    R.CheckResult.FSResultCode := 0;
-    R.CheckResult.ServerCheckStatus := Driver.KMServerCheckingStatus;
-    R.CheckResult.ServerTLVData := AnsiString(Driver.TagValueStr);
+    CheckMinLength(Answer, 3);
+    R.ItemCode := BinToInt(Answer, 1, 2);
+    R.CodeType := BinToInt(Answer, 3, 1);
+    if Length(Answer) >= 7 then
+    begin
+      R.CheckResult.LocalCheckResult := Ord(Answer[4]);
+      R.CheckResult.LocalCheckError := Ord(Answer[5]);
+      R.CheckResult.SymbolicType := Ord(Answer[6]);
+      R.CheckResult.DataLength := Ord(Answer[7]);
+      if R.CheckResult.DataLength > 1 then
+      begin
+        R.CheckResult.FSResultCode := Ord(Answer[8]);
+        R.CheckResult.ServerCheckStatus := Ord(Answer[9]);
+        R.CheckResult.ServerTLVData := Copy(Answer, 10, Length(Answer));
+      end;
+    end;
   end;
 end;
 
