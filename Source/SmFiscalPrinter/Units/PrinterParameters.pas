@@ -17,6 +17,7 @@ const
 
   DriverTypeInternal      = 0;
   DriverTypeShtrihDriver  = 1;
+  DriverTypeRRElectro     = 2;
   DefDriverType = DriverTypeInternal;
 
   /////////////////////////////////////////////////////////////////////////////

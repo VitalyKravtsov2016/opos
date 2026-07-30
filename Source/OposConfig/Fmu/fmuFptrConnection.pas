@@ -61,6 +61,7 @@ type
   private
     FModels: TPrinterModels;
     procedure UpdateModels;
+    procedure InitDriverTypes;
   public
     procedure UpdatePage; override;
     procedure UpdateObject; override;
@@ -125,13 +126,31 @@ begin
   cbModel.Items.EndUpdate;
 end;
 
+procedure TfmFptrConnection.InitDriverTypes;
+begin
+  // Order must match DriverType* constants in PrinterParameters
+  cbDriverType.Items.BeginUpdate;
+  try
+    cbDriverType.Items.Clear;
+    cbDriverType.Items.Add('Internal');            // DriverTypeInternal
+    cbDriverType.Items.Add('SHTRIH-M DrvFR');       // DriverTypeShtrihDriver
+    cbDriverType.Items.Add('RR-Electro KKTDrv');   // DriverTypeRRElectro
+  finally
+    cbDriverType.Items.EndUpdate;
+  end;
+end;
+
 procedure TfmFptrConnection.UpdatePage;
 var
   Index: Integer;
 begin
   UpdateModels;
   cbConnectionType.ItemIndex := Parameters.ConnectionType;
-  cbDriverType.ItemIndex := Parameters.DriverType;
+  if (Parameters.DriverType >= 0) and
+     (Parameters.DriverType < cbDriverType.Items.Count) then
+    cbDriverType.ItemIndex := Parameters.DriverType
+  else
+    cbDriverType.ItemIndex := DriverTypeInternal;
   cbPrinterProtocol.ItemIndex := Parameters.PrinterProtocol;
   edtRemoteHost.Text := Parameters.RemoteHost;
   seRemotePort.Value := Parameters.RemotePort;
@@ -157,7 +176,10 @@ end;
 procedure TfmFptrConnection.UpdateObject;
 begin
   Parameters.ConnectionType := cbConnectionType.ItemIndex;
-  Parameters.DriverType := cbDriverType.ItemIndex;
+  if cbDriverType.ItemIndex >= 0 then
+    Parameters.DriverType := cbDriverType.ItemIndex
+  else
+    Parameters.DriverType := DriverTypeInternal;
   Parameters.PrinterProtocol := cbPrinterProtocol.ItemIndex;
   Parameters.RemoteHost := edtRemoteHost.Text;
   Parameters.RemotePort := seRemotePort.Value;
@@ -182,6 +204,7 @@ end;
 procedure TfmFptrConnection.FormCreate(Sender: TObject);
 begin
   CreatePorts(cbComPort.Items);
+  InitDriverTypes;
 end;
 
 end.

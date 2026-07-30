@@ -233,9 +233,6 @@ object fmFptrConnection: TfmFptrConnection
       Anchors = [akLeft, akTop, akRight]
       ItemHeight = 13
       TabOrder = 1
-      Items.Strings = (
-        'Internal'
-        'SHTRIH-M DrvFR')
     end
   end
   object gbPassword: TTntGroupBox

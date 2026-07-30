@@ -18,10 +18,12 @@
 #define OleConst_sNoRunningObject 64791
 #define untDriver_SCommandNotSupportedInMode 64792
 #define untDriver_SCommandNotSupportedInSubMode 64793
-#define DBConsts_SBcdOverflow 64794
-#define DBConsts_SInvalidBcdValue 64795
-#define DBConsts_SCouldNotParseTimeStamp 64796
-#define DBConsts_SInvalidSqlTimeStamp 64797
+#define untDriverRR_SCommandNotSupportedInMode 64794
+#define untDriverRR_SCommandNotSupportedInSubMode 64795
+#define DBConsts_SBcdOverflow 64796
+#define DBConsts_SInvalidBcdValue 64797
+#define DBConsts_SCouldNotParseTimeStamp 64798
+#define DBConsts_SInvalidSqlTimeStamp 64799
 #define IdResourceStringsCore_RSICMPConvUnsupportedTransportProtocol 64800
 #define IdResourceStringsCore_RSICMPConvOverallLengthExceeded 64801
 #define IdResourceStringsCore_RSICMPConvIPHeaderLengthExceeded 64802
@@ -770,6 +772,8 @@ BEGIN
 	OleConst_sNoRunningObject,	"Unable to retrieve a pointer to a running object registered with OLE for %s/%s"
 	untDriver_SCommandNotSupportedInMode,	"Команда не поддерживается в данном режиме"
 	untDriver_SCommandNotSupportedInSubMode,	"Команда не поддерживается в данном подрежиме"
+	untDriverRR_SCommandNotSupportedInMode,	"Команда не поддерживается в данном режиме"
+	untDriverRR_SCommandNotSupportedInSubMode,	"Команда не поддерживается в данном подрежиме"
 	DBConsts_SBcdOverflow,	"BCD overflow"
 	DBConsts_SInvalidBcdValue,	"%s is not a valid BCD value"
 	DBConsts_SCouldNotParseTimeStamp,	"Could not parse SQL TimeStamp string"

@@ -90,6 +90,7 @@ uses
   PrinterParametersX in 'Units\PrinterParametersX.pas',
   PrinterParametersRegIBT in 'Units\PrinterParametersRegIBT.pas',
   FiscalPrinterDriver in 'Units\FiscalPrinterDriver.pas',
+  FiscalPrinterDriverRR in 'Units\FiscalPrinterDriverRR.pas',
   PrinterParametersReg in 'Units\PrinterParametersReg.pas',
   DriverError in '..\Shared\DriverError.pas',
   StringUtils in '..\Shared\StringUtils.pas',
@@ -177,6 +178,8 @@ uses
   FiscalPrinterDevice in 'Units\FiscalPrinterDevice.pas',
   untDriver in '..\Shared\untDriver.pas',
   DrvFRLib_TLB in '..\Shared\DrvFRLib_TLB.pas',
+  untDriverRR in '..\Shared\untDriverRR.pas',
+  KKTDrvLib_TLB in '..\Shared\KKTDrvLib_TLB.pas',
   BinUtils in '..\Shared\BinUtils.pas';
 
 exports

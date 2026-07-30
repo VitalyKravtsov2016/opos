@@ -10,7 +10,8 @@ uses
   // Opos
   Opos, OposFptr, OposFptrUtils, OposException, OposSemaphore,
   // This
-  FiscalPrinterDevice, FiscalPrinterDriver, PrinterTypes, PrinterConnection,
+  FiscalPrinterDevice, FiscalPrinterDriver, FiscalPrinterDriverRR,
+  PrinterTypes, PrinterConnection,
   LogFile, SerialPorts, StringUtils, FiscalPrinterStatistics,
   FiscalPrinterTypes, FixedStrings, FileUtils, DeviceTables, CommunicationError,
   PrinterProtocol1, PrinterProtocol2, TCPConnection, DCOMConnection, VSysUtils,
@@ -310,10 +311,14 @@ function TSharedPrinter.GetDevice: IFiscalPrinterDevice;
 begin
   if FDevice = nil then
   begin
-    if Parameters.DriverType = DriverTypeInternal then
-      FDevice := TFiscalPrinterDevice.Create(Context, CreateConnection)
+    case Parameters.DriverType of
+      DriverTypeShtrihDriver:
+        FDevice := TFiscalPrinterDriver.Create(Context);
+      DriverTypeRRElectro:
+        FDevice := TFiscalPrinterDriverRR.Create(Context);
     else
-      FDevice := TFiscalPrinterDriver.Create(Context);
+      FDevice := TFiscalPrinterDevice.Create(Context, CreateConnection);
+    end;
 
     FDevice.OnConnect := DeviceConnect;
     FDevice.OnDisconnect := DeviceDisconnect;
