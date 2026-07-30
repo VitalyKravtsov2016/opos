@@ -1,8 +1,8 @@
 unit duMarkedReceiptDrivers;
 
-{ Acceptance test: print a marked receipt via three IFiscalPrinterDevice
+{ Acceptance test: print a marked receipt via IFiscalPrinterDevice
   implementations and compare protocol bytes captured by TFiscalPrinterEmulator
-  on Com0Com (driver COM5 <-> emulator COM6). Baseline = FiscalPrinterDevice. }
+  on Com0Com. Baseline = FiscalPrinterDevice (Internal). }
 
 interface
 
@@ -13,7 +13,8 @@ uses
   TestFramework,
   // This
   FiscalPrinterEmulator, FiscalPrinterTypes, FiscalPrinterDevice,
-  FiscalPrinterDriver, FiscalPrinterDriverRR, DriverContext, PrinterParameters,
+  FiscalPrinterDriver, FiscalPrinterDriverRR, FiscalPrinterDriverTB,
+  DriverContext, PrinterParameters,
   PrinterTypes, PrinterProtocol1, SerialPort, PrinterPort, PrinterConnection,
   StringUtils, LogFile, FileUtils;
 
@@ -24,7 +25,7 @@ type
   private
     FEmu: TFiscalPrinterEmulator;
     FContext: TDriverContext;
-    FLogs: array[0..2] of TStringList;
+    FLogs: array[0..3] of TStringList;
 
     function CreateDevice(DriverType: Integer): IFiscalPrinterDevice;
     procedure ConfigureParameters;
@@ -36,7 +37,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
-    procedure CheckMarkedReceiptOnThreeDrivers;
+    procedure CheckMarkedReceiptOnDrivers;
   end;
 
 implementation
@@ -59,7 +60,7 @@ var
 begin
   CoInitialize(nil);
 
-  for i := 0 to 2 do
+  for i := Low(FLogs) to High(FLogs) do
     FLogs[i] := TStringList.Create;
 
   FEmu := TFiscalPrinterEmulator.Create;
@@ -84,7 +85,7 @@ begin
     FEmu := nil;
   end;
 
-  for i := 0 to 2 do
+  for i := Low(FLogs) to High(FLogs) do
   begin
     FLogs[i].Free;
     FLogs[i] := nil;
@@ -120,17 +121,12 @@ begin
   FContext.Parameters.DriverType := DriverType;
   case DriverType of
     DriverTypeShtrihDriver:
-      begin
-        // Poscenter Addin.DrvFR returns -70 "command not supported by driver"
-        // for OpenCheck/FNOperation/ExchangeBytes against this stub FR.
-        // For TX parity use the same Protocol1 stack as Internal.
-        Port := GetSerialPort(DriverPort, FContext.Logger);
-        Port.BaudRate := BaudRate;
-        Conn := TPrinterProtocol1.Create(FContext.Logger, Port);
-        Result := TFiscalPrinterDevice.Create(FContext, Conn);
-      end;
+      Result := TFiscalPrinterDriver.Create(FContext);
     DriverTypeRRElectro:
       Result := TFiscalPrinterDriverRR.Create(FContext);
+    DriverTypeTorgBalance:
+      // TorgBalance DrvFR5: c:\Program Files (x86)\TorgBalance\DrvFR5\Bin\DrvFR.dll
+      Result := TFiscalPrinterDriverTB.Create(FContext);
   else
     Port := GetSerialPort(DriverPort, FContext.Logger);
     Port.BaudRate := BaudRate;
@@ -261,27 +257,30 @@ begin
   FLogs[0].SaveToFile(Path + 'baseline_internal.tx');
   FLogs[1].SaveToFile(Path + 'shtrih_drvfr.tx');
   FLogs[2].SaveToFile(Path + 'rr_kktdrv.tx');
+  FLogs[3].SaveToFile(Path + 'torgbalance_drvfr.tx');
 end;
 
-procedure TMarkedReceiptDriversTest.CheckMarkedReceiptOnThreeDrivers;
+procedure TMarkedReceiptDriversTest.CheckMarkedReceiptOnDrivers;
 var
   Device: IFiscalPrinterDevice;
   Baseline, Other: string;
   i: Integer;
-  DriverTypes: array[0..2] of Integer;
-  Names: array[0..2] of string;
+  DriverTypes: array[0..3] of Integer;
+  Names: array[0..3] of string;
   Raw: string;
   MarkHex: string;
 begin
   DriverTypes[0] := DriverTypeInternal;
   DriverTypes[1] := DriverTypeShtrihDriver;
   DriverTypes[2] := DriverTypeRRElectro;
+  DriverTypes[3] := DriverTypeTorgBalance;
   Names[0] := 'Internal';
   Names[1] := 'SHTRIH-M DrvFR';
   Names[2] := 'RR-Electro KKTDrv';
+  Names[3] := 'TorgBalance DrvFR5';
   MarkHex := StrToHexText(AnsiString(TestMarkCode));
 
-  for i := 0 to 2 do
+  for i := Low(DriverTypes) to High(DriverTypes) do
   begin
     FEmu.ClearLog;
     Device := CreateDevice(DriverTypes[i]);
@@ -316,7 +315,7 @@ begin
   Check(Pos('FF67', UpperCase(Baseline)) > 0,
     'Baseline must contain FF67 (bind marking)');
 
-  for i := 1 to 2 do
+  for i := 1 to High(DriverTypes) do
   begin
     Other := NormalizeLog(FLogs[i]);
     if Baseline <> Other then

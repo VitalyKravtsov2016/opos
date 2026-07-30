@@ -1,10 +1,10 @@
-program SmFiscalPrinterTest;
+program RunMarkedReceiptTest;
 
 uses
-  FastMM4,
+  
   Forms,
   TestFramework,
-  GUITestRunner,
+  TextTestRunner,
   LogFile in '..\..\Source\Shared\LogFile.pas',
   Opos in '..\..\Source\Opos\OPOS.pas',
   OposUtils in '..\..\Source\Opos\OposUtils.pas',
@@ -238,5 +238,6 @@ uses
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}
 
 begin
-  TGUITestRunner.RunTest(RegisteredTests);
+  if not TextTestRunner.RunRegisteredTests.WasSuccessful then Halt(1) else Halt(0);
 end.
+

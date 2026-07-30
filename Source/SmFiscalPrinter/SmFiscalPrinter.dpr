@@ -91,6 +91,7 @@ uses
   PrinterParametersRegIBT in 'Units\PrinterParametersRegIBT.pas',
   FiscalPrinterDriver in 'Units\FiscalPrinterDriver.pas',
   FiscalPrinterDriverRR in 'Units\FiscalPrinterDriverRR.pas',
+  FiscalPrinterDriverTB in 'Units\FiscalPrinterDriverTB.pas',
   PrinterParametersReg in 'Units\PrinterParametersReg.pas',
   DriverError in '..\Shared\DriverError.pas',
   StringUtils in '..\Shared\StringUtils.pas',

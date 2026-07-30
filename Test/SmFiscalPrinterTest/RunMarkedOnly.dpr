@@ -1,10 +1,11 @@
-program SmFiscalPrinterTest;
+program RunMarkedOnly;
+{$APPTYPE CONSOLE}
 
 uses
-  FastMM4,
+  SysUtils,
   Forms,
   TestFramework,
-  GUITestRunner,
+  TextTestRunner,
   LogFile in '..\..\Source\Shared\LogFile.pas',
   Opos in '..\..\Source\Opos\OPOS.pas',
   OposUtils in '..\..\Source\Opos\OposUtils.pas',
@@ -234,9 +235,19 @@ uses
   FiscalPrinterEmulator in '..\AcceptanceTest\Units\FiscalPrinterEmulator.pas',
   duMarkedReceiptDrivers in '..\AcceptanceTest\Units\duMarkedReceiptDrivers.pas';
 
-{$R *.RES}
+{$R SmFiscalPrinterTest.RES}
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}
 
 begin
-  TGUITestRunner.RunTest(RegisteredTests);
+    with TextTestRunner.RunTest(TMarkedReceiptDriversTest.Suite) do
+  begin
+    WriteLn(Format('Runs=%d Failures=%d Errors=%d', [RunCount, FailureCount, ErrorCount]));
+    if FailureCount + ErrorCount = 0 then
+      Halt(0)
+    else
+      Halt(1);
+  end;
 end.
+
+
+

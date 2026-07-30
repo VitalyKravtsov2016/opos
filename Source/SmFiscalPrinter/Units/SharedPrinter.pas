@@ -11,6 +11,7 @@ uses
   Opos, OposFptr, OposFptrUtils, OposException, OposSemaphore,
   // This
   FiscalPrinterDevice, FiscalPrinterDriver, FiscalPrinterDriverRR,
+  FiscalPrinterDriverTB,
   PrinterTypes, PrinterConnection,
   LogFile, SerialPorts, StringUtils, FiscalPrinterStatistics,
   FiscalPrinterTypes, FixedStrings, FileUtils, DeviceTables, CommunicationError,
@@ -316,6 +317,8 @@ begin
         FDevice := TFiscalPrinterDriver.Create(Context);
       DriverTypeRRElectro:
         FDevice := TFiscalPrinterDriverRR.Create(Context);
+      DriverTypeTorgBalance:
+        FDevice := TFiscalPrinterDriverTB.Create(Context);
     else
       FDevice := TFiscalPrinterDevice.Create(Context, CreateConnection);
     end;

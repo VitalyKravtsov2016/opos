@@ -100,7 +100,7 @@ var
   ModelData: TPrinterModelRec;
 begin
   cbModel.Items.BeginUpdate;
-  Reader := TXmlModelReader.Create(FModels);
+  Reader := TXmlModelReader.Create(FModels, Logger);
   try
     cbModel.Items.Clear;
     FileName := GetModulePath + ModelsFileName;
@@ -132,9 +132,10 @@ begin
   cbDriverType.Items.BeginUpdate;
   try
     cbDriverType.Items.Clear;
-    cbDriverType.Items.Add('Internal');            // DriverTypeInternal
-    cbDriverType.Items.Add('SHTRIH-M DrvFR');       // DriverTypeShtrihDriver
-    cbDriverType.Items.Add('RR-Electro KKTDrv');   // DriverTypeRRElectro
+    cbDriverType.Items.Add('Internal');              // DriverTypeInternal
+    cbDriverType.Items.Add('SHTRIH-M DrvFR');         // DriverTypeShtrihDriver
+    cbDriverType.Items.Add('RR-Electro KKTDrv');     // DriverTypeRRElectro
+    cbDriverType.Items.Add('TorgBalance DrvFR5');    // DriverTypeTorgBalance
   finally
     cbDriverType.Items.EndUpdate;
   end;
