@@ -1160,7 +1160,8 @@ type
   TFSCloseReceiptParams2 = record
     Payments: TPayments;
     Discount: Byte;
-    TaxAmount: array [1..10] of Int64;
+    // 1..10 Ч как FF76/FNCloseCheckEx3; 11..12 Ч Ќƒ— 22% / 22/122 (FNCloseCheckEx4)
+    TaxAmount: array [1..12] of Int64;
     TaxSystem: Byte;
     Text: WideString;
   end;

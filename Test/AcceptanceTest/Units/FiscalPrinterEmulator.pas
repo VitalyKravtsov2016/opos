@@ -1,7 +1,8 @@
 unit FiscalPrinterEmulator;
 
-{ Serial fiscal printer emulator (Protocol 1) for acceptance tests.
-  Listens on a COM port (one side of Com0Com) and answers Shtrih/FS commands. }
+{ Serial fiscal printer emulators (Protocol 1) for acceptance tests.
+  Transport/framing is shared; model-specific command sets live in subclasses
+  (close receipt codes, F7 layout, FC model id, serial tables, etc.). }
 
 interface
 
@@ -12,7 +13,14 @@ uses
   StringUtils;
 
 type
-  { TFiscalPrinterEmulator }
+  TFrEmulatorKind = (
+    ekShtrih,       // Internal / generic SHTRIH-M
+    ekPosCenter,    // PosCenter DrvKKT — close Ex4 = FF7B
+    ekTorgBalance,  // TorgBalance DrvFR5 — close Ex4 = FF78
+    ekRRElectro     // RR-Electro KKTDrv
+  );
+
+  { TFiscalPrinterEmulator — Protocol 1 base (default = SHTRIH-M profile) }
 
   TFiscalPrinterEmulator = class
   private
@@ -25,16 +33,6 @@ type
     FLock: TCriticalSection;
     FCommands: TStringList;
     FPendingAnswer: AnsiString;
-    FMode: Byte;
-    FSubMode: Byte;
-    FFlags: Word;
-    FDocNumber: Word;
-    FDayNumber: Word;
-    FOperator: Byte;
-    FReceiptOpened: Boolean;
-    FReceiptTotal: Int64;
-    FLastMarkCode: AnsiString;
-    FFSDocNumber: Integer;
     FTimeoutMs: DWORD;
 
     procedure OpenPort;
@@ -46,12 +44,35 @@ type
     function EncodeFrame(const Data: AnsiString): AnsiString;
     function FrameCRC(const LenAndData: AnsiString): Byte;
     function ProcessPayload(const Payload: AnsiString): AnsiString;
-    function BuildAnswer(CommandCode: Integer; const Body: AnsiString): AnsiString;
     procedure LogCommand(CommandCode: Integer; const Payload: AnsiString);
     procedure HandleSession;
     function ThreadProc: DWORD;
+  protected
+    FMode: Byte;
+    FSubMode: Byte;
+    FFlags: Word;
+    FDocNumber: Word;
+    FDayNumber: Word;
+    FOperator: Byte;
+    FReceiptOpened: Boolean;
+    FReceiptTotal: Int64;
+    FLastMarkCode: AnsiString;
+    FFSDocNumber: Integer;
+
+    function BuildAnswer(CommandCode: Integer; const Body: AnsiString): AnsiString;
+    function AnswerCloseReceipt(CommandCode: Integer): AnsiString;
+    function IsCharTableField(Table, Field: Integer): Boolean; virtual;
+    function ReadTableValue(Table, Row, Field: Integer): AnsiString; virtual;
+
+    { Model profile }
+    function GetModelID: Byte; virtual;
+    function GetDeviceName: AnsiString; virtual;
+    function GetSerialNumber: AnsiString; virtual;
+    function BuildF7Body: AnsiString; virtual;
+    function IsCloseReceiptCommand(CommandCode: Integer): Boolean; virtual;
+    function GetEmulatorKind: TFrEmulatorKind; virtual;
   public
-    constructor Create;
+    constructor Create; virtual;
     destructor Destroy; override;
 
     procedure Start(APortNumber: Integer; ABaudRate: Integer = 115200);
@@ -62,10 +83,50 @@ type
     function GetCommandLogLines: TStrings;
 
     property PortNumber: Integer read FPortNumber;
+    property EmulatorKind: TFrEmulatorKind read GetEmulatorKind;
     function IsRunning: Boolean;
   end;
 
+  { Internal / generic SHTRIH-M: FF45 / FF76 }
+
+  TShtrihFrEmulator = class(TFiscalPrinterEmulator)
+  protected
+    function GetEmulatorKind: TFrEmulatorKind; override;
+    function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
+    function BuildF7Body: AnsiString; override;
+  end;
+
+  { PosCenter DrvKKT: FF45 / FF76 / FF7B (Ex4), model 247, extended F7 }
+
+  TPosCenterFrEmulator = class(TFiscalPrinterEmulator)
+  protected
+    function GetEmulatorKind: TFrEmulatorKind; override;
+    function GetModelID: Byte; override;
+    function GetDeviceName: AnsiString; override;
+    function BuildF7Body: AnsiString; override;
+    function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
+    function IsCharTableField(Table, Field: Integer): Boolean; override;
+  end;
+
+  { TorgBalance DrvFR5: FF45 / FF76 / FF78 (Ex4 on wire) }
+
+  TTorgBalanceFrEmulator = class(TFiscalPrinterEmulator)
+  protected
+    function GetEmulatorKind: TFrEmulatorKind; override;
+    function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
+  end;
+
+  { RR-Electro KKTDrv }
+
+  TRRElectroFrEmulator = class(TFiscalPrinterEmulator)
+  protected
+    function GetEmulatorKind: TFrEmulatorKind; override;
+    function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
+  end;
+
 function EmulatorThreadFunc(Param: Pointer): DWORD; stdcall;
+function CreateFrEmulator(Kind: TFrEmulatorKind): TFiscalPrinterEmulator;
+function FrEmulatorKindToName(Kind: TFrEmulatorKind): string;
 
 implementation
 
@@ -84,6 +145,28 @@ begin
   Result := TFiscalPrinterEmulator(Param).ThreadProc;
 end;
 
+function FrEmulatorKindToName(Kind: TFrEmulatorKind): string;
+begin
+  case Kind of
+    ekPosCenter:   Result := 'PosCenter';
+    ekTorgBalance: Result := 'TorgBalance';
+    ekRRElectro:   Result := 'RR-Electro';
+  else
+    Result := 'SHTRIH-M';
+  end;
+end;
+
+function CreateFrEmulator(Kind: TFrEmulatorKind): TFiscalPrinterEmulator;
+begin
+  case Kind of
+    ekPosCenter:   Result := TPosCenterFrEmulator.Create;
+    ekTorgBalance: Result := TTorgBalanceFrEmulator.Create;
+    ekRRElectro:   Result := TRRElectroFrEmulator.Create;
+  else
+    Result := TShtrihFrEmulator.Create;
+  end;
+end;
+
 { TFiscalPrinterEmulator }
 
 constructor TFiscalPrinterEmulator.Create;
@@ -95,7 +178,7 @@ begin
   FThread := 0;
   FMode := MODE_24NOTOVER;
   FSubMode := 0;
-  FFlags := $0002; // receipt paper present (typical)
+  FFlags := $0002; // receipt paper present
   FDocNumber := 1;
   FDayNumber := 1;
   FOperator := 1;
@@ -109,6 +192,77 @@ begin
   FCommands.Free;
   FLock.Free;
   inherited Destroy;
+end;
+
+function TFiscalPrinterEmulator.GetEmulatorKind: TFrEmulatorKind;
+begin
+  Result := ekShtrih;
+end;
+
+function TFiscalPrinterEmulator.GetModelID: Byte;
+begin
+  Result := 27; // FN-capable
+end;
+
+function TFiscalPrinterEmulator.GetDeviceName: AnsiString;
+begin
+  Result := 'SHTRIH-M FR';
+end;
+
+function TFiscalPrinterEmulator.GetSerialNumber: AnsiString;
+begin
+  Result := '0212280008053991';
+end;
+
+function TFiscalPrinterEmulator.BuildF7Body: AnsiString;
+begin
+  // Short generic F7 (flags + fonts + passwords + graphics)
+  Result :=
+    IntToBin(0, 8) +
+    #42 + #42 +
+    #0 +
+    #12 + #12 +
+    #12 + #12 +
+    IntToBin(0, 4) +
+    IntToBin(30, 4) +
+    #0 +
+    #1 +
+    IntToBin(64, 2) +
+    #40 +
+    #64 +
+    IntToBin(200, 2);
+end;
+
+function TFiscalPrinterEmulator.IsCloseReceiptCommand(CommandCode: Integer): Boolean;
+begin
+  Result := (CommandCode = $FF45) or (CommandCode = $FF76);
+end;
+
+function TFiscalPrinterEmulator.IsCharTableField(Table, Field: Integer): Boolean;
+begin
+  Result := (Table = 0) or ((Table = 6) and (Field = 2));
+end;
+
+function TFiscalPrinterEmulator.ReadTableValue(Table, Row, Field: Integer): AnsiString;
+begin
+  if Table = 0 then
+    Result := Copy(GetSerialNumber + StringOfChar(' ', 40), 1, 40)
+  else if IsCharTableField(Table, Field) then
+    Result := Copy('STRING' + StringOfChar(' ', 40), 1, 40)
+  else
+    Result := #0#0#0#0;
+end;
+
+function TFiscalPrinterEmulator.AnswerCloseReceipt(CommandCode: Integer): AnsiString;
+var
+  Body: AnsiString;
+begin
+  FReceiptOpened := False;
+  FMode := MODE_24NOTOVER;
+  Inc(FDocNumber);
+  Inc(FFSDocNumber);
+  Body := #0 + IntToBin(0, 5) + IntToBin(FFSDocNumber, 4) + IntToBin(1, 4);
+  Result := BuildAnswer(CommandCode, Body);
 end;
 
 procedure TFiscalPrinterEmulator.ClearLog;
@@ -138,7 +292,7 @@ end;
 
 function TFiscalPrinterEmulator.IsRunning: Boolean;
 begin
-  Result := FThread <> 0;
+  Result := (FThread <> 0) and (not FStop);
 end;
 
 procedure TFiscalPrinterEmulator.OpenPort;
@@ -275,7 +429,6 @@ procedure TFiscalPrinterEmulator.LogCommand(CommandCode: Integer;
 var
   Line: string;
 begin
-  // Skip only short status poll from comparison log (keep long status for diag)
   if CommandCode = $10 then
     Exit;
 
@@ -300,6 +453,7 @@ var
   MarkLen: Integer;
   NowDT: TDateTime;
   Y, M, D, H, N, S, MS: Word;
+  Table, Field: Integer;
 begin
   Result := '';
   if Length(Payload) < 1 then
@@ -319,54 +473,53 @@ begin
 
   LogCommand(Code, Data);
 
+  if IsCloseReceiptCommand(Code) then
+  begin
+    Result := AnswerCloseReceipt(Code);
+    Exit;
+  end;
+
   case Code of
-    $10: // Short status (answer LEN=16: cmd+result+14 fields)
+    $10:
       begin
         Body := #0 + AnsiChar(FOperator) +
           IntToBin(FFlags, 2) +
           AnsiChar(FMode) +
           AnsiChar(FSubMode) +
-          #0 +              // ops lo
-          #100 +            // battery
-          #220 +            // power
-          #0 +              // FM error
-          #0 +              // EKLZ error
-          #0 +              // ops hi
-          #0#0#0;           // reserved
+          #0 + #100 + #220 + #0 + #0 + #0 + #0#0#0;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $11: // Long status (result + 47 bytes fields ≈ 48 total)
+    $11:
       begin
         NowDT := Now;
         DecodeDate(NowDT, Y, M, D);
         DecodeTime(NowDT, H, N, S, MS);
         Body := #0 + AnsiChar(FOperator) +
-          '1' + '0' +                     // firmware version hi/lo
-          IntToBin(100, 2) +              // build
+          '1' + '0' +
+          IntToBin(100, 2) +
           AnsiChar(D) + AnsiChar(M) + AnsiChar(Y mod 100) +
-          #1 +                            // logical number
+          #1 +
           IntToBin(FDocNumber, 2) +
           IntToBin(FFlags, 2) +
           AnsiChar(FMode) +
           AnsiChar(FSubMode) +
-          #1 +                            // port
-          '1' + '0' +                     // FM version
+          #1 +
+          '1' + '0' +
           IntToBin(1, 2) +
           AnsiChar(D) + AnsiChar(M) + AnsiChar(Y mod 100) +
           AnsiChar(D) + AnsiChar(M) + AnsiChar(Y mod 100) +
           AnsiChar(H) + AnsiChar(N) + AnsiChar(S) +
-          #$40 +                          // FM flags: day opened
-          IntToBin(123456, 4) +           // serial
+          #$40 +
+          IntToBin(123456, 4) +
           IntToBin(FDayNumber, 2) +
-          IntToBin(2000, 2) +             // free records
-          #1 +                            // last fisc number (1 byte)
-          #15 +                           // free fisc records (1 byte)
-          #0#0#0#0#0#0;                   // INN
+          IntToBin(2000, 2) +
+          #1 + #15 +
+          #0#0#0#0#0#0;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $62: // FM totals
+    $62:
       begin
         Body := #0 + AnsiChar(FOperator) +
           IntToBin(0, 8) +
@@ -376,58 +529,42 @@ begin
         Result := BuildAnswer(Code, Body);
       end;
 
-    $FC: // Device metrics
+    $FC:
       begin
         Body := #0 +
-          #0 + #0 +       // type/subtype
-          #1 + #4 +       // protocol 1.4
-          #27 +           // model with FN (IsModelType2)
-          #0 +            // language RU
-          'SHTRIH-M FR';
+          #0 + #0 +
+          #1 + #4 +
+          AnsiChar(GetModelID) +
+          #0 +
+          GetDeviceName;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $F7: // Read printer parameters / flags (F7 01)
+    $F7:
       begin
-        // Flags(8) + Font1 + Font2 + GraphStart + InnDigits + RnmDigits +
-        // LongRnm + LongSerial + DefTaxPwd(4) + DefSysPwd(4) + BT + TaxField +
-        // MaxCmdLen(2) + GraphWidth + Graph512Width + Graph512Height(2)
-        Body := #0 +
-          IntToBin(0, 8) +  // flags
-          #42 + #42 +       // font widths
-          #0 +              // graphics start line
-          #12 + #12 +       // INN/RNM digits
-          #12 + #12 +       // long RNM/serial digits
-          IntToBin(0, 4) +  // def tax password
-          IntToBin(30, 4) + // def sys password
-          #0 +              // bluetooth table
-          #1 +              // tax field number
-          IntToBin(64, 2) + // max command length
-          #40 +             // graphics width bytes
-          #64 +             // graphics 512 width
-          IntToBin(200, 2); // graphics 512 height
+        Body := #0 + BuildF7Body;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $8D: // Open receipt
+    $8D:
       begin
         FReceiptOpened := True;
         FReceiptTotal := 0;
-        FMode := MODE_REC; // sale receipt
+        FMode := MODE_REC;
         if Length(Data) >= 5 then
         begin
           case Ord(Data[5]) of
-            0: FMode := $08; // sell
-            1: FMode := $18; // buy
-            2: FMode := $28; // ret sell
-            3: FMode := $38; // ret buy
+            0: FMode := $08;
+            1: FMode := $18;
+            2: FMode := $28;
+            3: FMode := $38;
           end;
         end;
         Body := #0 + AnsiChar(FOperator);
         Result := BuildAnswer(Code, Body);
       end;
 
-    $85: // Close receipt (classic)
+    $85:
       begin
         FReceiptOpened := False;
         FMode := MODE_24NOTOVER;
@@ -436,20 +573,20 @@ begin
         Result := BuildAnswer(Code, Body);
       end;
 
-    $89: // Subtotal
+    $89:
       begin
         Body := #0 + AnsiChar(FOperator) + IntToBin(FReceiptTotal, 5);
         Result := BuildAnswer(Code, Body);
       end;
 
-    $E0: // Open session / day
+    $E0:
       begin
         FMode := MODE_24NOTOVER;
         Body := #0 + AnsiChar(FOperator);
         Result := BuildAnswer(Code, Body);
       end;
 
-    $2D: // Table structure
+    $2D:
       begin
         Body := #0 +
           Copy('TABLE' + StringOfChar(' ', 40), 1, 40) +
@@ -458,52 +595,44 @@ begin
         Result := BuildAnswer(Code, Body);
       end;
 
-    $2E: // Field structure (type: 0=BIN, 1=CHAR)
+    $2E:
       begin
-        // Table 0 (DrvFR model probe) and tax name → CHAR; else BIN
-        if (Length(Data) >= 6) and (
-             (Ord(Data[5]) = 0) or
-             ((Ord(Data[5]) = 6) and (Ord(Data[6]) = 2))) then
+        Table := 0;
+        Field := 1;
+        if Length(Data) >= 6 then
         begin
-          Body := #0 +
-            Copy('NAME' + StringOfChar(' ', 40), 1, 40) +
-            #1 + #40;
-        end else
-        begin
-          Body := #0 +
-            Copy('FIELD' + StringOfChar(' ', 40), 1, 40) +
-            #0 + #4 +
-            IntToBin(0, 4) +
-            IntToBin($7FFFFFFF, 4);
+          Table := Ord(Data[5]);
+          Field := Ord(Data[6]);
         end;
-        Result := BuildAnswer(Code, Body);
-      end;
-
-    $1F: // Read table value
-      begin
-        if (Length(Data) >= 8) and (
-             (Ord(Data[5]) = 0) or
-             ((Ord(Data[5]) = 6) and (Ord(Data[8]) = 2))) then
-          Body := #0 + Copy('RETAIL-01F' + StringOfChar(' ', 40), 1, 40)
+        if IsCharTableField(Table, Field) then
+          Body := #0 + Copy('NAME' + StringOfChar(' ', 40), 1, 40) + #1 + #40
         else
-          Body := #0 + #0#0#0#0;
+          Body := #0 + Copy('FIELD' + StringOfChar(' ', 40), 1, 40) +
+            #0 + #4 + IntToBin(0, 4) + IntToBin($7FFFFFFF, 4);
         Result := BuildAnswer(Code, Body);
       end;
 
-    $26: // Font metrics (no operator; ends with FontCount)
+    $1F:
       begin
-        Body := #0 +
-          IntToBin(42, 2) +  // print width
-          #12 +              // char width
-          #24 +              // char height
-          #1;                // font count
+        Table := 0;
+        Field := 1;
+        if Length(Data) >= 8 then
+        begin
+          Table := Ord(Data[5]);
+          Field := Ord(Data[8]);
+        end;
+        Body := #0 + ReadTableValue(Table, 1, Field);
         Result := BuildAnswer(Code, Body);
       end;
 
-    $FF01: // FS state (FSReadState layout, 30 bytes after result)
+    $26:
       begin
-        // State Document DocReceived DayOpened WarningFlags
-        // Date(YMD) Time(HM) FSNumber(16) DocNumber(4)
+        Body := #0 + IntToBin(42, 2) + #12 + #24 + #1;
+        Result := BuildAnswer(Code, Body);
+      end;
+
+    $FF01:
+      begin
         NowDT := Now;
         DecodeDate(NowDT, Y, M, D);
         DecodeTime(NowDT, H, N, S, MS);
@@ -516,46 +645,32 @@ begin
         Result := BuildAnswer(Code, Body);
       end;
 
-    $FF45, $FF76: // FS close receipt
+    $FF46:
       begin
-        FReceiptOpened := False;
-        FMode := MODE_24NOTOVER;
-        Inc(FDocNumber);
-        Inc(FFSDocNumber);
-        // Result + Change(5) + FSDocNum(4) + FiscalSign(4)
-        Body := #0 + IntToBin(0, 5) + IntToBin(FFSDocNumber, 4) + IntToBin(1, 4);
-        Result := BuildAnswer(Code, Body);
-      end;
-
-    $FF46: // FS sale V2
-      begin
-        // pwd(4)+type(1)+qty(6)+price(5)+total(5)...
         if Length(Data) >= 21 then
           FReceiptTotal := FReceiptTotal + BinToInt(Data, 17, 5);
         Body := #0;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $FF61: // Check item code
+    $FF61:
       begin
-        // LocalCheckResult, LocalCheckError, SymbolicType, DataLength(+optional)
         Body := #0 + #0 + #0 + #0 + #0;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $FF67: // Bind marking code
+    $FF67:
       begin
         if Length(Data) >= 5 then
         begin
           MarkLen := Ord(Data[5]);
           FLastMarkCode := Copy(Data, 6, MarkLen);
         end;
-        // ItemCode(2) + CodeType(1) + optional check block
         Body := #0 + IntToBin(1, 2) + #0 + #0 + #0 + #0 + #0;
         Result := BuildAnswer(Code, Body);
       end;
 
-    $FF69: // Accept / clear MC
+    $FF69:
       begin
         Body := #0;
         Result := BuildAnswer(Code, Body);
@@ -563,7 +678,6 @@ begin
 
   else
     begin
-      // Unknown command: success + padding (no operator — many cmds lack it)
       Body := #0 + StringOfChar(#0, 128);
       Result := BuildAnswer(Code, Body);
     end;
@@ -618,13 +732,12 @@ begin
         if Answer <> '' then
         begin
           FPendingAnswer := EncodeFrame(Answer);
-          // Host usually reads answer immediately after ACK of command
           WritePort(FPendingAnswer);
           FPendingAnswer := '';
         end;
       end;
   else
-    // ignore noise / $FF
+    // ignore noise
   end;
 end;
 
@@ -637,7 +750,6 @@ begin
       try
         HandleSession;
       except
-        // keep running; host may reopen port
         Sleep(10);
       end;
     end;
@@ -676,6 +788,92 @@ begin
     FThread := 0;
   end;
   ClosePort;
+end;
+
+{ TShtrihFrEmulator }
+
+function TShtrihFrEmulator.GetEmulatorKind: TFrEmulatorKind;
+begin
+  Result := ekShtrih;
+end;
+
+function TShtrihFrEmulator.IsCloseReceiptCommand(CommandCode: Integer): Boolean;
+begin
+  Result := (CommandCode = $FF45) or (CommandCode = $FF76);
+end;
+
+function TShtrihFrEmulator.BuildF7Body: AnsiString;
+begin
+  Result := inherited BuildF7Body;
+end;
+
+{ TPosCenterFrEmulator }
+
+function TPosCenterFrEmulator.GetEmulatorKind: TFrEmulatorKind;
+begin
+  Result := ekPosCenter;
+end;
+
+function TPosCenterFrEmulator.GetModelID: Byte;
+begin
+  Result := 247;
+end;
+
+function TPosCenterFrEmulator.GetDeviceName: AnsiString;
+begin
+  // cp1251: ШТРИХ-M-01Ф + padding (as in DrvKKT.log)
+  Result := #$D8#$D2#$D0#$C8#$D5'-M-01'#$D4'         ';
+end;
+
+function TPosCenterFrEmulator.BuildF7Body: AnsiString;
+begin
+  // Real PosCenter F7 from DrvKKT.log (extended), CapCashCore cleared
+  Result :=
+    #$5A#$A0#$00#$03#$20#$EC#$C1#$01 +
+    #$0C#$18#$01#$0C#$10 +
+    #$00#$00#$00#$00#$00 +
+    #$00#$1E#$00#$00#$00 +
+    #$00#$06#$FF#$00#$48#$40#$B6#$03 +
+    #$12#$13#$18#$11#$11#$19#$11 +
+    #$47#$30#$30#$33#$02#$01#$01#$00;
+end;
+
+function TPosCenterFrEmulator.IsCloseReceiptCommand(CommandCode: Integer): Boolean;
+begin
+  // Protocol v1.23: FF45 / FF76 / FF7B (Ex4)
+  Result := (CommandCode = $FF45) or (CommandCode = $FF76) or
+    (CommandCode = $FF7B);
+end;
+
+function TPosCenterFrEmulator.IsCharTableField(Table, Field: Integer): Boolean;
+begin
+  Result := inherited IsCharTableField(Table, Field) or (Table = 18);
+end;
+
+{ TTorgBalanceFrEmulator }
+
+function TTorgBalanceFrEmulator.GetEmulatorKind: TFrEmulatorKind;
+begin
+  Result := ekTorgBalance;
+end;
+
+function TTorgBalanceFrEmulator.IsCloseReceiptCommand(CommandCode: Integer): Boolean;
+begin
+  // Observed on wire: Ex4 = FF78 (not PosCenter FF7B)
+  Result := (CommandCode = $FF45) or (CommandCode = $FF76) or
+    (CommandCode = $FF78);
+end;
+
+{ TRRElectroFrEmulator }
+
+function TRRElectroFrEmulator.GetEmulatorKind: TFrEmulatorKind;
+begin
+  Result := ekRRElectro;
+end;
+
+function TRRElectroFrEmulator.IsCloseReceiptCommand(CommandCode: Integer): Boolean;
+begin
+  Result := (CommandCode = $FF45) or (CommandCode = $FF76);
 end;
 
 end.

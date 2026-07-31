@@ -1270,6 +1270,8 @@ begin
         CloseParams2.TaxAmount[8] := StrToInt64Def(Parameters.Parameter9, 0);
         CloseParams2.TaxAmount[9] := StrToInt64Def(Parameters.Parameter10, 0);
         CloseParams2.TaxAmount[10] := StrToInt64Def(Parameters.Parameter11, 0);
+        CloseParams2.TaxAmount[11] := StrToInt64Def(Parameters.Parameter12, 0); // НДС 22%
+        CloseParams2.TaxAmount[12] := StrToInt64Def(Parameters.Parameter13, 0); // НДС 22/122
         CloseParams2.TaxSystem := StrToInt64Def(Parameters.Parameter7, 0);
         CloseParams2.Text := Parameters.CloseRecText;
         Device.Check(Device.ReceiptClose2(CloseParams2, FCloseResult2));

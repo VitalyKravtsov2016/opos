@@ -49,6 +49,8 @@ type
   protected
     function ReceiptClose22(const P: TFSCloseReceiptParams2;
       var R: TFSCloseReceiptResult2): Integer;
+    function ReceiptClose4(const P: TFSCloseReceiptParams2;
+      var R: TFSCloseReceiptResult2): Integer;
     property Context: TDriverContext read FContext;
   public
     FFFDVersion: TFFDVersion;
@@ -1524,12 +1526,22 @@ end;
 
 procedure TFiscalPrinterDriver.PrintString(Flags: Byte;
   const Line: WideString);
+var
+  Code: Integer;
 begin
   FLogger.Debug(Format('PrintString(%d,''%s'')', [Flags, Line]));
 
+  WaitForPrinting;
   SetPrintFlags(Flags);
   Driver.StringForPrinting := Line;
-  Driver.Check(Driver.PrintString);
+  Code := Driver.PrintString;
+  // $50/580: previous command is still printing (DrvFR)
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.PrintString;
+  end;
+  Driver.Check(Code);
 end;
 
 function TFiscalPrinterDriver.OpenFiscalDay: Boolean;
@@ -1545,13 +1557,22 @@ end;
 
 
 procedure TFiscalPrinterDriver.PrintDocHeader(const DocName: WideString; DocNumber: Word);
+var
+  Code: Integer;
 begin
   FLogger.Debug(Format('PrintDocHeader(''%s'', %d)',
     [DocName, DocNumber]));
 
+  WaitForPrinting;
   Driver.DocumentName := DocName;
   Driver.DocumentNumber := DocNumber;
-  Driver.Check(Driver.PrintDocumentTitle);
+  Code := Driver.PrintDocumentTitle;
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.PrintDocumentTitle;
+  end;
+  Driver.Check(Code);
 end;
 
 procedure TFiscalPrinterDriver.StartTest(Interval: Byte);
@@ -1792,13 +1813,23 @@ begin
 end;
 
 procedure TFiscalPrinterDriver.CutPaper(CutType: Byte);
+var
+  Code: Integer;
 begin
   if not FParameters2.Flags.CapCutter then Exit;
   FLogger.Debug(Format('CutPaper(%d)', [CutType]));
 
-
+  WaitForPrinting;
   Driver.CutType := CutType = PRINTER_CUTTYPE_PARTIAL;
-  Driver.Check(Driver.CutCheck);
+  Code := Driver.CutCheck;
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.CutCheck;
+  end;
+  Driver.Check(Code);
+  // Cut starts paper feed; wait so nonfiscal/PrintNormal does not get 580
+  WaitForPrinting;
 end;
 
 procedure TFiscalPrinterDriver.FullCut;
@@ -1905,6 +1936,7 @@ procedure TFiscalPrinterDriver.PrintStringFont(Flags, Font: Byte;
   const Line: WideString);
 var
   Text: AnsiString;
+  Code: Integer;
 begin
   Text := Line;
   Flags := GetPrintFlags(Flags);
@@ -1913,11 +1945,18 @@ begin
   FLogger.Debug(Format('PrintStringFont(%d,%d, ''%s'')',
     [Flags, Font, Text]));
 
-
+  WaitForPrinting;
   SetPrintFlags(Flags);
   Driver.FontType := Font;
   Driver.StringForPrinting := Line;
-  Driver.Check(Driver.PrintStringWithFont);
+  Code := Driver.PrintStringWithFont;
+  // $50/580: previous command is still printing (DrvFR after CutPaper)
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.PrintStringWithFont;
+  end;
+  Driver.Check(Code);
 end;
 
 procedure TFiscalPrinterDriver.PrintXReport;
@@ -6066,10 +6105,14 @@ end;
 function TFiscalPrinterDriver.ReceiptClose2(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
+const
+  E_DRV_NOT_SUPPORTED = -70; // DrvFR: command not supported by driver
 begin
-  if FCapCloseReceipt3 then
-    Result := ReceiptClose3(P, R)
-  else
+  // PosCenter DrvFR: FNCloseCheckEx4 (VAT 22%/22/122), then Ex3
+  Result := ReceiptClose4(P, R);
+  if (Result = ERROR_COMMAND_NOT_SUPPORTED) or (Result = E_DRV_NOT_SUPPORTED) then
+    Result := ReceiptClose3(P, R);
+  if (Result = ERROR_COMMAND_NOT_SUPPORTED) or (Result = E_DRV_NOT_SUPPORTED) then
     Result := ReceiptClose22(P, R);
 end;
 
@@ -6115,6 +6158,7 @@ function TFiscalPrinterDriver.ReceiptClose3(
   const P: TFSCloseReceiptParams2;
   var R: TFSCloseReceiptResult2): Integer;
 begin
+  // FNCloseCheckEx3 — Руководство программиста ДККТ, TaxValue1..10
   Driver.Summ1 := IntToAmount(P.Payments[0]);
   Driver.Summ2 := IntToAmount(P.Payments[1]);
   Driver.Summ3 := IntToAmount(P.Payments[2]);
@@ -6145,6 +6189,51 @@ begin
   Driver.TaxType := P.TaxSystem;
   Driver.StringForPrinting := P.Text;
   Result := Driver.FNCloseCheckEx3;
+  if Result = 0 then
+  begin
+    R.Change := AmountToInt(Driver.Change);
+    R.DocNumber := Driver.DocumentNumber;
+    R.MacValue := Driver.FiscalSign;
+  end;
+end;
+
+function TFiscalPrinterDriver.ReceiptClose4(
+  const P: TFSCloseReceiptParams2;
+  var R: TFSCloseReceiptResult2): Integer;
+begin
+  // FNCloseCheckEx4 — как Ex3 + TaxValue11 (НДС 22%), TaxValue12 (НДС 22/122)
+  Driver.Summ1 := IntToAmount(P.Payments[0]);
+  Driver.Summ2 := IntToAmount(P.Payments[1]);
+  Driver.Summ3 := IntToAmount(P.Payments[2]);
+  Driver.Summ4 := IntToAmount(P.Payments[3]);
+  Driver.Summ5 := IntToAmount(P.Payments[4]);
+  Driver.Summ6 := IntToAmount(P.Payments[5]);
+  Driver.Summ7 := IntToAmount(P.Payments[6]);
+  Driver.Summ8 := IntToAmount(P.Payments[7]);
+  Driver.Summ9 := IntToAmount(P.Payments[8]);
+  Driver.Summ10 := IntToAmount(P.Payments[9]);
+  Driver.Summ11 := IntToAmount(P.Payments[10]);
+  Driver.Summ12 := IntToAmount(P.Payments[11]);
+  Driver.Summ13 := IntToAmount(P.Payments[12]);
+  Driver.Summ14 := IntToAmount(P.Payments[13]);
+  Driver.Summ15 := IntToAmount(P.Payments[14]);
+  Driver.Summ16 := IntToAmount(P.Payments[15]);
+  Driver.RoundingSumm := P.Discount;
+  Driver.TaxValue1 := IntToAmount(P.TaxAmount[1]);
+  Driver.TaxValue2 := IntToAmount(P.TaxAmount[2]);
+  Driver.TaxValue3 := IntToAmount(P.TaxAmount[3]);
+  Driver.TaxValue4 := IntToAmount(P.TaxAmount[4]);
+  Driver.TaxValue5 := IntToAmount(P.TaxAmount[5]);
+  Driver.TaxValue6 := IntToAmount(P.TaxAmount[6]);
+  Driver.TaxValue7 := IntToAmount(P.TaxAmount[7]);
+  Driver.TaxValue8 := IntToAmount(P.TaxAmount[8]);
+  Driver.TaxValue9 := IntToAmount(P.TaxAmount[9]);
+  Driver.TaxValue10 := IntToAmount(P.TaxAmount[10]);
+  Driver.TaxValue11 := IntToAmount(P.TaxAmount[11]);
+  Driver.TaxValue12 := IntToAmount(P.TaxAmount[12]);
+  Driver.TaxType := P.TaxSystem;
+  Driver.StringForPrinting := P.Text;
+  Result := Driver.FNCloseCheckEx4;
   if Result = 0 then
   begin
     R.Change := AmountToInt(Driver.Change);
@@ -6761,25 +6850,37 @@ end;
 
 function TFiscalPrinterDriver.FSBindItemCode(P: TFSBindItemCode;
   var R: TFSBindItemCodeResult): Integer;
+var
+  Answer: AnsiString;
+  Command: AnsiString;
 begin
+  // Send FF67 directly (same wire format as FiscalPrinterDevice).
+  // FNBindMarkingItem may return 211/711 "GS1 format error" for marks with GS.
   P.Code := CorrectGS1(P.Code);
   DoConnect;
   SetDriverPassword(FUsrPassword);
-  Driver.Barcode := P.Code;
-  Driver.BarcodeHex := StrToHex(P.Code);
-  Driver.MarkingOnly := P.IsAccounted;
-  Result := Driver.FNBindMarkingItem;
+  Command := #$FF#$67 + IntToBin(FUsrPassword, 4) + Chr(Length(P.Code)) + P.Code;
+  if P.IsAccounted then
+    Command := Command + #$FF;
+  Result := ExecuteData(Command, Answer);
   if Result = 0 then
   begin
-    R.ItemCode := Driver.MarkingType;
-    R.CodeType := Driver.MarkingTypeEx;
-    R.CheckResult.LocalCheckResult := 0;
-    R.CheckResult.LocalCheckError := 0;
-    R.CheckResult.SymbolicType := Driver.MarkingType;
-    R.CheckResult.DataLength := 0;
-    R.CheckResult.FSResultCode := 0;
-    R.CheckResult.ServerCheckStatus := Driver.KMServerCheckingStatus;
-    R.CheckResult.ServerTLVData := AnsiString(Driver.TagValueStr);
+    CheckMinLength(Answer, 3);
+    R.ItemCode := BinToInt(Answer, 1, 2);
+    R.CodeType := BinToInt(Answer, 3, 1);
+    if Length(Answer) >= 7 then
+    begin
+      R.CheckResult.LocalCheckResult := Ord(Answer[4]);
+      R.CheckResult.LocalCheckError := Ord(Answer[5]);
+      R.CheckResult.SymbolicType := Ord(Answer[6]);
+      R.CheckResult.DataLength := Ord(Answer[7]);
+      if R.CheckResult.DataLength > 1 then
+      begin
+        R.CheckResult.FSResultCode := Ord(Answer[8]);
+        R.CheckResult.ServerCheckStatus := Ord(Answer[9]);
+        R.CheckResult.ServerTLVData := Copy(Answer, 10, Length(Answer));
+      end;
+    end;
   end;
 end;
 

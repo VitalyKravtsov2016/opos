@@ -1,21 +1,21 @@
 [Closed Files]
-File_0=SourceModule,'D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duSharedPrinter.pas',0,1,37,61,80,0,0
-File_1=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\oleFiscalPrinter.pas',0,1,1184,27,1188,0,0
-File_2=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,1,24,17,0,0
-File_3=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\PrinterParameters.pas',0,1,374,20,387,0,0
-File_4=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\DriverContext.pas',0,1,1,2,8,0,0
-File_5=SourceModule,'D:\Projects\Shtrih\opos\Source\Opos\OPOS.pas',0,1,99,18,115,0,0
-File_6=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\oleCashDrawer.pas',0,1,237,26,248,0,0
-File_7=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SharedPrinter.pas',0,1,477,10,487,0,0
-File_8=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\PrinterParametersX.pas',0,1,33,31,46,0,0
-File_9=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FiscalPrinterTypes.pas',0,1,537,1,553,0,0
+File_0=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\oleFiscalPrinter.pas',0,1,1419,67,1433,0,0
+File_1=SourceModule,'D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',0,1,513,76,536,0,0
+File_2=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas',0,1,1,27,7,0,0
+File_3=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\DriverContext.pas',0,1,19,16,19,0,0
+File_4=SourceModule,'D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duLogFile.pas',0,1,222,1,233,0,0
+File_5=SourceModule,'D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duSharedPrinter.pas',0,1,118,95,131,0,0
+File_6=SourceModule,'D:\Projects\Shtrih\opos\Source\Shared\LogFile.pas',0,1,392,21,403,0,0
+File_7=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SharedPrinter.pas',0,1,251,52,265,0,0
+File_8=SourceModule,'c:\program files (x86)\borland\delphi7\source\rtl\Sys\sysutils.pas',0,1,5287,1,5297,0,0
+File_9=SourceModule,'D:\Projects\Shtrih\opos\Source\Shared\FileUtils.pas',0,1,1,23,13,0,0
 
 [Modules]
 Count=0
 EditWindowCount=0
 TypeLibWindowCount=3
 
-[D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\SmFiscalPrinter.tlb]
+[D:\Projects\Shtrih\opos\Test\AcceptanceTest\AcceptanceTest.dpr]
 FormState=0
 FormOnTop=0
 
@@ -36,6 +36,10 @@ FormState=0
 FormOnTop=0
 
 [D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\SmFiscalPrinter.todo]
+FormState=0
+FormOnTop=0
+
+[D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\SmFiscalPrinter.tlb]
 FormState=0
 FormOnTop=0
 
@@ -84,10 +88,6 @@ FormState=0
 FormOnTop=0
 
 [D:\Projects\Shtrih\opos\Source\SmFptrSrv\SmFptrSrv.tlb]
-FormState=0
-FormOnTop=0
-
-[D:\Projects\Shtrih\opos\Test\AcceptanceTest\AcceptanceTest.dpr]
 FormState=0
 FormOnTop=0
 
@@ -155,8 +155,9 @@ LRDockWidth=320
 Dockable=1
 
 [Breakpoints]
-Count=1
+Count=2
 Breakpoint0='D:\projects\IBTS\Opos\Source\SmFiscalPrinter\Units\SalesReceipt.pas',376,'',0,1,'',1,0,0,'',1,'','',''
+Breakpoint1='D:\Projects\Shtrih\opos\Source\Shared\SerialPort.pas',35,'',0,1,'',1,0,0,'',1,'','',''
 
 [AddressBreakpoints]
 Count=0
@@ -182,12 +183,12 @@ Visible=1
 State=0
 Left=1
 Top=120
-Width=520
-Height=411
+Width=722
+Height=432
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=504
-ClientHeight=372
+ClientWidth=706
+ClientHeight=393
 TBDockHeight=681
 LRDockWidth=445
 Dockable=0

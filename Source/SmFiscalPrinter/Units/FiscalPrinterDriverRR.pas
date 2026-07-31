@@ -1525,12 +1525,21 @@ end;
 
 procedure TFiscalPrinterDriverRR.PrintString(Flags: Byte;
   const Line: WideString);
+var
+  Code: Integer;
 begin
   FLogger.Debug(Format('PrintString(%d,''%s'')', [Flags, Line]));
 
+  WaitForPrinting;
   SetPrintFlags(Flags);
   Driver.StringForPrinting := Line;
-  Driver.Check(Driver.PrintString);
+  Code := Driver.PrintString;
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.PrintString;
+  end;
+  Driver.Check(Code);
 end;
 
 function TFiscalPrinterDriverRR.OpenFiscalDay: Boolean;
@@ -1546,13 +1555,22 @@ end;
 
 
 procedure TFiscalPrinterDriverRR.PrintDocHeader(const DocName: WideString; DocNumber: Word);
+var
+  Code: Integer;
 begin
   FLogger.Debug(Format('PrintDocHeader(''%s'', %d)',
     [DocName, DocNumber]));
 
+  WaitForPrinting;
   Driver.DocumentName := DocName;
   Driver.DocumentNumber := DocNumber;
-  Driver.Check(Driver.PrintDocumentTitle);
+  Code := Driver.PrintDocumentTitle;
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.PrintDocumentTitle;
+  end;
+  Driver.Check(Code);
 end;
 
 procedure TFiscalPrinterDriverRR.StartTest(Interval: Byte);
@@ -1793,13 +1811,22 @@ begin
 end;
 
 procedure TFiscalPrinterDriverRR.CutPaper(CutType: Byte);
+var
+  Code: Integer;
 begin
   if not FParameters2.Flags.CapCutter then Exit;
   FLogger.Debug(Format('CutPaper(%d)', [CutType]));
 
-
+  WaitForPrinting;
   Driver.CutType := CutType = PRINTER_CUTTYPE_PARTIAL;
-  Driver.Check(Driver.CutCheck);
+  Code := Driver.CutCheck;
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.CutCheck;
+  end;
+  Driver.Check(Code);
+  WaitForPrinting;
 end;
 
 procedure TFiscalPrinterDriverRR.FullCut;
@@ -1906,6 +1933,7 @@ procedure TFiscalPrinterDriverRR.PrintStringFont(Flags, Font: Byte;
   const Line: WideString);
 var
   Text: AnsiString;
+  Code: Integer;
 begin
   Text := Line;
   Flags := GetPrintFlags(Flags);
@@ -1914,11 +1942,17 @@ begin
   FLogger.Debug(Format('PrintStringFont(%d,%d, ''%s'')',
     [Flags, Font, Text]));
 
-
+  WaitForPrinting;
   SetPrintFlags(Flags);
   Driver.FontType := Font;
   Driver.StringForPrinting := Line;
-  Driver.Check(Driver.PrintStringWithFont);
+  Code := Driver.PrintStringWithFont;
+  if (Code = $50) or (Code = 580) then
+  begin
+    WaitForPrinting;
+    Code := Driver.PrintStringWithFont;
+  end;
+  Driver.Check(Code);
 end;
 
 procedure TFiscalPrinterDriverRR.PrintXReport;

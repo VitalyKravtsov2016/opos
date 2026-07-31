@@ -28,6 +28,8 @@ type
     FLogs: array[0..3] of TStringList;
 
     function CreateDevice(DriverType: Integer): IFiscalPrinterDevice;
+    function EmulatorKindForDriver(DriverType: Integer): TFrEmulatorKind;
+    procedure RestartEmulator(Kind: TFrEmulatorKind);
     procedure ConfigureParameters;
     procedure PrintMarkedReceipt(Device: IFiscalPrinterDevice);
     function NormalizeLog(const Src: TStrings): string;
@@ -63,12 +65,34 @@ begin
   for i := Low(FLogs) to High(FLogs) do
     FLogs[i] := TStringList.Create;
 
-  FEmu := TFiscalPrinterEmulator.Create;
-  FEmu.Start(EmulatorPort, BaudRate);
-  Sleep(200);
+  FEmu := nil;
 
   FContext := TDriverContext.Create;
   ConfigureParameters;
+end;
+
+function TMarkedReceiptDriversTest.EmulatorKindForDriver(DriverType: Integer): TFrEmulatorKind;
+begin
+  case DriverType of
+    DriverTypeShtrihDriver: Result := ekPosCenter; // PosCenter / SHTRIH-M DrvFR → FF7B
+    DriverTypeRRElectro:    Result := ekRRElectro;
+    DriverTypeTorgBalance:  Result := ekTorgBalance;
+  else
+    Result := ekShtrih; // Internal
+  end;
+end;
+
+procedure TMarkedReceiptDriversTest.RestartEmulator(Kind: TFrEmulatorKind);
+begin
+  if FEmu <> nil then
+  begin
+    FEmu.Stop;
+    FEmu.Free;
+    FEmu := nil;
+  end;
+  FEmu := CreateFrEmulator(Kind);
+  FEmu.Start(EmulatorPort, BaudRate);
+  Sleep(200);
 end;
 
 procedure TMarkedReceiptDriversTest.TearDown;
@@ -233,16 +257,15 @@ begin
     if Line = '' then
       Continue;
     Code := UpperCase(Copy(Line, 1, 4));
+    // Close opcodes differ by FR model (FF45/FF76/FF7B/FF78) — exclude from
+    // cross-driver parity; they stay in raw *.tx logs.
     if (Copy(Code, 1, 2) = '8D') or
        (Copy(Code, 1, 2) = '80') or
-       (Copy(Code, 1, 2) = '85') or
        (Copy(Code, 1, 2) = 'E0') or
        (Pos('FF46', Code) = 1) or
        (Pos('FF67', Code) = 1) or
        (Pos('FF69', Code) = 1) or
-       (Pos('FF61', Code) = 1) or
-       (Pos('FF45', Code) = 1) or
-       (Pos('FF76', Code) = 1) then
+       (Pos('FF61', Code) = 1) then
     begin
       Result := Result + Line + #13#10;
     end;
@@ -282,7 +305,8 @@ begin
 
   for i := Low(DriverTypes) to High(DriverTypes) do
   begin
-    FEmu.ClearLog;
+    // Each COM driver talks to a matching FR model profile (close codes differ).
+    RestartEmulator(EmulatorKindForDriver(DriverTypes[i]));
     Device := CreateDevice(DriverTypes[i]);
     try
       try
