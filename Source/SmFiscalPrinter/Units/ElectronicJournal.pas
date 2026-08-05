@@ -88,7 +88,7 @@ begin
   Printer.Check(Printer.GetEJSesssionResult(SesssionNumber, Line));
   repeat
     AResult := Printer.GetEJReportLine(Line);
-    if Pos('ï¿½ï¿½ï¿½ï¿½', Line) <> 0 then
+    if Pos('ÇÀÊÐ', Line) <> 0 then
     begin
       Result := Line;
       Break;

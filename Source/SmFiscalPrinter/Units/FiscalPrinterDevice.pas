@@ -595,9 +595,9 @@ begin
     raise Exception.Create(Format('%s, %s', [_('Invalid parameter value'), ParamName]));
 end;
 
-// 0	пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-// 1	пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-// 2	пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+// 0	По левому краю
+// 1	По центру
+// 2	По правому краю
 function IntToAlignment(Alignment: Integer): Integer;
 begin
   Result := 1;
@@ -608,7 +608,7 @@ begin
   end;
 end;
 
-{ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ }
+{ Получение таймаута выполнения команды }
 function GetCommandTimeout(Command: Word): Integer;
 begin
   case Command of
@@ -871,7 +871,6 @@ begin
   FFilter.Free;
   FSTLVTag.Free;
   FTLVItems.Free;
-  FConnection := nil;
   inherited Destroy;
 end;
 
@@ -1486,7 +1485,7 @@ begin
         SetIsOnline(False);
         if not CanRepeatCommand(Command.Code) then Break;
         if (i = (Parameters.MaxRetryCount-1)) then
-          raise ECommunicationError.Create(_('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+          raise ECommunicationError.Create(_('Нет связи'));
       end;
     end;
     if Parameters.MaxRetryCount > 0 then
@@ -1758,21 +1757,21 @@ end;
   Get Short FP Status
 
   Command:	10H. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
 
   Answer:		10H. Length: 16 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	FP flags (2 bytes)
-  пїЅ	FP mode (1 byte)
-  пїЅ	FP submode (1 byte)
-  пїЅ	Quantity of operations on the current receipt (1 byte) lower byte of a two-byte digit (see below)
-  пїЅ	Battery voltage (1 byte)
-  пїЅ	Power source voltage (1 byte)
-  пїЅ	Fiscal Memory error code (1 byte)
-  пїЅ	EKLZ error code (1 byte) EKLZ=Electronic Cryptographic Journal
-  пїЅ	Quantity of operations on the current receipt (1 byte) upper byte of a two-byte digit (see below)
-  пїЅ	Reserved (3 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	FP flags (2 bytes)
+  ·	FP mode (1 byte)
+  ·	FP submode (1 byte)
+  ·	Quantity of operations on the current receipt (1 byte) lower byte of a two-byte digit (see below)
+  ·	Battery voltage (1 byte)
+  ·	Power source voltage (1 byte)
+  ·	Fiscal Memory error code (1 byte)
+  ·	EKLZ error code (1 byte) EKLZ=Electronic Cryptographic Journal
+  ·	Quantity of operations on the current receipt (1 byte) upper byte of a two-byte digit (see below)
+  ·	Reserved (3 bytes)
 
 ******************************************************************************)
 
@@ -1835,31 +1834,31 @@ end;
 
   Get FP Status
   Command:	11H. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		11H. Length: 48 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	FP firmware version (2 bytes)
-  пїЅ	FP firmware build (2 bytes)
-  пїЅ	FP firmware date (3 bytes) DD-MM-YY
-  пїЅ	Number of FP in checkout line (1 byte)
-  пїЅ	Current receipt number (2 bytes)
-  пїЅ	FP flags (2 bytes)
-  пїЅ	FP mode (1 byte)
-  пїЅ	FP submode (1 byte)
-  пїЅ	FP port (1 byte)
-  пїЅ	FM firmware version (2 bytes)
-  пїЅ	FM firmware build (2 bytes)
-  пїЅ	FM firmware date (3 bytes) DD-MM-YY
-  пїЅ	Current date (3 bytes) DD-MM-YY
-  пїЅ	Current time (3 bytes) HH-MM-SS
-  пїЅ	FM flags (1 byte)
-  пїЅ	Serial number (4 bytes)
-  пїЅ	Number of last daily totals record in FM (2 bytes) 0000пїЅ2100
-  пїЅ	Quantity of free daily totals records left in FM (2 bytes)
-  пїЅ	Last fiscalization/refiscalization record number in FM (1 byte) 1пїЅ16
-  пїЅ	Quantity of free fiscalization/refiscalization records left in FM (1 byte) 0пїЅ15
-  пїЅ	Taxpayer ID (6 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	FP firmware version (2 bytes)
+  ·	FP firmware build (2 bytes)
+  ·	FP firmware date (3 bytes) DD-MM-YY
+  ·	Number of FP in checkout line (1 byte)
+  ·	Current receipt number (2 bytes)
+  ·	FP flags (2 bytes)
+  ·	FP mode (1 byte)
+  ·	FP submode (1 byte)
+  ·	FP port (1 byte)
+  ·	FM firmware version (2 bytes)
+  ·	FM firmware build (2 bytes)
+  ·	FM firmware date (3 bytes) DD-MM-YY
+  ·	Current date (3 bytes) DD-MM-YY
+  ·	Current time (3 bytes) HH-MM-SS
+  ·	FM flags (1 byte)
+  ·	Serial number (4 bytes)
+  ·	Number of last daily totals record in FM (2 bytes) 0000…2100
+  ·	Quantity of free daily totals records left in FM (2 bytes)
+  ·	Last fiscalization/refiscalization record number in FM (1 byte) 1…16
+  ·	Quantity of free fiscalization/refiscalization records left in FM (1 byte) 0…15
+  ·	Taxpayer ID (6 bytes)
 
 ******************************************************************************)
 
@@ -1902,13 +1901,13 @@ end;
   Print String In Bold Type
 
   Command:	12H. Length: 26 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt
+  ·	Operator password (4 bytes)
+  ·	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt
     station.
-  пїЅ	String of characters (20 bytes)
+  ·	String of characters (20 bytes)
   Answer:		12H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -1936,10 +1935,10 @@ end;
   Beep
   
   Command:	13H. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		13H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -1962,12 +1961,12 @@ end;
   Set Communication Parameters
   
   Command:	14H. Length: 8 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Port number (1 byte) 0пїЅ255
-  пїЅ	Baud rate (1 byte) 0пїЅ6
-  пїЅ	Inter-character time out (1 byte) 0пїЅ255
+  ·	System Administrator password (4 bytes) 30
+  ·	Port number (1 byte) 0…255
+  ·	Baud rate (1 byte) 0…6
+  ·	Inter-character time out (1 byte) 0…255
   Answer:		14H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -1997,12 +1996,12 @@ end;
   Get Communication Parameters
 
   Command:	15H. Length: 6 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Port number (1 byte) 0пїЅ255
+  ·	System Administrator password (4 bytes) 30
+  ·	Port number (1 byte) 0…255
   Answer:		15H. Length: 4 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Baud rate (1 byte) 0пїЅ6
-  пїЅ	Inter-character time out (1 byte) 0пїЅ255
+  ·	Result Code (1 byte)
+  ·	Baud rate (1 byte) 0…6
+  ·	Inter-character time out (1 byte) 0…255
 
 ******************************************************************************)
                        
@@ -2031,7 +2030,7 @@ end;
 
   Command:	16H. Length: 1 byte.
   Answer:		16H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 
 ******************************************************************************)
@@ -2046,12 +2045,12 @@ end;
   Print String
 
   Command:	17H. Length: 46 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt station.
-  пїЅ	String of characters to print (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt station.
+  ·	String of characters to print (40 bytes)
   Answer:		17H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2082,14 +2081,14 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+  Открыть смену
 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: E0H. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 5пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ: E0H. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1пїЅ30
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅ.
+Команда: E0H. Длина сообщения: 5байт.
+Пароль оператора (4 байта)
+Ответ: E0H. Длина сообщения: 2 байта.
+Порядковый номер оператора (1 байт) 1…30
+Примечание: Команда открывает смену в ФП и переводит ФР в режим «Открытой
+смены».
 
 ******************************************************************************)
 
@@ -2128,13 +2127,13 @@ end;
   Print Receipt Header
 
   Command:	18H. Length: 37 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Receipt title (30 bytes)
-  пїЅ	Receipt number (2 bytes)
+  ·	Operator password (4 bytes)
+  ·	Receipt title (30 bytes)
+  ·	Receipt number (2 bytes)
   Answer:		18H. Length: 5 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Current receipt number (2 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Current receipt number (2 bytes)
 
 ******************************************************************************)
 
@@ -2163,11 +2162,11 @@ end;
   Start Test
 
   Command:	19H. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Test time out (1 byte) 1пїЅ99
+  ·	Operator password (4 bytes)
+  ·	Test time out (1 byte) 1…99
   Answer:		19H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2183,12 +2182,12 @@ end;
   Get Cash Totalizer Value
 
   Command:	1AH. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Cash totalizer number (1 byte) 0пїЅ255
+  ·	Operator password (4 bytes)
+  ·	Cash totalizer number (1 byte) 0…255
   Answer:		1AH. Length: 9 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Cash totalizer value (6 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Cash totalizer value (6 bytes)
 
 ******************************************************************************)
 
@@ -2323,12 +2322,12 @@ end;
   Get Operation Totalizer Value
 
   Command:	1BH. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Operation totalizer number (1 byte) 0пїЅ255
+  ·	Operator password (4 bytes)
+  ·	Operation totalizer number (1 byte) 0…255
   Answer:		1BH. Length: 5 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Operation totalizer value (2 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Operation totalizer value (2 bytes)
 
 ******************************************************************************)
 
@@ -2363,10 +2362,10 @@ end;
   Set License
 
   Command:	1CH. Length: 10 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	License (5 bytes) 0000000000пїЅ9999999999
+  ·	System Administrator password (4 bytes) 30
+  ·	License (5 bytes) 0000000000…9999999999
   Answer:		1CH. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2391,10 +2390,10 @@ end;
   Get License
 
   Command:	1DH. Length: 5 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
+  ·	System Administrator password (4 bytes) 30
   Answer:		1DH. Length: 7 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	License (5 bytes) 0000000000пїЅ9999999999
+  ·	Result Code (1 byte)
+  ·	License (5 bytes) 0000000000…9999999999
 
 ******************************************************************************)
 
@@ -2442,13 +2441,13 @@ end;
   Get Table Field Value
 
   Command:	1FH. Length: 9 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Table (1 byte)
-  пїЅ	Row (2 bytes)
-  пїЅ	Field (1 byte)
+  ·	System Administrator password (4 bytes) 30
+  ·	Table (1 byte)
+  ·	Row (2 bytes)
+  ·	Field (1 byte)
   Answer:		1FH. Length: (2+X) bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Value (X bytes) up to 40 bytes
+  ·	Result Code (1 byte)
+  ·	Value (X bytes) up to 40 bytes
 
 ******************************************************************************)
 
@@ -2478,10 +2477,10 @@ end;
   Set Decimal Dot Position
   
   Command:	20H. Length: 6 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Decimal dot position (1 byte) '0' - 0 digits after the dot, '1' - 2 digits after the dot
+  ·	System Administrator password (4 bytes) 30
+  ·	Decimal dot position (1 byte) '0' - 0 digits after the dot, '1' - 2 digits after the dot
   Answer:		20H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2498,10 +2497,10 @@ end;
   Set Clock Time
 
   Command:	21H. Length: 8 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Time (3 bytes) HH-MM-SS
+  ·	System Administrator password (4 bytes) 30
+  ·	Time (3 bytes) HH-MM-SS
   Answer:		21H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2519,10 +2518,10 @@ end;
   Set Calendar Date
 
   Command:	22H. Length: 8 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Date (3 bytes) DD-MM-YY
+  ·	System Administrator password (4 bytes) 30
+  ·	Date (3 bytes) DD-MM-YY
   Answer:		22H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2540,10 +2539,10 @@ end;
   Confirm Date
 
   Command:	23H. Length: 8 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Date (3 bytes) DD-MM-YY
+  ·	System Administrator password (4 bytes) 30
+  ·	Date (3 bytes) DD-MM-YY
   Answer:		23H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2561,9 +2560,9 @@ end;
   Set Table With Default Values
 
   Command:	24H. Length: 5 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
+  ·	System Administrator password (4 bytes) 30
   Answer:		24H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2577,11 +2576,11 @@ end;
   Cut
   
   Command:	25H. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Cut type (1 byte) '0' - complete, '1' - incomplete
+  ·	Operator password (4 bytes)
+  ·	Cut type (1 byte) '0' - complete, '1' - incomplete
   Answer:		25H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2612,14 +2611,14 @@ end;
   Get Font Parameters
   
   Command:	26H. Length: 6 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Font type (1 byte)
+  ·	System Administrator password (4 bytes) 30
+  ·	Font type (1 byte)
   Answer:		26H. Length: 7 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Print width in dots (2 bytes)
-  пїЅ	Character width in dots (1 byte) the width is given together with inter-character spacing
-  пїЅ	Character height in dots (1 byte) the height is given together with inter-line spacing
-  пїЅ	Number of fonts in FP (1 byte)
+  ·	Result Code (1 byte)
+  ·	Print width in dots (2 bytes)
+  ·	Character width in dots (1 byte) the width is given together with inter-character spacing
+  ·	Character height in dots (1 byte) the height is given together with inter-line spacing
+  ·	Number of fonts in FP (1 byte)
 
 ******************************************************************************)
 
@@ -2637,9 +2636,9 @@ end;
   Clear All Totalizers
 
   Command:	27H. Length: 5 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
+  ·	System Administrator password (4 bytes) 30
   Answer:		27H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -2653,11 +2652,11 @@ end;
   Open Cash Drawer
   
   Command:	28H. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Cash drawer number (1 byte) 0, 1
+  ·	Operator password (4 bytes)
+  ·	Cash drawer number (1 byte) 0, 1
   Answer:		28H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2672,12 +2671,12 @@ end;
   Feed
 
   Command:	29H. Length: 7 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Flags (1 byte) Bit 0 - journal station, Bit 1 - receipt station, Bit 2 - slip station
-  пїЅ	Number of lines to feed (1 byte) 1пїЅ255 - the maximum number of lines to feed is limited by the size of print buffer, but does not exceed 255
+  ·	Operator password (4 bytes)
+  ·	Flags (1 byte) Bit 0 - journal station, Bit 1 - receipt station, Bit 2 - slip station
+  ·	Number of lines to feed (1 byte) 1…255 - the maximum number of lines to feed is limited by the size of print buffer, but does not exceed 255
   Answer:		29H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2694,11 +2693,11 @@ end;
   Eject Slip
   
   Command:	2AH. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Slip paper eject direction (1 byte) '0' - down, '1' - up
+  ·	Operator password (4 bytes)
+  ·	Slip paper eject direction (1 byte) '0' - down, '1' - up
   Answer:		2AH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2715,10 +2714,10 @@ end;
   Interrupt Test
 
   Command:	2BH. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		2BH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2732,10 +2731,10 @@ end;
   Print Operation Totalizers Report
 
   Command:	2CH. Length: 5 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
   Answer:		2CH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
 
 ******************************************************************************)
 
@@ -2749,13 +2748,13 @@ end;
   Get Table Structure
 
   Command:	2DH. Length: 6 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Table number (1 byte)
+  ·	System Administrator password (4 bytes) 30
+  ·	Table number (1 byte)
   Answer:		2DH. Length: 45 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Table name (40 bytes)
-  пїЅ	Number of rows (2 bytes)
-  пїЅ	Number of fields (1 byte)
+  ·	Result Code (1 byte)
+  ·	Table name (40 bytes)
+  ·	Number of rows (2 bytes)
+  ·	Number of fields (1 byte)
 
 ******************************************************************************)
 
@@ -2783,16 +2782,16 @@ end;
   Get Field Structure
 
   Command:	2EH. Length: 7 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Table number (1 byte)
-  пїЅ	Field number (1 byte)
+  ·	System Administrator password (4 bytes) 30
+  ·	Table number (1 byte)
+  ·	Field number (1 byte)
   Answer:		2EH. Length: (44+X+X) bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Field name (40 bytes)
-  пїЅ	Field type (1 byte) '0' - BIN, '1' - CHAR
-  пїЅ	Number of bytes - X (1 byte)
-  пїЅ	Field minimum value (X bytes) for BIN-type fields only
-  пїЅ	Field maximum value (X bytes) for BIN-type fields only
+  ·	Result Code (1 byte)
+  ·	Field name (40 bytes)
+  ·	Field type (1 byte) '0' - BIN, '1' - CHAR
+  ·	Number of bytes - X (1 byte)
+  ·	Field minimum value (X bytes) for BIN-type fields only
+  ·	Field maximum value (X bytes) for BIN-type fields only
 
 
 ******************************************************************************)
@@ -2829,13 +2828,13 @@ end;
   Print String With Specific Font
 
   Command:	2FH. Length: 47 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt station
-  пїЅ	Font number (1 byte) 0пїЅ255
-  пїЅ	String of characters to print (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Flags (1 byte) Bit 0 - print on journal station, Bit 1 - print on receipt station
+  ·	Font number (1 byte) 0…255
+  ·	String of characters to print (40 bytes)
   Answer:		2FH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -2860,10 +2859,10 @@ end;
   Print X-Report
 
   Command:	40H. Length: 5 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
   Answer:		40H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
 
 ******************************************************************************)
 
@@ -2899,9 +2898,9 @@ begin
     if FSReadCommStatus(R) = 0 then
     begin
       PrintText(PRINTER_STATION_REC, StringOfChar('-', GetPrintWidth));
-      PrintLines('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ:', IntToStr(R.DocumentCount));
-      PrintLines('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ:', IntToStr(R.DocumentNumber));
-      PrintLines('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:', PrinterDateTimeToStr2(R.DocumentDate));
+      PrintLines('КОЛИЧЕСТВО СООБЩЕНИЙ ДЛЯ ОФД:', IntToStr(R.DocumentCount));
+      PrintLines('НОМЕР ПЕРВОГО ДОКУМЕНТА ДЛЯ ОФД:', IntToStr(R.DocumentNumber));
+      PrintLines('ДАТА ПЕРВОГО ДОКУМЕНТА:', PrinterDateTimeToStr2(R.DocumentDate));
       Break;
     end;
     Sleep(1000)
@@ -2909,12 +2908,12 @@ begin
 end;
 
 (******************************************************************************
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ FF42H
+Начать закрытие смены FF42H
 
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF42h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF42h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+Код команды FF42h. Длина сообщения: 6 байт.
+  Пароль системного администратора: 4 байта
+Ответ: FF42h Длина сообщения: 1 байт.
+  Код ошибки: 1 байт
 
 ******************************************************************************)
 
@@ -2930,10 +2929,10 @@ end;
   Print Z-Report
 
   Command:	41H. Length: 5 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
   Answer:		41H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
 
 ******************************************************************************)
 
@@ -2974,10 +2973,10 @@ end;
   Print Department Report
   
   Command:	42H. Length: 5 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
   Answer:		42H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
 
 ******************************************************************************)
 
@@ -2991,10 +2990,10 @@ end;
   Print Taxes Report
   
   Command:	43H. Length: 5 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
   Answer:		43H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
 
 ******************************************************************************)
 
@@ -3008,10 +3007,10 @@ end;
   Print Fixed Header
   
   Command:	52H. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		52H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3025,13 +3024,13 @@ end;
   End document
 
   Command:	53H. Length: 6 bytes
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Parameter (1 bytes)
-  пїЅ	0 - Without trailer
-  пїЅ	1 - With trailer
+  ·	Operator password (4 bytes)
+  ·	Parameter (1 bytes)
+  ·	0 - Without trailer
+  ·	1 - With trailer
   Answer:		53H. Length: 3 bytes.
-  пїЅ	Result code (1 bytes)
-  пїЅ	Operator index number (1 bytes) 1пїЅ30
+  ·	Result code (1 bytes)
+  ·	Operator index number (1 bytes) 1…30
 
 ******************************************************************************)
 
@@ -3045,10 +3044,10 @@ end;
 
   Print trailer
   Command:	54H. Length:5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		54H. Length: 3 bytes.
-  пїЅ	Result code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3062,10 +3061,10 @@ end;
   Set Serial Number
 
   Command:	60H. Length: 9 bytes.
-  пїЅ	Password (4 bytes) (default value is '0')
-  пїЅ	Serial number (4 bytes) 00000000пїЅ99999999
+  ·	Password (4 bytes) (default value is '0')
+  ·	Serial number (4 bytes) 00000000…99999999
   Answer:		60H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -3081,7 +3080,7 @@ end;
 
   Command:	61H. Length: 1 byte.
   Answer:		61H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -3095,18 +3094,18 @@ end;
   Get FM Totals
 
   Command:	62H. Length: 6 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
-  пїЅ	Report type (1 byte) '0' - grand totals, '1' - grand totals after the last
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Report type (1 byte) '0' - grand totals, '1' - grand totals after the last
     refiscalization
   Answer:		62H. Length: 29 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
-  пїЅ	Grand totals of sales (8 bytes)
-  пїЅ	Grand totals of buys (6 bytes) If there is no FM2, the value is
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
+  ·	Grand totals of sales (8 bytes)
+  ·	Grand totals of buys (6 bytes) If there is no FM2, the value is
     FFh FFh FFh FFh FFh FFh
-  пїЅ	Grand totals of sale refunds (6 bytes) If there is no FM2, the value is
+  ·	Grand totals of sale refunds (6 bytes) If there is no FM2, the value is
     FFh FFh FFh FFh FFh FFh
-  пїЅ	Grand totals of buy refunds (6 bytes) If there is no FM2, the value is
+  ·	Grand totals of buy refunds (6 bytes) If there is no FM2, the value is
     FFh FFh FFh FFh FFh FFh
 
 ******************************************************************************)
@@ -3142,13 +3141,13 @@ end;
   Get Date of Last Record In FM
 
   Command:	63H. Length: 5 bytes.
-  пїЅ	Administrator or System Administrator password (4 bytes) 29, 30
+  ·	Administrator or System Administrator password (4 bytes) 29, 30
   Answer:		63H. Length: 7 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 29, 30
-  пїЅ	Type of last record in FM (1 byte) '0' - fiscalization/refiscalization,
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 29, 30
+  ·	Type of last record in FM (1 byte) '0' - fiscalization/refiscalization,
     '1' - daily totals
-  пїЅ	Date (3 bytes) DD-MM-YY
+  ·	Date (3 bytes) DD-MM-YY
 
 
 ******************************************************************************)
@@ -3167,13 +3166,13 @@ end;
   Get Dates And Days Ranges In FM
 
   Command:	64H. Length: 5 bytes.
-  пїЅ	Tax Officer password (4 bytes)
+  ·	Tax Officer password (4 bytes)
   Answer:		64H. Length: 12 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Number of first daily totals record in FM (2 bytes) 0000пїЅ2100
-  пїЅ	Number of last daily totals record in FM (2 bytes) 0000пїЅ2100
+  ·	Result Code (1 byte)
+  ·	Date of first daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Date of last daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Number of first daily totals record in FM (2 bytes) 0000…2100
+  ·	Number of last daily totals record in FM (2 bytes) 0000…2100
 
 ******************************************************************************)
 
@@ -3191,16 +3190,16 @@ end;
   Fiscalize/Refiscalize Printer
 
   Command:	65H. Length: 20 bytes.
-  пїЅ	Tax Officer old password (4 bytes)
-  пїЅ	Tax Officer new password (4 bytes)
-  пїЅ	ECRRN (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Taxpayer ID (6 bytes) 000000000000пїЅ999999999999
+  ·	Tax Officer old password (4 bytes)
+  ·	Tax Officer new password (4 bytes)
+  ·	ECRRN (5 bytes) 0000000000…9999999999
+  ·	Taxpayer ID (6 bytes) 000000000000…999999999999
   Answer:		65H. Length: 9 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Fiscalization/Refiscalization number (1 byte) 1пїЅ16
-  пїЅ	Quantity of free fiscalization/refiscalization records left in FM (1 byte) 0пїЅ15
-  пїЅ	Number of last daily totals record in FM (2 bytes) 0000пїЅ2100
-  пїЅ	Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
+  ·	Result Code (1 byte)
+  ·	Fiscalization/Refiscalization number (1 byte) 1…16
+  ·	Quantity of free fiscalization/refiscalization records left in FM (1 byte) 0…15
+  ·	Number of last daily totals record in FM (2 bytes) 0000…2100
+  ·	Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
 
 ******************************************************************************)
 
@@ -3227,16 +3226,16 @@ end;
   Periodic Daily Totals Fiscal Report
 
   Command:	66H. Length: 12 bytes.
-  пїЅ	Tax Officer password (4 bytes)
-  пїЅ	Report type (1 byte) '0' - short, '1' - full
-  пїЅ	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Date of last daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Tax Officer password (4 bytes)
+  ·	Report type (1 byte) '0' - short, '1' - full
+  ·	Date of first daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Date of last daily totals record in FM (3 bytes) DD-MM-YY
   Answer:		66H. Length: 12 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Number of first daily totals record in FM (2 bytes) 0000пїЅ2100
-  пїЅ	Number of last daily totals record in FM (2 bytes) 0000пїЅ2100
+  ·	Result Code (1 byte)
+  ·	Date of first daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Date of last daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Number of first daily totals record in FM (2 bytes) 0000…2100
+  ·	Number of last daily totals record in FM (2 bytes) 0000…2100
 
 ******************************************************************************)
 
@@ -3263,16 +3262,16 @@ end;
   Fiscal Report For Daily Totals Numbers Range
 
   Command:	67H. Length: 10 bytes.
-  пїЅ	Tax Officer password (4 bytes)
-  пїЅ	Report type (1 byte) '0' - short, '1' - full
-  пїЅ	Day number of first daily totals record in FM (2 bytes) 0000пїЅ2100
-  пїЅ	Day number of last daily totals record in FM (2 bytes) 0000пїЅ2100
+  ·	Tax Officer password (4 bytes)
+  ·	Report type (1 byte) '0' - short, '1' - full
+  ·	Day number of first daily totals record in FM (2 bytes) 0000…2100
+  ·	Day number of last daily totals record in FM (2 bytes) 0000…2100
   Answer:		67H. Length: 12 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Date of first daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Date of last daily totals record in FM (3 bytes) DD-MM-YY
-  пїЅ	Number of first daily totals record in FM (2 bytes) 0000пїЅ2100
-  пїЅ	Number of last daily totals record in FM (2 bytes) 0000пїЅ2100
+  ·	Result Code (1 byte)
+  ·	Date of first daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Date of last daily totals record in FM (3 bytes) DD-MM-YY
+  ·	Number of first daily totals record in FM (2 bytes) 0000…2100
+  ·	Number of last daily totals record in FM (2 bytes) 0000…2100
 
 ******************************************************************************)
 
@@ -3299,9 +3298,9 @@ end;
   Interrupt Full Report
 
   Command:	68H. Length: 5 bytes.
-  пїЅ	Tax Officer password (4 bytes)
+  ·	Tax Officer password (4 bytes)
   Answer:		68H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -3315,15 +3314,15 @@ end;
   Get Fiscalization/Refiscalization Parameters
 
   Command:	69H. Length: 6 bytes.
-  пїЅ	Tax Officer password (4 bytes) password of Tax Officer who fiscalized the printer
-  пїЅ	Fiscalization/Refiscalization number (1 byte) 1пїЅ16
+  ·	Tax Officer password (4 bytes) password of Tax Officer who fiscalized the printer
+  ·	Fiscalization/Refiscalization number (1 byte) 1…16
   Answer:		69H. Length: 22 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Password (4 bytes)
-  пїЅ	ECRRN (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Taxpayer ID (6 bytes) 000000000000пїЅ999999999999
-  пїЅ	Number of the last daily totals record in FM before fiscalization/refiscalization (2 bytes) 0000пїЅ2100
-  пїЅ	Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
+  ·	Result Code (1 byte)
+  ·	Password (4 bytes)
+  ·	ECRRN (5 bytes) 0000000000…9999999999
+  ·	Taxpayer ID (6 bytes) 000000000000…999999999999
+  ·	Number of the last daily totals record in FM before fiscalization/refiscalization (2 bytes) 0000…2100
+  ·	Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
 
 ******************************************************************************)
 
@@ -3353,32 +3352,32 @@ end;
   Open Fiscal Slip
 
   Command:	70H. Length: 26 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Slip type (1 byte) '0' - Sale, '1' - Buy, '2' - Sale Refund, '3' - Buy Refund
-  пїЅ	Slip duplicates type (1 byte) '0' - duplicates as columns, '1' - duplicates as line blocks
-  пїЅ	Number of duplicates (1 byte) 0пїЅ5
-  пїЅ	Spacing between Original and Duplicate 1 (1 byte) *
-  пїЅ	Spacing between Duplicate 1 and Duplicate 2 (1 byte) *
-  пїЅ	Spacing between Duplicate 2 and Duplicate 3 (1 byte) *
-  пїЅ	Spacing between Duplicate 3 and Duplicate 4 (1 byte) *
-  пїЅ	Spacing between Duplicate 4 and Duplicate 5 (1 byte) *
-  пїЅ	Font number of fixed header (1 byte)
-  пїЅ	Font number of header (1 byte)
-  пїЅ	Font number of EKLZ serial number (1 byte)
-  пїЅ	Font number of KPK value and KPK number (1 byte)
-  пїЅ	Vertical position of the first line of fixed header (1 byte)
-  пїЅ	Vertical position of the first line of header (1 byte)
-  пїЅ	Vertical position of line with EKLZ number (1 byte)
-  пїЅ	Vertical position of line with duplicate marker (1 byte)
-  пїЅ	Horizontal position of fixed header in line (1 byte)
-  пїЅ	Horizontal position of header in line (1 byte)
-  пїЅ	Horizontal position of EKLZ number in line (1 byte)
-  пїЅ	Horizontal position of KPK value and KPK number in line (1 byte)
-  пїЅ	Horizontal position of duplicate marker in line (1 byte)
+  ·	Operator password (4 bytes)
+  ·	Slip type (1 byte) '0' - Sale, '1' - Buy, '2' - Sale Refund, '3' - Buy Refund
+  ·	Slip duplicates type (1 byte) '0' - duplicates as columns, '1' - duplicates as line blocks
+  ·	Number of duplicates (1 byte) 0…5
+  ·	Spacing between Original and Duplicate 1 (1 byte) *
+  ·	Spacing between Duplicate 1 and Duplicate 2 (1 byte) *
+  ·	Spacing between Duplicate 2 and Duplicate 3 (1 byte) *
+  ·	Spacing between Duplicate 3 and Duplicate 4 (1 byte) *
+  ·	Spacing between Duplicate 4 and Duplicate 5 (1 byte) *
+  ·	Font number of fixed header (1 byte)
+  ·	Font number of header (1 byte)
+  ·	Font number of EKLZ serial number (1 byte)
+  ·	Font number of KPK value and KPK number (1 byte)
+  ·	Vertical position of the first line of fixed header (1 byte)
+  ·	Vertical position of the first line of header (1 byte)
+  ·	Vertical position of line with EKLZ number (1 byte)
+  ·	Vertical position of line with duplicate marker (1 byte)
+  ·	Horizontal position of fixed header in line (1 byte)
+  ·	Horizontal position of header in line (1 byte)
+  ·	Horizontal position of EKLZ number in line (1 byte)
+  ·	Horizontal position of KPK value and KPK number in line (1 byte)
+  ·	Horizontal position of duplicate marker in line (1 byte)
   Answer:		70H. Length: 5 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Current receipt number (2 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Current receipt number (2 bytes)
 
 ******************************************************************************)
 
@@ -3403,19 +3402,19 @@ end;
   Open Standard Fiscal Slip
 
   Command:	71H. Length: 13 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Slip type (1 byte) '0' - Sale, '1' - Buy, '2' - Sale Refund, '3' - Buy Refund
-  пїЅ	Slip duplicates type (1 byte) '0' - duplicates as columns, '1' - duplicates as line blocks
-  пїЅ	Number of duplicates (1 byte) 0пїЅ5
-  пїЅ	Spacing between Original and Duplicate 1 (1 byte) *
-  пїЅ	Spacing between Duplicate 1 and Duplicate 2 (1 byte) *
-  пїЅ	Spacing between Duplicate 2 and Duplicate 3 (1 byte) *
-  пїЅ	Spacing between Duplicate 3 and Duplicate 4 (1 byte) *
-  пїЅ	Spacing between Duplicate 4 and Duplicate 5 (1 byte) *
+  ·	Operator password (4 bytes)
+  ·	Slip type (1 byte) '0' - Sale, '1' - Buy, '2' - Sale Refund, '3' - Buy Refund
+  ·	Slip duplicates type (1 byte) '0' - duplicates as columns, '1' - duplicates as line blocks
+  ·	Number of duplicates (1 byte) 0…5
+  ·	Spacing between Original and Duplicate 1 (1 byte) *
+  ·	Spacing between Duplicate 1 and Duplicate 2 (1 byte) *
+  ·	Spacing between Duplicate 2 and Duplicate 3 (1 byte) *
+  ·	Spacing between Duplicate 3 and Duplicate 4 (1 byte) *
+  ·	Spacing between Duplicate 4 and Duplicate 5 (1 byte) *
   Answer:		71H. Length: 5 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Current receipt number (2 bytes)
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Current receipt number (2 bytes)
 
 ******************************************************************************)
 
@@ -3440,40 +3439,40 @@ end;
   Transaction On Slip
 
   Command:	72H. Length: 82 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Quantity format (1 byte) '0' - no digits after decimal dot, '1' - digits after decimal dot
-  пїЅ	Number of lines in transaction block (1 byte) 1пїЅ3
-  пїЅ	Line number of Text element in transaction block (1 byte) 0пїЅ3, '0' - do not print
-  пїЅ	Line number of Quantity Times Unit Price element in transaction block (1 byte) 0пїЅ3, '0' - do not print
-  пїЅ	Line number of Transaction Sum element in transaction block (1 byte) 1пїЅ3
-  пїЅ	Line number of Department element in transaction block (1 byte) 1пїЅ3
-  пїЅ	Font type of Text element (1 byte)
-  пїЅ	Font type of Quantity element (1 byte)
-  пїЅ	Font type of Multiplication sign element (1 byte)
-  пїЅ	Font type of Unit Price element (1 byte)
-  пїЅ	Font type of Transaction Sum element (1 byte)
-  пїЅ	Font type of Department element (1 byte)
-  пїЅ	Length of Text element in characters (1 byte)
-  пїЅ	Length of Quantity element in characters (1 byte)
-  пїЅ	Length of Unit Price element in characters (1 byte)
-  пїЅ	Length of Transaction Sum element in characters (1 byte)
-  пїЅ	Length of Department element in characters (1 byte)
-  пїЅ	Position in line of Text element (1 byte)
-  пїЅ	Position in line of Quantity Times Unit Price element (1 byte)
-  пїЅ	Position in line of Transaction Sum element (1 byte)
-  пїЅ	Position in line of Department element (1 byte)
-  пїЅ	Slip line number with the first line of transaction block (1 byte)
-  пїЅ	Quantity (5 bytes)
-  пїЅ	Unit Price (5 bytes)
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Quantity format (1 byte) '0' - no digits after decimal dot, '1' - digits after decimal dot
+  ·	Number of lines in transaction block (1 byte) 1…3
+  ·	Line number of Text element in transaction block (1 byte) 0…3, '0' - do not print
+  ·	Line number of Quantity Times Unit Price element in transaction block (1 byte) 0…3, '0' - do not print
+  ·	Line number of Transaction Sum element in transaction block (1 byte) 1…3
+  ·	Line number of Department element in transaction block (1 byte) 1…3
+  ·	Font type of Text element (1 byte)
+  ·	Font type of Quantity element (1 byte)
+  ·	Font type of Multiplication sign element (1 byte)
+  ·	Font type of Unit Price element (1 byte)
+  ·	Font type of Transaction Sum element (1 byte)
+  ·	Font type of Department element (1 byte)
+  ·	Length of Text element in characters (1 byte)
+  ·	Length of Quantity element in characters (1 byte)
+  ·	Length of Unit Price element in characters (1 byte)
+  ·	Length of Transaction Sum element in characters (1 byte)
+  ·	Length of Department element in characters (1 byte)
+  ·	Position in line of Text element (1 byte)
+  ·	Position in line of Quantity Times Unit Price element (1 byte)
+  ·	Position in line of Transaction Sum element (1 byte)
+  ·	Position in line of Department element (1 byte)
+  ·	Slip line number with the first line of transaction block (1 byte)
+  ·	Quantity (5 bytes)
+  ·	Unit Price (5 bytes)
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		72H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3506,19 +3505,19 @@ end;
   Standard Transaction On Slip
   
   Command:	73H. Length: 61 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Slip line number with the first line of transaction block (1 byte)
-  пїЅ	Quantity (5 bytes)
-  пїЅ	Unit Price (5 bytes)
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Slip line number with the first line of transaction block (1 byte)
+  ·	Quantity (5 bytes)
+  ·	Unit Price (5 bytes)
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		73H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3551,30 +3550,30 @@ end;
   Discount/Surcharge On Slip
   
   Command:	74H. Length: 68 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Number of lines in transaction block (1 byte) 1пїЅ2
-  пїЅ	Line number of Text element in transaction block (1 byte) 0пїЅ2, '0' - do not print
-  пїЅ	Line number of Transaction Name element in transaction block (1 byte) 1пїЅ2
-  пїЅ	Line number of Transaction Sum element in transaction block (1 byte) 1пїЅ2
-  пїЅ	Font type of Text element (1 byte)
-  пїЅ	Font type of Transaction Name element (1 byte)
-  пїЅ	Font type of Transaction Sum element (1 byte)
-  пїЅ	Length of Text element in characters (1 byte)
-  пїЅ	Length of Transaction Sum element in characters (1 byte)
-  пїЅ	Position in line of Text element (1 byte)
-  пїЅ	Position in line of Transaction Name element (1 byte)
-  пїЅ	Position in line of Transaction Sum element (1 byte)
-  пїЅ	Transaction type (1 byte) '0' - Discount, '1' - Surcharge
-  пїЅ	Slip line number with the first line of Discount/Surcharge block (1 byte)
-  пїЅ	Transaction Sum (5 bytes)
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Number of lines in transaction block (1 byte) 1…2
+  ·	Line number of Text element in transaction block (1 byte) 0…2, '0' - do not print
+  ·	Line number of Transaction Name element in transaction block (1 byte) 1…2
+  ·	Line number of Transaction Sum element in transaction block (1 byte) 1…2
+  ·	Font type of Text element (1 byte)
+  ·	Font type of Transaction Name element (1 byte)
+  ·	Font type of Transaction Sum element (1 byte)
+  ·	Length of Text element in characters (1 byte)
+  ·	Length of Transaction Sum element in characters (1 byte)
+  ·	Position in line of Text element (1 byte)
+  ·	Position in line of Transaction Name element (1 byte)
+  ·	Position in line of Transaction Sum element (1 byte)
+  ·	Transaction type (1 byte) '0' - Discount, '1' - Surcharge
+  ·	Slip line number with the first line of Discount/Surcharge block (1 byte)
+  ·	Transaction Sum (5 bytes)
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		74H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3608,18 +3607,18 @@ end;
   Standard Discount/Surcharge On Slip
 
   Command:	75H. Length: 56 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Transaction type (1 byte) '0' - Discount, '1' - Surcharge
-  пїЅ	Slip line number with the first line of Discount/Surcharge block (1 byte)
-  пїЅ	Transaction Sum (5 bytes)
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Transaction type (1 byte) '0' - Discount, '1' - Surcharge
+  ·	Slip line number with the first line of Discount/Surcharge block (1 byte)
+  ·	Transaction Sum (5 bytes)
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		75H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3651,132 +3650,132 @@ end;
   Close Fiscal Slip
   
   Command:	76H. Length: 182 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Number of lines in transaction block (1 byte) 1пїЅ17
-  пїЅ	Line number of Receipt Total element in transaction block (1 byte) 1пїЅ17
-  пїЅ	Line number of Text element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Cash Payment element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Payment Type 2 element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Payment Type 3 element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Payment Type 4 element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Change element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 1 Turnover element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 2 Turnover element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 3 Turnover element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 4 Turnover element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 1 Sum element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 2 Sum element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 3 Sum element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Tax 4 Sum element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Receipt Subtotal Before Discount/Surcharge element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Line number of Discount/Surcharge Value element in transaction block (1 byte) 0пїЅ17, '0' - do not print
-  пїЅ	Font type of Text element (1 byte)
-  пїЅ	Font type of 'TOTAL' element (1 byte)
-  пїЅ	Font type of Receipt Total Value element (1 byte)
-  пїЅ	Font type of 'CASH' element (1 byte)
-  пїЅ	Font type of Cash Payment Value element (1 byte)
-  пїЅ	Font type of Payment Type 2 Name element (1 byte)
-  пїЅ	Font type of Payment Type 2 Value element (1 byte)
-  пїЅ	Font type of Payment Type 3 Name element (1 byte)
-  пїЅ	Font type of Payment Type 3 Value element (1 byte)
-  пїЅ	Font type of Payment Type 4Name element (1 byte)
-  пїЅ	Font type of Payment Type 4Value element (1 byte)
-  пїЅ	Font type of 'CHANGE' element (1 byte)
-  пїЅ	Font type of Change Value element (1 byte)
-  пїЅ	Font type of Tax 1 Name element (1 byte)
-  пїЅ	Font type of Tax 1 Turnover Value element (1 byte)
-  пїЅ	Font type of Tax 1 Rate element (1 byte)
-  пїЅ	Font type of Tax 1 Value element (1 byte)
-  пїЅ	Font type of Tax 2 Name element (1 byte)
-  пїЅ	Font type of Tax 2 Turnover Value element (1 byte)
-  пїЅ	Font type of Tax 2 Rate element (1 byte)
-  пїЅ	Font type of Tax 2 Value element (1 byte)
-  пїЅ	Font type of Tax 3 Name element (1 byte)
-  пїЅ	Font type of Tax 3 Turnover Value element (1 byte)
-  пїЅ	Font type of Tax 3 Rate element (1 byte)
-  пїЅ	Font type of Tax 3 Value element (1 byte)
-  пїЅ	Font type of Tax 4 Name element (1 byte)
-  пїЅ	Font type of Tax 4 Turnover Value element (1 byte)
-  пїЅ	Font type of Tax 4 Rate element (1 byte)
-  пїЅ	Font type of Tax 4 Value element (1 byte)
-  пїЅ	Font type of 'SUBTOTAL' element (1 byte)
-  пїЅ	Font type of Receipt Subtotal Before Discount/Surcharge Value element (1 byte)
-  пїЅ	Font type of 'DISCOUNT XX.XX%' element (1 byte)
-  пїЅ	Font type of Receipt Discount Value element (1 byte)
-  пїЅ	Length of Text element in characters (1 byte)
-  пїЅ	Length of Receipt Total Value element in characters (1 byte)
-  пїЅ	Length of Cash Payment Value element in characters (1 byte)
-  пїЅ	Length of Payment Type 2 Value element in characters (1 byte)
-  пїЅ	Length of Payment Type 3 Value element in characters (1 byte)
-  пїЅ	Length of Payment Type 4Value element in characters (1 byte)
-  пїЅ	Length of Change Value element in characters (1 byte)
-  пїЅ	Length of Tax 1 Name element in characters (1 byte)
-  пїЅ	Length of Tax 1 Turnover element in characters (1 byte)
-  пїЅ	Length of Tax 1 Rate element in characters (1 byte)
-  пїЅ	Length of Tax 1 Value element in characters (1 byte)
-  пїЅ	Length of Tax 2 Name element in characters (1 byte)
-  пїЅ	Length of Tax 2 Turnover element in characters (1 byte)
-  пїЅ	Length of Tax 2 Rate element in characters (1 byte)
-  пїЅ	Length of Tax 2 Value element in characters (1 byte)
-  пїЅ	Length of Tax 3 Name element in characters (1 byte)
-  пїЅ	Length of Tax 3 Turnover element in characters (1 byte)
-  пїЅ	Length of Tax 3 Rate element in characters (1 byte)
-  пїЅ	Length of Tax 3 Value element in characters (1 byte)
-  пїЅ	Length of Tax 4 Name element in characters (1 byte)
-  пїЅ	Length of Tax 4 Turnover element in characters (1 byte)
-  пїЅ	Length of Tax 4 Rate element in characters (1 byte)
-  пїЅ	Length of Tax 4 Value element in characters (1 byte)
-  пїЅ	Length of Receipt Subtotal Before Discount/Surcharge Value element in characters (1 byte)
-  пїЅ	Length of 'DISCOUNT XX.XX%' element in characters (1 byte)
-  пїЅ	Length of Receipt Discount Value element in characters (1 byte)
-  пїЅ	Position in line of Text element (1 byte)
-  пїЅ	Position in line of 'TOTAL' element (1 byte)
-  пїЅ	Position in line of Receipt Total Value element (1 byte)
-  пїЅ	Position in line of 'CASH' element (1 byte)
-  пїЅ	Position in line of Cash Payment Value element (1 byte)
-  пїЅ	Position in line of Payment Type 2 Name element (1 byte)
-  пїЅ	Position in line of Payment Type 2 Value element (1 byte)
-  пїЅ	Position in line of Payment Type 3 Name element (1 byte)
-  пїЅ	Position in line of Payment Type 3 Value element (1 byte)
-  пїЅ	Position in line of Payment Type 4 Name element (1 byte)
-  пїЅ	Position in line of Payment Type 4 Value element (1 byte)
-  пїЅ	Position in line of 'CHANGE' element (1 byte)
-  пїЅ	Position in line of Change Value element (1 byte)
-  пїЅ	Position in line of Tax 1 Name element (1 byte)
-  пїЅ	Position in line of Tax 1 Turnover Value element (1 byte)
-  пїЅ	Position in line of Tax 1 Rate element (1 byte)
-  пїЅ	Position in line of Tax 1 Value element (1 byte)
-  пїЅ	Position in line of Tax 2 Name element (1 byte)
-  пїЅ	Position in line of Tax 2 Turnover Value element (1 byte)
-  пїЅ	Position in line of Tax 2 Rate element (1 byte)
-  пїЅ	Position in line of Tax 2 Value element (1 byte)
-  пїЅ	Position in line of Tax 3 Name element (1 byte)
-  пїЅ	Position in line of Tax 3 Turnover Value element (1 byte)
-  пїЅ	Position in line of Tax 3 Rate element (1 byte)
-  пїЅ	Position in line of Tax 3 Value element (1 byte)
-  пїЅ	Position in line of Tax 4 Name element (1 byte)
-  пїЅ	Position in line of Tax 4 Turnover Value element (1 byte)
-  пїЅ	Position in line of Tax 4 Rate element (1 byte)
-  пїЅ	Position in line of Tax 4 Value element (1 byte)
-  пїЅ	Position in line of 'SUBTOTAL' element (1 byte)
-  пїЅ	Position in line of Receipt Subtotal Before Discount/Surcharge Value element (1 byte)
-  пїЅ	Position in line of 'DISCOUNT XX.XX%' element (1 byte)
-  пїЅ	Position in line of Receipt Discount Value element (1 byte)
-  пїЅ	Slip line number with the first line of Close Fiscal Slip block (1 byte)
-  пїЅ	Cash Payment value (5 bytes)
-  пїЅ	Payment Type 2 value (5 bytes)
-  пїЅ	Payment Type 3 value (5 bytes)
-  пїЅ	Payment Type 4 value (5 bytes)
-  пїЅ	Receipt Discount Value 0 to 99,99 % (2 bytes) 0000пїЅ9999
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Number of lines in transaction block (1 byte) 1…17
+  ·	Line number of Receipt Total element in transaction block (1 byte) 1…17
+  ·	Line number of Text element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Cash Payment element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Payment Type 2 element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Payment Type 3 element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Payment Type 4 element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Change element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 1 Turnover element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 2 Turnover element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 3 Turnover element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 4 Turnover element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 1 Sum element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 2 Sum element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 3 Sum element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Tax 4 Sum element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Receipt Subtotal Before Discount/Surcharge element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Line number of Discount/Surcharge Value element in transaction block (1 byte) 0…17, '0' - do not print
+  ·	Font type of Text element (1 byte)
+  ·	Font type of 'TOTAL' element (1 byte)
+  ·	Font type of Receipt Total Value element (1 byte)
+  ·	Font type of 'CASH' element (1 byte)
+  ·	Font type of Cash Payment Value element (1 byte)
+  ·	Font type of Payment Type 2 Name element (1 byte)
+  ·	Font type of Payment Type 2 Value element (1 byte)
+  ·	Font type of Payment Type 3 Name element (1 byte)
+  ·	Font type of Payment Type 3 Value element (1 byte)
+  ·	Font type of Payment Type 4Name element (1 byte)
+  ·	Font type of Payment Type 4Value element (1 byte)
+  ·	Font type of 'CHANGE' element (1 byte)
+  ·	Font type of Change Value element (1 byte)
+  ·	Font type of Tax 1 Name element (1 byte)
+  ·	Font type of Tax 1 Turnover Value element (1 byte)
+  ·	Font type of Tax 1 Rate element (1 byte)
+  ·	Font type of Tax 1 Value element (1 byte)
+  ·	Font type of Tax 2 Name element (1 byte)
+  ·	Font type of Tax 2 Turnover Value element (1 byte)
+  ·	Font type of Tax 2 Rate element (1 byte)
+  ·	Font type of Tax 2 Value element (1 byte)
+  ·	Font type of Tax 3 Name element (1 byte)
+  ·	Font type of Tax 3 Turnover Value element (1 byte)
+  ·	Font type of Tax 3 Rate element (1 byte)
+  ·	Font type of Tax 3 Value element (1 byte)
+  ·	Font type of Tax 4 Name element (1 byte)
+  ·	Font type of Tax 4 Turnover Value element (1 byte)
+  ·	Font type of Tax 4 Rate element (1 byte)
+  ·	Font type of Tax 4 Value element (1 byte)
+  ·	Font type of 'SUBTOTAL' element (1 byte)
+  ·	Font type of Receipt Subtotal Before Discount/Surcharge Value element (1 byte)
+  ·	Font type of 'DISCOUNT XX.XX%' element (1 byte)
+  ·	Font type of Receipt Discount Value element (1 byte)
+  ·	Length of Text element in characters (1 byte)
+  ·	Length of Receipt Total Value element in characters (1 byte)
+  ·	Length of Cash Payment Value element in characters (1 byte)
+  ·	Length of Payment Type 2 Value element in characters (1 byte)
+  ·	Length of Payment Type 3 Value element in characters (1 byte)
+  ·	Length of Payment Type 4Value element in characters (1 byte)
+  ·	Length of Change Value element in characters (1 byte)
+  ·	Length of Tax 1 Name element in characters (1 byte)
+  ·	Length of Tax 1 Turnover element in characters (1 byte)
+  ·	Length of Tax 1 Rate element in characters (1 byte)
+  ·	Length of Tax 1 Value element in characters (1 byte)
+  ·	Length of Tax 2 Name element in characters (1 byte)
+  ·	Length of Tax 2 Turnover element in characters (1 byte)
+  ·	Length of Tax 2 Rate element in characters (1 byte)
+  ·	Length of Tax 2 Value element in characters (1 byte)
+  ·	Length of Tax 3 Name element in characters (1 byte)
+  ·	Length of Tax 3 Turnover element in characters (1 byte)
+  ·	Length of Tax 3 Rate element in characters (1 byte)
+  ·	Length of Tax 3 Value element in characters (1 byte)
+  ·	Length of Tax 4 Name element in characters (1 byte)
+  ·	Length of Tax 4 Turnover element in characters (1 byte)
+  ·	Length of Tax 4 Rate element in characters (1 byte)
+  ·	Length of Tax 4 Value element in characters (1 byte)
+  ·	Length of Receipt Subtotal Before Discount/Surcharge Value element in characters (1 byte)
+  ·	Length of 'DISCOUNT XX.XX%' element in characters (1 byte)
+  ·	Length of Receipt Discount Value element in characters (1 byte)
+  ·	Position in line of Text element (1 byte)
+  ·	Position in line of 'TOTAL' element (1 byte)
+  ·	Position in line of Receipt Total Value element (1 byte)
+  ·	Position in line of 'CASH' element (1 byte)
+  ·	Position in line of Cash Payment Value element (1 byte)
+  ·	Position in line of Payment Type 2 Name element (1 byte)
+  ·	Position in line of Payment Type 2 Value element (1 byte)
+  ·	Position in line of Payment Type 3 Name element (1 byte)
+  ·	Position in line of Payment Type 3 Value element (1 byte)
+  ·	Position in line of Payment Type 4 Name element (1 byte)
+  ·	Position in line of Payment Type 4 Value element (1 byte)
+  ·	Position in line of 'CHANGE' element (1 byte)
+  ·	Position in line of Change Value element (1 byte)
+  ·	Position in line of Tax 1 Name element (1 byte)
+  ·	Position in line of Tax 1 Turnover Value element (1 byte)
+  ·	Position in line of Tax 1 Rate element (1 byte)
+  ·	Position in line of Tax 1 Value element (1 byte)
+  ·	Position in line of Tax 2 Name element (1 byte)
+  ·	Position in line of Tax 2 Turnover Value element (1 byte)
+  ·	Position in line of Tax 2 Rate element (1 byte)
+  ·	Position in line of Tax 2 Value element (1 byte)
+  ·	Position in line of Tax 3 Name element (1 byte)
+  ·	Position in line of Tax 3 Turnover Value element (1 byte)
+  ·	Position in line of Tax 3 Rate element (1 byte)
+  ·	Position in line of Tax 3 Value element (1 byte)
+  ·	Position in line of Tax 4 Name element (1 byte)
+  ·	Position in line of Tax 4 Turnover Value element (1 byte)
+  ·	Position in line of Tax 4 Rate element (1 byte)
+  ·	Position in line of Tax 4 Value element (1 byte)
+  ·	Position in line of 'SUBTOTAL' element (1 byte)
+  ·	Position in line of Receipt Subtotal Before Discount/Surcharge Value element (1 byte)
+  ·	Position in line of 'DISCOUNT XX.XX%' element (1 byte)
+  ·	Position in line of Receipt Discount Value element (1 byte)
+  ·	Slip line number with the first line of Close Fiscal Slip block (1 byte)
+  ·	Cash Payment value (5 bytes)
+  ·	Payment Type 2 value (5 bytes)
+  ·	Payment Type 3 value (5 bytes)
+  ·	Payment Type 4 value (5 bytes)
+  ·	Receipt Discount Value 0 to 99,99 % (2 bytes) 0000…9999
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		76H. Length: 8 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Change value (5 bytes) 0000000000пїЅ9999999999
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Change value (5 bytes) 0000000000…9999999999
 
 ******************************************************************************)
 
@@ -3812,18 +3811,18 @@ end;
   Sale
 
   Command:	80H. Length: 60 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Quantity (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Unit Price (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Quantity (5 bytes) 0000000000…9999999999
+  ·	Unit Price (5 bytes) 0000000000…9999999999
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		80H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3900,18 +3899,18 @@ end;
   Buy
 
   Command:	81H. Length: 60 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Quantity (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Unit Price (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Quantity (5 bytes) 0000000000…9999999999
+  ·	Unit Price (5 bytes) 0000000000…9999999999
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		81H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3945,18 +3944,18 @@ end;
   Sale Refund
 
   Command:	82H. Length: 60 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Quantity (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Unit Price (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Quantity (5 bytes) 0000000000…9999999999
+  ·	Unit Price (5 bytes) 0000000000…9999999999
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		82H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -3990,18 +3989,18 @@ end;
   Buy Refund
 
   Command:	83H. Length: 60 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Quantity (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Unit Price (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Quantity (5 bytes) 0000000000…9999999999
+  ·	Unit Price (5 bytes) 0000000000…9999999999
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		83H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4035,18 +4034,18 @@ end;
   Void Transaction
   
   Command:	84H. Length: 60 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Quantity (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Unit Price (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Department (1 byte) 0пїЅ16
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Quantity (5 bytes) 0000000000…9999999999
+  ·	Unit Price (5 bytes) 0000000000…9999999999
+  ·	Department (1 byte) 0…16
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		84H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4079,21 +4078,21 @@ end;
   Close Receipt
   
   Command:	85H. Length: 71 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Cash Payment value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Payment Type 2 value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Payment Type 3 value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Payment Type 4 value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Receipt Percentage Discount/Surcharge Value 0 to 99,99 % (2 bytes with sign) -9999пїЅ9999, surcharge if value is negative
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Cash Payment value (5 bytes) 0000000000…9999999999
+  ·	Payment Type 2 value (5 bytes) 0000000000…9999999999
+  ·	Payment Type 3 value (5 bytes) 0000000000…9999999999
+  ·	Payment Type 4 value (5 bytes) 0000000000…9999999999
+  ·	Receipt Percentage Discount/Surcharge Value 0 to 99,99 % (2 bytes with sign) -9999…9999, surcharge if value is negative
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		85H. Length: 8 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Change value (5 bytes) 0000000000пїЅ9999999999
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Change value (5 bytes) 0000000000…9999999999
 
 ******************************************************************************)
 
@@ -4134,16 +4133,16 @@ end;
   Discount
 
   Command:	86H. Length: 54 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Discount value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Discount value (5 bytes) 0000000000…9999999999
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		86H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4171,15 +4170,15 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF4BH
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF4Bh . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:  145 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅ:         5 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:    5 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ:  1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 128 пїЅпїЅпїЅпїЅ ASCII
-пїЅпїЅпїЅпїЅпїЅ:    FF4Bh пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+Скидка, надбавка  на чек для Роснефти FF4BH
+  Код команды FF4Bh . Длина сообщения:  145 байт.
+  Пароль системного администратора: 4 байта
+  Скидка:         5 байт
+  Надбавка:    5 байт
+  Налог:  1 байт
+  Описание скидки или надбавки: 128 байт ASCII
+Ответ:    FF4Bh Длина сообщения: 1 байт.
+  Код ошибки: 1 байт
 
 *)
 
@@ -4204,16 +4203,16 @@ end;
   Surcharge
 
   Command:	87H. Length: 54 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Surcharge value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Surcharge value (5 bytes) 0000000000…9999999999
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		87H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4245,10 +4244,10 @@ end;
   Cancel Receipt
 
   Command:	88H. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		88H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4323,11 +4322,11 @@ end;
   Get Receipt Subtotal
 
   Command:	89H. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		89H. Length: 8 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
-  пїЅ	Receipt Subtotal (5 bytes) 0000000000пїЅ9999999999
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
+  ·	Receipt Subtotal (5 bytes) 0000000000…9999999999
 
 ******************************************************************************)
 
@@ -4352,16 +4351,16 @@ end;
   Void Discount
 
   Command:	8AH. Length: 54 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Void Discount value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Void Discount value (5 bytes) 0000000000…9999999999
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		8AH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4391,16 +4390,16 @@ end;
   Void Surcharge
 
   Command:	8BH. Length: 54 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Void Surcharge value (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax ID
-  пїЅ	Text (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Void Surcharge value (5 bytes) 0000000000…9999999999
+  ·	Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax ID
+  ·	Text (40 bytes)
   Answer:		8BH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4430,10 +4429,10 @@ end;
   Print Last Receipt Duplicate
 
   Command:	8CH. Length: 5 bytes.
-  пїЅ	Operator password (4 bytes)
+  ·	Operator password (4 bytes)
   Answer:		8CH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4456,14 +4455,14 @@ end;
   Open Receipt
 
   Command:	8DH. Length: 6 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Receipt type (1 byte):		0 - Sale;
+  ·	Operator password (4 bytes)
+  ·	Receipt type (1 byte):		0 - Sale;
   1 - Buy;
   2 - Sale Refund;
   3 - Buy Refund.
   Answer:		8DH. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4489,10 +4488,10 @@ end;
   Continue Printing
 
   Command:	B0H. Length: 5 bytes.
-  пїЅ	Operator, Administrator or System Administrator password (4 bytes)
+  ·	Operator, Administrator or System Administrator password (4 bytes)
   Answer:		B0H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4515,12 +4514,12 @@ end;
   Load Graphics In FP
 
   Command: 	C0H. Length: 46 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Graphics line number (1 byte) 0пїЅ199
-  пїЅ	Graphical data (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Graphics line number (1 byte) 0…199
+  ·	Graphical data (40 bytes)
   Answer:		C0H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4550,12 +4549,12 @@ end;
   Print Graphics
 
   Command:	C1H. Length: 7 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Number of first line of preloaded graphics to be printed (1 byte) 1пїЅ200
-  пїЅ	Number of last line of preloaded graphics to be printed (1 byte) 1пїЅ200
+  ·	Operator password (4 bytes)
+  ·	Number of first line of preloaded graphics to be printed (1 byte) 1…200
+  ·	Number of last line of preloaded graphics to be printed (1 byte) 1…200
   Answer:		C1H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4582,11 +4581,11 @@ end;
   Print Bar Code
 
   Command:	C2H. Length: 10 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Bar code (5 bytes) 000000000000пїЅ999999999999
+  ·	Operator password (4 bytes)
+  ·	Bar code (5 bytes) 000000000000…999999999999
   Answer:		C2H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4612,12 +4611,12 @@ end;
   Extended Graphics Load In FP
 
   Command: 	C3H. Length: 47 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Graphics line number (2 bytes) 0пїЅ1199
-  пїЅ	Graphical data (40 bytes)
+  ·	Operator password (4 bytes)
+  ·	Graphics line number (2 bytes) 0…1199
+  ·	Graphical data (40 bytes)
   Answer:		C3H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4644,12 +4643,12 @@ end;
   Print Extended Graphics
 
   Command:	C4H. Length: 9 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Number of first line of preloaded graphics to be printed (1 byte) 1пїЅ1200
-  пїЅ	Number of last line of preloaded graphics to be printed (1 byte) 1пїЅ1200
+  ·	Operator password (4 bytes)
+  ·	Number of first line of preloaded graphics to be printed (1 byte) 1…1200
+  ·	Number of last line of preloaded graphics to be printed (1 byte) 1…1200
   Answer:		C4H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4679,13 +4678,13 @@ end;
   Print Graphical Line
 
   Command: 	C5H. Length: X + 7 bytes.
-  пїЅ	Operator password (4 bytes)
-  пїЅ	Number of repetitions (2 bytes)
-  пїЅ	Flags (1 byte)
-  пїЅ	Graphical data (X bytes)
+  ·	Operator password (4 bytes)
+  ·	Number of repetitions (2 bytes)
+  ·	Flags (1 byte)
+  ·	Graphical data (X bytes)
   Answer:		C5H. Length: 3 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Operator index number (1 byte) 1пїЅ30
+  ·	Result Code (1 byte)
+  ·	Operator index number (1 byte) 1…30
 
 ******************************************************************************)
 
@@ -4721,14 +4720,14 @@ end;
 
   Command:	FCH. Length: 1 byte.
   Answer:		FCH. Length: (8+X) bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Device type (1 byte) 0пїЅ255
-  пїЅ	Device subtype (1 byte) 0пїЅ255
-  пїЅ	Protocol version supported by device (1 byte) 0пїЅ255
-  пїЅ	Subprotocol version supported by device (1 byte) 0пїЅ255
-  пїЅ	Device model (1 byte) 0пїЅ255
-  пїЅ	Language (1 byte) 0пїЅ255, '0' - Russian, '1' - English
-  пїЅ	Device name (X bytes) AnsiString of WIN1251 code page characters;
+  ·	Result Code (1 byte)
+  ·	Device type (1 byte) 0…255
+  ·	Device subtype (1 byte) 0…255
+  ·	Protocol version supported by device (1 byte) 0…255
+  ·	Subprotocol version supported by device (1 byte) 0…255
+  ·	Device model (1 byte) 0…255
+  ·	Language (1 byte) 0…255, '0' - Russian, '1' - English
+  ·	Device name (X bytes) AnsiString of WIN1251 code page characters;
     AnsiString length in bytes depends on device model
 
 ******************************************************************************)
@@ -5026,11 +5025,11 @@ end;
   Get Data Of EKLZ Daily Totals Report
 
   Command:	BAH. Length: 7 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Number of daily totals (2 bytes) 0000пїЅ2100
+  ·	System Administrator password (4 bytes) 30
+  ·	Number of daily totals (2 bytes) 0000…2100
   Answer:		BAH. Length: 18 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	ECR model (16 bytes) AnsiString of WIN1251 code page characters
+  ·	Result Code (1 byte)
+  ·	ECR model (16 bytes) AnsiString of WIN1251 code page characters
 
 *******************************************************************************)
 
@@ -5047,12 +5046,12 @@ end;
 
 (*******************************************************************************
 
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: BBH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ: BBH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 18 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ WIN1251 (16 пїЅпїЅпїЅпїЅ)
+Запрос итога активизации ЭКЛЗ
+Команда: BBH. Длина сообщения: 5 байт.
+Пароль системного администратора (4 байта)
+Ответ: BBH. Длина сообщения: 18 байт.
+Код ошибки (1 байт)
+Тип ККМ – строка символов в кодировке WIN1251 (16 байт)
 
 *******************************************************************************)
 
@@ -5069,10 +5068,10 @@ end;
   Get Data Of EKLZ Report
 
   Command:	B3H. Length: 5 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
+  ·	System Administrator password (4 bytes) 30
   Answer:		B3H. Length: (2+X) bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	Report part or line (X bytes)
+  ·	Result Code (1 byte)
+  ·	Report part or line (X bytes)
 
 *******************************************************************************)
 
@@ -5089,9 +5088,9 @@ end;
   Cancel Active EKLZ Operation
 
   Command:	ACH. Length: 5 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
+  ·	System Administrator password (4 bytes) 30
   Answer:		ACH. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 *******************************************************************************)
 
@@ -5118,15 +5117,15 @@ end;
   Get EKLZ Status 1
 
   Command:	ADH. Length: 5 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
+  ·	System Administrator password (4 bytes) 30
   Answer:		ADH. Length: 22 bytes.
-  пїЅ	Result Code (1 byte)
-  пїЅ	KPK value of last fiscal receipt (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	Date of last KPK (3 bytes) DD-MM-YY
-  пїЅ	Time of last KPK (2 bytes) HH-MM
-  пїЅ	Number of last KPK (4 bytes) 00000000пїЅ99999999
-  пїЅ	EKLZ serial number (5 bytes) 0000000000пїЅ9999999999
-  пїЅ	EKLZ flags (1 byte)
+  ·	Result Code (1 byte)
+  ·	KPK value of last fiscal receipt (5 bytes) 0000000000…9999999999
+  ·	Date of last KPK (3 bytes) DD-MM-YY
+  ·	Time of last KPK (2 bytes) HH-MM
+  ·	Number of last KPK (4 bytes) 00000000…99999999
+  ·	EKLZ serial number (5 bytes) 0000000000…9999999999
+  ·	EKLZ flags (1 byte)
 
 *******************************************************************************)
 
@@ -5168,12 +5167,12 @@ end;
   Print Daily Totals Report In Dates Range From EKLZ
 
   Command:	A2H. Length: 12 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Report type (1 byte) '0' - short, '1' - full
-  пїЅ	Date of first daily totals in range (3 bytes) DD-MM-YY
-  пїЅ	Date of last daily totals in range (3 bytes) DD-MM-YY
+  ·	System Administrator password (4 bytes) 30
+  ·	Report type (1 byte) '0' - short, '1' - full
+  ·	Date of first daily totals in range (3 bytes) DD-MM-YY
+  ·	Date of last daily totals in range (3 bytes) DD-MM-YY
   Answer:		A2H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -5192,12 +5191,12 @@ end;
   Print Daily Totals Report In Daily Totals Numbers Range From EKLZ
 
   Command:	A3H. Length: 10 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Report type (1 byte) '0' - short, '1' - full
-  пїЅ	Number of first daily totals in range (2 bytes) 0000пїЅ2100
-  пїЅ	Number of last daily totals in range (2 bytes) 0000пїЅ2100
+  ·	System Administrator password (4 bytes) 30
+  ·	Report type (1 byte) '0' - short, '1' - full
+  ·	Number of first daily totals in range (2 bytes) 0000…2100
+  ·	Number of last daily totals in range (2 bytes) 0000…2100
   Answer:		A3H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -5559,11 +5558,11 @@ end;
   Print Daily Log Report For Daily Totals Number From EKLZ
 
   Command:	A6H. Length: 7 bytes.
-  пїЅ	System Administrator password (4 bytes) 30
-  пїЅ	Day number (2 bytes) 0000пїЅ2100
+  ·	System Administrator password (4 bytes) 30
+  ·	Day number (2 bytes) 0000…2100
 
   Answer:		A6H. Length: 2 bytes.
-  пїЅ	Result Code (1 byte)
+  ·	Result Code (1 byte)
 
 ******************************************************************************)
 
@@ -6934,7 +6933,7 @@ begin
   end;
 end;
 
-// 17,1,17,1,0,4,4,'Rus пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ','4'
+// 17,1,17,1,0,4,4,'Rus формат фд','4'
 function TFiscalPrinterDevice.GetFFDVersion: TFFDVersion;
 begin
   if FFFDVersion = TFFDVersion(-1) then
@@ -7235,50 +7234,50 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: DEH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 15 пїЅпїЅпїЅпїЅ.
-"	пїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 1...70891
-"	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 0...127
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 3 (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 5 (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-	пїЅпїЅпїЅпїЅпїЅ:		DEH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 122 пїЅпїЅпїЅпїЅ.
-"	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1пїЅ30
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 (1 пїЅпїЅпїЅпїЅ) 2
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 (1 пїЅпїЅпїЅпїЅ) 2
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 3 (1 пїЅпїЅпїЅпїЅ) 2
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 (1 пїЅпїЅпїЅпїЅ) 2
-"	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 5 (1 пїЅпїЅпїЅпїЅ) 2
-"	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 2
-"	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 2
+Печать многомерного штрих-кода
+Команда: DEH. Длина сообщения: 15 байт.
+"	Пароль (4 байта)
+"	Тип штрих-кода (1 байт)
+"	Длина данных штрих-кода (2 байта) 1...70891
+"	Номер начального блока данных (1 байт) 0...127
+"	Параметр 1 (1 байт)
+"	Параметр 2 (1 байт)
+"	Параметр 3 (1 байт)
+"	Параметр 4 (1 байт)
+"	Параметр 5 (1 байт)
+"	Выравнивание (1 байт)
+	Ответ:		DEH. Длина сообщения: 3 байт или 122 байт.
+"	Код ошибки (1 байт)
+"	Порядковый номер оператора (1 байт) 1…30
+"	Параметр 1 (1 байт) 2
+"	Параметр 2 (1 байт) 2
+"	Параметр 3 (1 байт) 2
+"	Параметр 4 (1 байт) 2
+"	Параметр 5 (1 байт) 2
+"	Размер штрих-кода (горизонтальный) в точках (2 байта) 2
+"	Размер штрих-кода (вертикальный) в точках (2 байта) 2
 
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅ
+Тип штрих-кода	Штрих-код
 0	PDF 417
 1	DATAMATRIX
 2	AZTEC
 3	QR code
 1312	QR code2
 
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	PDF 417	DATAMATRIX	AZTEC	QR Code
+Номер параметра	PDF 417	DATAMATRIX	AZTEC	QR Code
 1	Number of columns	Encoding scheme	Encoding scheme	Version, 0=auto; 40 (max)
 2	Number of rows	Rotate	-	Mask; 8 (max)
 3	Width of module	Dot size	Dot size	Dot size; 3...8
 4	Module height	Symbol size	Symbol size	-
 5	Error correction level	-	Error correction level	Error correction level; 0...3=L,M,Q,H
 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-0	пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-1	пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-2	пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-1 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ QR пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ;
-2 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ (QR пїЅпїЅпїЅ).
+Выравнивание	Тип выравнивания
+0	По левому краю
+1	По центру
+2	По правому краю
+Примечания:
+1 - в зависимости от версии печатаемого QR кода и типа данных;
+2 - для типа штрих-кода (QR код).
 *)
 
 function TFiscalPrinterDevice.PrintBarcode2D(const Barcode: TBarcode2D): Integer;
@@ -7301,17 +7300,17 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 	4EH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11+X2 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ L (1 пїЅпїЅпїЅпїЅ) 1пїЅ40 пїЅпїЅпїЅ T = 0; 1пїЅ643 пїЅпїЅпїЅ T = 1
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 1пїЅ12004 пїЅпїЅпїЅ T = 0; 1пїЅ6005 пїЅпїЅпїЅ T = 1
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ N6 (2 пїЅпїЅпїЅпїЅпїЅ) 1пїЅ12004 пїЅпїЅпїЅ T = 0; 1пїЅ6005 пїЅпїЅпїЅ T = 1
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ T (1 пїЅпїЅпїЅпїЅ) 0 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ [пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ] пїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 1 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (X2 = N * L пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ:		4EH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1пїЅ30
+Загрузка графики-512
+Команда: 	4EH. Длина сообщения: 11+X2 байт.
+Пароль оператора (4 байта)
+Длина линии L (1 байт) 1…40 для T = 0; 1…643 для T = 1
+Номер начальной линии (2 байта) 1…12004 для T = 0; 1…6005 для T = 1
+Количество последующих линий N6 (2 байта) 1…12004 для T = 0; 1…6005 для T = 1
+Тип графического буфера T (1 байт) 0 - для команд [расширенной] графики; 1 - для команд графики-512
+Графическая информация (X2 = N * L байт)
+Ответ:		4EH. Длина сообщения: 3 байта.
+Код ошибки (1 байт)
+Порядковый номер оператора (1 байт) 1…30
 *)
 
 function TFiscalPrinterDevice.LoadGraphics3(Line: Word; Data: AnsiString): Integer;
@@ -7339,22 +7338,22 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ1
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:	4DH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 12 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 1пїЅ600
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 1пїЅ600
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1пїЅ255
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1пїЅ6
-пїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ 0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ2, пїЅпїЅпїЅ 1 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ 23 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ 34 - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ; пїЅпїЅпїЅ 75 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ:		4DH. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1пїЅ30
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-1 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 42, пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ F7H);
-2 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 20, пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ F7H);
-3 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 21, пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ F7H);
-4 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 34, пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ F7H); пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 7 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ; пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 7, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 10H;
+Печать графики-512 с масштабированием1
+Команда:	4DH. Длина сообщения: 12 байт.
+Пароль оператора (4 байта)
+Начальная линия (2 байта) 1…600
+Конечная линия (2 байта) 1…600
+Коэффициент масштабирования точки по вертикали (1 байт) 1…255
+Коэффициент масштабирования точки по горизонтали (1 байт) 1…6
+Флаги (1 байт) Бит 0 - контрольная лента2, Бит 1 - чековая лента, Бит 23 - подкладной документ, Бит 34 - слип чек; Бит 75 - отложенная печать графики
+Ответ:		4DH. Длина сообщения: 3 байта.
+Код ошибки (1 байт)
+Порядковый номер оператора (1 байт) 1…30
+Примечания:
+1 - в зависимости от модели ККТ (для параметра модели Бит 42, см. команду F7H);
+2 - в зависимости от модели ККТ (для параметра модели Бит 20, см. команду F7H);
+3 - в зависимости от модели ККТ (для параметра модели Бит 21, см. команду F7H);
+4 - в зависимости от модели ККТ (для параметра модели Бит 34, см. команду F7H); если Бит 7 установлен и фискальный чек открыт и установлена настройка "ПЕЧАТЬ ЧЕКА ПО ЗАКРЫТИЮ" в таблице 1, то графика будет распечатана перед фискальным чеком; если не установлен Бит 7, то графика печатается немедленно; результат печати можно проверить командой 10H;
 *)
 
 function TFiscalPrinterDevice.PrintGraphics3(Line1, Line2: Word): Integer;
@@ -7430,32 +7429,32 @@ begin
 end;
 
 (******************************************************************************
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF0DH
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF0Dh . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:  254 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,
-  2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
-  3 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,
-  4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ 0000000000пїЅ9999999999
-  пїЅпїЅпїЅпїЅ:             5 пїЅпїЅпїЅпїЅ 0000000000пїЅ9999999999
-  пїЅпїЅпїЅпїЅпїЅпїЅ:         5 пїЅпїЅпїЅпїЅ 0000000000пїЅ9999999999
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:    5 пїЅпїЅпїЅпїЅ 0000000000пїЅ9999999999
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  0пїЅ16 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 255 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ:  1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ 1 пїЅ0пїЅ пїЅ пїЅпїЅпїЅ, пїЅ1пїЅ пїЅ 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ 2 пїЅ0пїЅ пїЅ пїЅпїЅпїЅ, пїЅ1пїЅ пїЅ 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ 3 пїЅ0пїЅ пїЅ пїЅпїЅпїЅ, пїЅ1пїЅ пїЅ 3 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ 4 пїЅ0пїЅ пїЅ пїЅпїЅпїЅ, пїЅ1пїЅ пїЅ 4 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ  000000000000пїЅ999999999999
-  пїЅпїЅпїЅпїЅпїЅ: 220 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ).
-пїЅпїЅпїЅпїЅпїЅ:    FF0Dh пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+Операция со скидками и надбавками FF0DH
+Код команды FF0Dh . Длина сообщения:  254 байт.
+  Пароль системного администратора: 4 байта
+  Тип операции: 1 байт
+  1 – Приход,
+  2 – Возврат прихода,
+  3 – Расход,
+  4 – Возврат расхода
+  Количество: 5 байт 0000000000…9999999999
+  Цена:             5 байт 0000000000…9999999999
+  Скидка:         5 байт 0000000000…9999999999
+  Надбавка:    5 байт 0000000000…9999999999
+  Номер отдела: 1 байт
+  0…16 – режим свободной продажи, 255 – режим продажи по коду товара
+  Налог:  1 байт
+  Бит 1 «0» – нет, «1» – 1 налоговая группа
+  Бит 2 «0» – нет, «1» – 2 налоговая группа
+  Бит 3 «0» – нет, «1» – 3 налоговая группа
+  Бит 4 «0» – нет, «1» – 4 налоговая группа
+  Штрих-код: 5 байт  000000000000…999999999999
+  Текст: 220 байта строка - название товара и скидки
+  Примечание: если строка начинается символами, то она передаётся на сервер
+    ОФД но не печатается на кассе. Названия товара и скидки должны
+    заканчиваться нулём (Нуль терминированные строки).
+Ответ:    FF0Dh Длина сообщения: 1 байт.
+  Код ошибки: 1 байт
 ******************************************************************************)
 
 function TFiscalPrinterDevice.FSSale(P: TFSSale): Integer;
@@ -7480,24 +7479,24 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ V2 FF46H
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF46h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:  160 пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-1 - пїЅпїЅпїЅпїЅпїЅпїЅ,
-2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
-3 - пїЅпїЅпїЅпїЅпїЅпїЅ,
-4 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ ( 6 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ )
-пїЅпїЅпїЅпїЅ:             5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 5 пїЅпїЅпїЅпїЅ *
-пїЅпїЅпїЅпїЅпїЅ:           5 пїЅпїЅпїЅпїЅ **
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ:  1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-0пїЅ16 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 255 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ : 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 0-128 пїЅпїЅпїЅпїЅ ASCII
+Операция V2 FF46H
+Код команды FF46h . Длина сообщения:  160 байта.
+Пароль: 4 байта
+Тип операции: 1 байт
+1 - Приход,
+2 - Возврат прихода,
+3 - Расход,
+4 - Возврат расхода
+Количество: 6 байт ( 6 знаков после запятой )
+Цена:             5 байт
+Сумма операции 5 байт *
+Налог:           5 байт **
+Налоговая ставка:  1 байт
+Номер отдела: 1 байт
+0…16 - режим свободной продажи, 255 - режим продажи по коду товара
+Признак способа расчёта : 1 байт
+Признак предмета расчёта: 1 байт
+Наименование товара: 0-128 байт ASCII
 
 *)
 
@@ -7523,18 +7522,18 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF0Eh. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 9 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅ, TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) (2 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅ T=FFFFh2, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF3Bh
-пїЅпїЅпїЅпїЅпїЅ: 		FF0Eh. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3+X1 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (X1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-1 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ FFFFh);
-2 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (X=0).
+Запрос параметра открытия ФН
+Код команды 	FF0Eh. Длина сообщения: 9 байт.
+Пароль системного администратора (4 байта)
+Порядковый номер отчета о регистрации/перерегистрации (1 байт)
+Номер тега (Тип Т, TLV параметра) (2 байта)
+если T=FFFFh2, то читать TLV структуру командой FF3Bh
+Ответ: 		FF0Eh. Длина сообщения: 3+X1 байт.
+Код ошибки (1 байт)
+TLV структура (X1 байт)
+Примечание:
+1 - длина ответного сообщения зависит от TLV структуры, возвращаемой ФН на заданный номер тега (кроме FFFFh);
+2 - при запросе всех тегов TLV структура не возвращается (X=0).
 
 *)
 
@@ -7554,34 +7553,34 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ 0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 
-пїЅпїЅпїЅ 1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
-пїЅпїЅпїЅ 2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
-пїЅпїЅпїЅ 3 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-00h пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
-01h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
-02h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
-04h пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 
-08h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
-10h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
-11h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-12h - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
-13h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-14h пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-15h пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-17h пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:  1 пїЅпїЅпїЅпїЅ
-00 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
-01 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-00 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
-01 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 16 пїЅпїЅпїЅпїЅ ASCII
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+Состояние фазы жизни: 1 байт
+Бит 0 – проведена настройка ФН 
+Бит 1 – открыт фискальный режим 
+Бит 2 – закрыт фискальный режим 
+Бит 3 – закончена передача фискальных данных в ОФД 
+Текущий документ: 1 байт
+00h – нет открытого документа 
+01h – отчет о фискализации 
+02h – отчет об открытии смены 
+04h – кассовый чек 
+08h – отчет о закрытии смены 
+10h – отчет о закрытии фискального режима 
+11h – Бланк строкой отчетности
+12h - Отчет об изменении параметров регистрации ККТ в связи с заменой ФН
+13h – Отчет об изменении параметров регистрации ККТ
+14h – Кассовый чек коррекции
+15h – БСО коррекции
+17h – Отчет о текущем состоянии расчетов
+Данные документа:  1 байт
+00 – нет данных документа 
+01 – получены данные документа 
+Состояние смены: 1 байт
+00 – смена закрыта 
+01 – смена открыта 
+Флаги предупреждения: 1 байт
+Дата и время: 5 байт
+Номер ФН: 16 байт ASCII
+Номер последнего ФД: 4 байта
 
 *)
 
@@ -7612,11 +7611,11 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ FF08H
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF08h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF08h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+Отменить документ в ФН FF08H
+Код команды FF08h. Длина сообщения: 6 байт.
+Пароль системного администратора: 4 байта
+Ответ: FF08h Длина сообщения: 1 байт.
+Код ошибки: 1 байт
 *)
 
 function TFiscalPrinterDevice.FSCancelDocument: Integer;
@@ -7630,13 +7629,13 @@ end;
 
 (*
 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF30h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ:	    FF30h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ( 2 пїЅпїЅпїЅпїЅпїЅ )  0 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ( 1 пїЅпїЅпїЅпїЅ)
+Запросить наличие данных в буфере
+Код команды FF30h . Длина сообщения: 6 байт.
+Пароль системного администратора: 4 байта
+Ответ:	    FF30h Длина сообщения: 4 байта.
+Код ошибки (1 байт)
+Количество байт в буфере ( 2 байта )  0 – нет данных
+Максимальный размер блока данных ( 1 байт)
 
 *)
 
@@ -7657,17 +7656,17 @@ end;
 
 (*
 
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF0Ah . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 10 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF0пїЅh пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 3+N пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-1- пїЅпїЅ
-0 -пїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: N пїЅпїЅпїЅпїЅ
+Найти фискальный документ по номеру
+Код команды FF0Ah . Длина сообщения: 10 байт.
+Пароль системного администратора: 4 байта
+Номер фискального документа: 4 байта
+Ответ: FF0Аh Длина сообщения 3+N байт.
+Код ошибки: 1 байт
+Тип фискального документа: 1 байт
+Получена ли квитанция из ОФД: 1 байт
+1- да
+0 -нет
+Данные фискального документа в зависимости от типа документ: N байт
 
 *)
 
@@ -7675,15 +7674,15 @@ function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
   var R: TFSDocument): Integer;
 
   (*
-  //SDocType1 = 'пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+  //SDocType1 = 'Отчёт о регистрации';
 
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅ	ASCII	12
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ	ASCII	20
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1}
+  Дата и время	DATE_TIME	5
+  Номер ФД	Uint32, LE	4
+  Фискальный признак	Uint32, LE	4
+  ИНН	ASCII	12
+  Регистрационный номер ККТ	ASCII	20
+  Код налогообложения	Byte	1
+  Режим работы	Byte	1}
   *)
 
   procedure DecodeDocType1(const Data: AnsiString; var R: TFSDocument1);
@@ -7699,11 +7698,11 @@ function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
   end;
 
   (*
-  //SDocType2 = 'пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ';
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ	Uint16, LE	2}
+  //SDocType2 = 'Отчёт об открытии смены';
+  Дата и время	DATE_TIME	5
+  Номер ФД	Uint32, LE	4
+  Фискальный признак	Uint32, LE	4
+  Номер смены	Uint16, LE	2}
   *)
 
   procedure DecodeDocType2(const Data: AnsiString; var R: TFSDocument2);
@@ -7716,12 +7715,12 @@ function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
   end;
 
   (*
-  SDocType3 = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ';
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint40, LE	5
+  SDocType3 = 'Кассовый чек';
+  Дата и время	DATE_TIME	5
+  Номер ФД	Uint32, LE	4
+  Фискальный признак	Uint32, LE	4
+  Тип операции	Byte	1
+  Сумма операции	Uint40, LE	5
   *)
 
   procedure DecodeDocType3(const Data: AnsiString; var R: TFSDocument3);
@@ -7734,12 +7733,12 @@ function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
     R.Amount := BinToInt(Data, 15, 5);
   end;
 
-  (*6 пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅ	ASCII	12
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ	ASCII	20 *)
+  (*6 Отчёт о закрытии фискального накопителя
+  Дата и время	DATE_TIME	5
+  Номер ФД	Uint32, LE	4
+  Фискальный признак	Uint32, LE	4
+  ИНН	ASCII	12
+  Регистрационный номер ККТ	ASCII	20 *)
 
   procedure DecodeDocType6(const Data: AnsiString; var R: TFSDocument6);
   begin
@@ -7751,15 +7750,15 @@ function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
     R.EcrRegNum := Copy(Data, 26, 20);
   end;
 
-  //11 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  {пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅ	ASCII	12
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ	ASCII	20
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1}
+  //11 Отчёт об изменении параметров регистрации
+  {Дата и время	DATE_TIME	5
+  Номер ФД	Uint32, LE	4
+  Фискальный признак	Uint32, LE	4
+  ИНН	ASCII	12
+  Регистрационный номер ККТ	ASCII	20
+  Код налогообложения	Byte	1
+  Режим работы	Byte	1
+  Код причины перерегистрации	Byte	1}
 
   procedure DecodeDocType11(const Data: AnsiString; var R: TFSDocument11);
   begin
@@ -7774,12 +7773,12 @@ function TFiscalPrinterDevice.FSFindDocument(DocNumber: Integer;
     R.ReasonCode := Ord(Data[48]);
   end;
 
-  //21 пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  {пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4
-  пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5}
+  //21 Отчет о состоянии расчетов
+  {Дата и время	DATE_TIME	5
+  Номер ФД	Uint32, LE	4
+  Фискальный признак	Uint32, LE	4
+  Кол-во неподтвержденных документов	Uint32, LE	4
+  Дата первого неподтвержденного документа	DATE_TIME	5}
 
   procedure DecodeDocType21(const Data: AnsiString; var R: TFSDocument21);
   begin
@@ -7841,14 +7840,14 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF31h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-        пїЅпїЅпїЅпїЅпїЅ:	    FF31h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1+N пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅ (N пїЅпїЅпїЅпїЅ)
+Прочитать блок данных данных из буфера
+Код команды FF31h . Длина сообщения: 6 байт.
+Пароль системного администратора: (4 байта)
+Начальное смещение: 2 байта
+Количество запрашиваемых данных (1 байт)
+        Ответ:	    FF31h Длина сообщения: 1+N байт.
+Код ошибки (1 байт)
+Данные (N байт)
 *)
 
 function TFiscalPrinterDevice.FSReadBlock(const P: TFSBlockRequest;
@@ -7868,13 +7867,13 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF32h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 8 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ( 2 пїЅпїЅпїЅпїЅпїЅ)
-        пїЅпїЅпїЅпїЅпїЅ:	    FF32h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+Начать запись данных в буфер
+Код команды FF32h . Длина сообщения: 8 байт.
+Пароль системного администратора: (4 байта)
+Размер данных ( 2 байта)
+        Ответ:	    FF32h Длина сообщения: 2 байта.
+Код ошибки (1 байт)
+Максимальный размер блок данных (1 байт)
 *)
 
 function TFiscalPrinterDevice.FSStartWrite(DataSize: Word;
@@ -7894,14 +7893,14 @@ end;
 
 (*
 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF33h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 9+N пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: (4 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: (2 пїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ( N пїЅпїЅпїЅпїЅ)
-         пїЅпїЅпїЅпїЅпїЅ:	    FF33h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+Записать блок данных в буфер
+Код команды FF33h . Длина сообщения: 9+N байт.
+Пароль системного администратора: (4 байта)
+Начальное смещение: (2 байта)
+Размер данных  (1 байт)
+Данные для записи ( N байт)
+         Ответ:	    FF33h Длина сообщения: 1 байт.
+Код ошибки (1 байт)
 
 *)
 
@@ -7993,15 +7992,15 @@ begin
 end;
 
 {******************************************************************************
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF38H
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF38h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ:	    FF38h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 16 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ,пїЅпїЅ,пїЅпїЅ
+Сформировать отчёт о состоянии расчётов FF38H
+Код команды FF38h . Длина сообщения: 6 байт.
+  Пароль системного администратора: 4 байта
+Ответ:	    FF38h Длина сообщения: 16 байт.
+  Код ошибки: 1 байт
+  Номер ФД: 4 байта
+  Фискальный признак: 4 байта
+  Количество неподтверждённых документов: 4 байта
+  Дата первого неподтверждённого документа: 3 байта ГГ,ММ,ДД
 ******************************************************************************}
 
 function TFiscalPrinterDevice.FSPrintCalcReport(var R: TFSCalcReport): Integer;
@@ -8025,23 +8024,23 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF39h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF39h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 14 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  (0 пїЅ пїЅпїЅпїЅ, 1 пїЅ пїЅпїЅ)
-  пїЅпїЅпїЅ 0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ 1 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
-  пїЅпїЅпїЅ 2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅ пїЅпїЅпїЅ
-  пїЅпїЅпїЅ 3 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ
-  пїЅпїЅпїЅ 4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
-  пїЅпїЅпїЅ 5 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ 1 пїЅ пїЅпїЅ, 0 -пїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ
+Получить статус информационного обмена
+Код команды FF39h . Длина сообщения: 6 байт.
+  Пароль системного администратора: 4 байта
+Ответ: FF39h Длина сообщения: 14 байт.
+  Код ошибки: 1 байт
+  Статус информационного обмена: 1 байт
+  (0 – нет, 1 – да)
+  Бит 0 – транспортное соединение установлено
+  Бит 1 – есть сообщение для передачи в ОФД
+  Бит 2 – ожидание ответного сообщения (квитанции) от ОФД
+  Бит 3 – есть команда от ОФД
+  Бит 4 – изменились настройки соединения с ОФД
+  Бит 5 – ожидание ответа на команду от ОФД
+  Состояние чтения сообщения: 1 байт 1 – да, 0 -нет
+  Количество сообщений для ОФД: 2 байта
+  Номер документа для ОФД первого в очереди: 4 байта
+  Дата и время документа для ОФД первого в очереди: 5 байт
 
 *)
 
@@ -8077,12 +8076,12 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF03h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF03h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ,пїЅпїЅ,пїЅпїЅ
+Запрос срока действия ФН
+Код команды FF03h . Длина сообщения: 6 байт.
+Пароль системного администратора: 4 байта
+Ответ: FF03h Длина сообщения: 4 байт.
+Код ошибки: 1 байт
+Срок действия: 3 байта ГГ,ММ,ДД
 *)
 
 function TFiscalPrinterDevice.FSReadExpiration(var R: TCommandFF03): Integer;
@@ -8102,20 +8101,20 @@ begin
 end;
 
 (*
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Запрос итогов фискализации
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF09h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-    пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+  Код команды FF09h . Длина сообщения: 6 байт.
+    Пароль системного администратора: 4 байта
 
-  пїЅпїЅпїЅпїЅпїЅ: FF09h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 48 пїЅпїЅпїЅпїЅ.
-    пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ : 1 пїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ DATE_TIME
-    пїЅпїЅпїЅ : 12 пїЅпїЅпїЅпїЅ ASCII
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅT: 20 пїЅпїЅпїЅпїЅ ASCII
-    пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+  Ответ: FF09h Длина сообщения: 48 байт.
+    Код ошибки : 1 байт
+    Дата и время: 5 байт DATE_TIME
+    ИНН : 12 байт ASCII
+    Регистрационный номер ККT: 20 байт ASCII
+    Код налогообложения: 1 байт
+    Режим работы: 1 байт
+    Номер ФД: 4 байта
+    Фискальный признак: 4 байта
 *)
 
 function TFiscalPrinterDevice.FSReadFiscalResult(var R: TFSFiscalResult): Integer;
@@ -8139,14 +8138,14 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF3пїЅh . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF3пїЅh пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1+N пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: N пїЅпїЅпїЅпїЅ
+Запрос квитанции о получении данных в ОФД по номеру
+документа
+Код команды FF3Сh . Длина сообщения: 11 байт.
+Пароль системного администратора: 4 байта
+Номер фискального документа: 4 байта
+Ответ: FF3Сh Длина сообщения: 1+N байт.
+Код ошибки: 1 байт
+Квитанция: N байт
 *)
 
 function TFiscalPrinterDevice.FSReadTicket(var R: TFSTicket): Integer;
@@ -8189,7 +8188,7 @@ begin
   case ParamId of
     DIO_FPTR_PARAMETER_QRCODE_ENABLED:
     begin
-      // 1,1,41,1,0,0,1,'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ','1'
+      // 1,1,41,1,0,0,1,'Кодирование реквизитов чека','1'
       Result := ReadTableStr(1, 1, 41);
     end;
     DIO_FPTR_PARAMETER_OFD_ADDRESS:
@@ -8343,8 +8342,8 @@ begin
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
-//  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1
-// (FE F4 00 00 00 00), пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
+//  Добавлен запрос необнуляемых сумм через сервисную команду 1
+// (FE F4 00 00 00 00), возвращает 4 8-ми байтных числа.
 
 function TFiscalPrinterDevice.FSReadTotals(var R: TFMTotals): Integer;
 var
@@ -8385,17 +8384,17 @@ begin
 end;
 
 (*
-0xF4    пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-"	FE F4 00 00 00 00 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ). пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-"	FE F4 01 00 00 00 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 16 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ). пїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 16-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-"	FE F4 02 00 00 00 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 16 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ). пїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 16-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-"	FE F4 03 00 00 00 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 16 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ). пїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 16-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-"	FE F4 04 00 00 00 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 16 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ). пїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 16-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-"	FE F4 05 00 00 00 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 8-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ.  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 33(129) пїЅпїЅпїЅпїЅ.
-"	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-"	пїЅпїЅпїЅпїЅпїЅпїЅ (X пїЅпїЅпїЅпїЅ). X пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
+0xF4    Запрос необнуляемых сумм.
+Второй параметр отвечает за тип запрашиваемых сумм
+"	FE F4 00 00 00 00 - возвращает 4 8-ми байтных числа (приход, возврат прихода, расход, возврат расхода). Это НС без деталировки по типам оплаты
+"	FE F4 01 00 00 00 - возвращает 16 8-ми байтных числа (приход). Это НС с деталировкой по 16-ти типам оплаты
+"	FE F4 02 00 00 00 - возвращает 16 8-ми байтных числа (возврат прихода). Это НС с деталировкой по 16-ти типам оплаты
+"	FE F4 03 00 00 00 - возвращает 16 8-ми байтных числа (расход). Это НС с деталировкой по 16-ти типам оплаты
+"	FE F4 04 00 00 00 - возвращает 16 8-ми байтных числа (возврат расхода). Это НС с деталировкой по 16-ти типам оплаты
+"	FE F4 05 00 00 00 - возвращает 4 8-ми байтных числа (коррекция прихода, коррекция возврата прихода, коррекция расхода, коррекция возврата расхода)
+Ответ.  Длина сообщения: 33(129) байт.
+"	Код ошибки (1 байт)
+"	Данные (X байт). X в зависимости от типа запрашиваемых данных.
 
 *)
 
@@ -8419,12 +8418,12 @@ end;
 
 (*
 
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 4 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ:
-193пїЅ196 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-197пїЅ200 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2;
-201пїЅ204 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3;
-205пїЅ208 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4;
+Накопления по видам оплаты по 4 типам торговых операций (продажа, покупка,
+возврат продажи, возврат покупки) за смену:
+193…196 – наличными;
+197…200 – видом оплаты 2;
+201…204 – видом оплаты 3;
+205…208 – видом оплаты 4;
 
 *)
 
@@ -8437,12 +8436,12 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 4 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅ:
-72пїЅ75 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-76пїЅ79 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2;
-80пїЅ83 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3;
-84пїЅ87 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4;
+Накопления по видам оплаты по 4 типам торговых операций (продажа, покупка,
+возврат продажи, возврат покупки) в чеке:
+72…75 – наличными;
+76…79 – видом оплаты 2;
+80…83 – видом оплаты 3;
+84…87 – видом оплаты 4;
 *)
 
 function TFiscalPrinterDevice.ReadTotalsByReceiptType(Index: Integer): Int64;
@@ -8510,17 +8509,17 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF36H
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF36h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 12 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ 0000000000пїЅ9999999999
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅ
+Сформировать чек коррекции FF36H
+Код команды FF36h . Длина сообщения: 12 байт.
+Пароль системного администратора: 4 байта
+Итог чека: 5 байт 0000000000…9999999999
+Тип операции 1 байт
 
-пїЅпїЅпїЅпїЅпїЅ: FF36h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅ
+Ответ: FF36h Длина сообщения: 11 байт.
+Код ошибки: 1 байт
+Номер чека: 2 байта
+Номер ФД: 4 байта
+Фискальный признак: 4 байт
 *)
 
 function TFiscalPrinterDevice.FSPrintCorrectionReceipt(
@@ -8547,24 +8546,24 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ V2 FF4AH
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF4Ah . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 69 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ :1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:1пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ :5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 20%:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 10%:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 0%:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ 20/120:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ 10/110:5 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:1пїЅпїЅпїЅпїЅ
+Сформировать чек коррекции V2 FF4AH
+Код команды FF4Ah . Длина сообщения: 69 байт.
+Пароль системного администратора: 4 байта
+Тип коррекции :1 байт
+Признак расчета:1байт
+Сумма расчёта :5 байт
+Сумма по чеку наличными:5 байт
+Сумма по чеку электронными:5 байт
+Сумма по чеку предоплатой:5 байт
+Сумма по чеку постоплатой:5 байт
+Сумма по чеку встречным представлением:5 байт
+Сумма НДС 20%:5 байт
+Сумма НДС 10%:5 байт
+Сумма расчёта по ставке 0%:5 байт
+Сумма расчёта по чеку без НДС:5 байт
+Сумма расчёта по расч. ставке 20/120:5 байт
+Сумма расчёта по расч. ставке 10/110:5 байт
+Применяемая система налогообложения:1байт
 *)
 
 function TFiscalPrinterDevice.FSPrintCorrectionReceipt2(
@@ -8717,92 +8716,92 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ V2 FF45H
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF45H. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 182 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 5 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 6 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 7 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 8 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 9 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 10 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 11 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 12 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 13 (5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 14 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 15 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 16 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ 1 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅ 20%)
-пїЅпїЅпїЅпїЅпїЅ 2 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅ 10%)
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅ 0%)
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅ пїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ 5 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. 18/118)
-пїЅпїЅпїЅпїЅпїЅ 6 (5 пїЅпїЅпїЅпїЅ) (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. 10/110)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ (0-64 пїЅпїЅпїЅпїЅ)
+Закрытие чека расширенное вариант V2 FF45H
+Код команды FF45H. Длина сообщения: 182 байт.
+Пароль системного администратора: 4 байта
+Сумма наличных (5 байт)
+Сумма типа оплаты 2 (5 байт)
+Сумма типа оплаты 3 (5 байт)
+Сумма типа оплаты 4 (5 байт)
+Сумма типа оплаты 5 (5 байт)
+Сумма типа оплаты 6 (5 байт)
+Сумма типа оплаты 7 (5 байт)
+Сумма типа оплаты 8 (5 байт)
+Сумма типа оплаты 9 (5 байт)
+Сумма типа оплаты 10 (5 байт)
+Сумма типа оплаты 11 (5 байт)
+Сумма типа оплаты 12 (5 байт)
+Сумма типа оплаты 13 (5 байт)
+Сумма типа оплаты 14 (5 байт) (предоплата)
+Сумма типа оплаты 15 (5 байт) (постоплата)
+Сумма типа оплаты 16 (5 байт) (встречное представление)
+Округление до рубля в копейках (1 байт)
+Налог 1 (5 байт) (НДС 20%)
+Налог 2 (5 байт) (НДС 10%)
+Оборот по налогу 3 (5 байт) (НДС 0%)
+Оборот по налогу 4 (5 байт) (Без НДС)
+Налог 5 (5 байт) (НДС расч. 18/118)
+Налог 6 (5 байт) (НДС расч. 10/110)
+Система налогообложения(1 байт)
+Текст (0-64 байт)
 _______________________________________________________
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2-13 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ".
-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0 ( 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ.
+Примечания:
+Типы оплаты 2-13 при передаче в ОФД суммируются и передаются как оплата "ЭЛЕКТРОННЫМИ".
+В режиме начисления налогов 0 ( 1 Таблица) касса рассчитывает налоги самостоятельно исходя из проведенных в документе операций и налоги переданные в команде игнорируются. В режиме начисления налогов 1 налоги должны быть обязательно переданы из верхнего ПО.
 
-пїЅпїЅпїЅпїЅпїЅ:   FF45h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 14 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ ( 5 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ :4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+Ответ:   FF45h Длина сообщения: 14 байт.
+Код ошибки: 1 байт
+Сдача ( 5 байт)
+Номер ФД :4 байта
+Фискальный признак: 4 байта
 
 -------------------------------------------------------------------------------
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ2
+Закрытие чека расширенное вариант №2
 
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ  FF45h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 118 - 182 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 202 пїЅпїЅпїЅпїЅпїЅ 4
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 5 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 6 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 7 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 8 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 9 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 10 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 11 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 12 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 13 (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 14 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅ 5
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 15 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 16 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ 1 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ 18%
-- пїЅпїЅпїЅпїЅпїЅ 2 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ 10%
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ 0%
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅ
-- пїЅпїЅпїЅпїЅпїЅ 5 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. 18/118
-- пїЅпїЅпїЅпїЅпїЅ 6 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. 10/110
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)1
-- пїЅпїЅпїЅ 0 пїЅ пїЅпїЅпїЅ
-- пїЅпїЅпїЅ 1 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅ 2 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅ 3 пїЅ пїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅ 4 пїЅ пїЅпїЅпїЅ
-- пїЅпїЅпїЅ 5 пїЅ пїЅпїЅпїЅ
-- пїЅпїЅпїЅпїЅпїЅ (0-64 пїЅпїЅпїЅпїЅ) 4
-- пїЅпїЅпїЅпїЅпїЅ 7 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ 5% 4
-- пїЅпїЅпїЅпїЅпїЅ 8 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ 7% 4
-- пїЅпїЅпїЅпїЅпїЅ 9 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. 5/105 4
-- пїЅпїЅпїЅпїЅпїЅ 10 (5 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. 7/107 4
+Код команды  FF45h. Длина сообщения: 118 - 182 байта или 202 байта 4
+- Пароль системного администратора (4 байта)
+- Сумма наличных (5 байт)
+- Сумма типа оплаты 2 (5 байт)
+- Сумма типа оплаты 3 (5 байт)
+- Сумма типа оплаты 4 (5 байт)
+- Сумма типа оплаты 5 (5 байт)
+- Сумма типа оплаты 6 (5 байт)
+- Сумма типа оплаты 7 (5 байт)
+- Сумма типа оплаты 8 (5 байт)
+- Сумма типа оплаты 9 (5 байт)
+- Сумма типа оплаты 10 (5 байт)
+- Сумма типа оплаты 11 (5 байт)
+- Сумма типа оплаты 12 (5 байт)
+- Сумма типа оплаты 13 (5 байт)
+- Сумма типа оплаты 14 (5 байт) аванс 5
+- Сумма типа оплаты 15 (5 байт) кредит
+- Сумма типа оплаты 16 (5 байт) встречное представление
+- Округление до рубля в копейках (1 байт)
+- Налог 1 (5 байт) НДС 18%
+- Налог 2 (5 байт) НДС 10%
+- Оборот по налогу 3 (5 байт) НДС 0%
+- Оборот по налогу 4 (5 байт) Без НДС
+- Налог 5 (5 байт) НДС расч. 18/118
+- Налог 6 (5 байт) НДС расч. 10/110
+- Система налогообложения (1 байт)1
+- Бит 0 – ОСН
+- Бит 1 – УСН доход
+- Бит 2 – УСН доход минус расход
+- Бит 3 – ЕНВД
+- Бит 4 – ЕСП
+- Бит 5 – ПСН
+- Текст (0-64 байт) 4
+- Налог 7 (5 байт) НДС 5% 4
+- Налог 8 (5 байт) НДС 7% 4
+- Налог 9 (5 байт) НДС расч. 5/105 4
+- Налог 10 (5 байт) НДС расч. 7/107 4
 
-пїЅпїЅпїЅпїЅпїЅ:  FF45h.  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 16 (21) пїЅпїЅпїЅпїЅ2.
-- пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ (5 пїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-- пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ (5 пїЅпїЅпїЅпїЅ) DATE_TIME3
+Ответ:  FF45h.  Длина сообщения: 16 (21) байт2.
+- Код ошибки (1 байт)
+- Сдача (5 байт)
+- Номер ФД (4 байта)
+- Фискальный признак (4 байта)
+- Дата и время (5 байт) DATE_TIME3
 
 *)
 
@@ -8982,106 +8981,106 @@ begin
 end;
 
 (******************************************************************************
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: F7H. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2+X пїЅпїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 0пїЅ255
-пїЅпїЅпїЅпїЅпїЅпїЅ (X1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅ: F7H. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2+Y1 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅ (Y1 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅ (Y1 = 31):
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-(8 пїЅпїЅпїЅпїЅ)
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ):
-0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-3 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-5 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-6 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-7 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-8 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-9 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-10 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-11 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-12 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-13 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-14 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-15 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-16 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-17 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+Расширенный запрос
+Команда: F7H. Длина сообщения: 2+X байта.
+Тип запроса (1 байт) 0…255
+Данные (X1 байт)
+Ответ: F7H. Длина сообщения: 2+Y1 байт.
+Код ошибки (1 байт)
+Данные (Y1 байт)
+Тип запроса 1 – ПАРАМЕТРЫ МОДЕЛИ
+Данные (Y1 = 31):
+числовые поля
+Параметры модели
+(8 байт)
+Битовое поле (назначение бит):
+0 – Весовой датчик контрольной ленты
+1 – Весовой датчик чековой ленты
+2 – Оптический датчик контрольной ленты
+3 – Оптический датчик чековой ленты
+4 – Датчик крышки
+5 – Рычаг термоголовки контрольной ленты
+6 – Рычаг термоголовки чековой ленты
+7 – Верхний датчик подкладного документа
+8 – Нижний датчик подкладного документа
+9 – Презентер поддерживается
+10 – Поддержка команд работы с презентером
+11 – Флаг заполнения ЭКЛЗ
+12 – ЭКЛЗ поддерживается
+13 – Отрезчик поддерживается
+14 – Состояние ДЯ как датчик бумаги в презентере
+15 – Датчик денежного ящика
+16 – Датчик бумаги на входе в презентер
+17 – Датчик бумаги на выходе из презентера
+Спецификация
 82
-18 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-19 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-20 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-21 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-22 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-23 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (cashcore)
-24 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
-25 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
-26 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-27 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-28 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-29 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH
-30 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2FH
-31 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
-32 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
-33 пїЅ пїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" (28) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: X,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-34 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 3 "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, C3H, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H; пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 10H пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-35 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C4H
-36 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 6BH "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
-37 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-C3H пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H
-38 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-39 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-40 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ5
-41 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4FH)
-42 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, 4EH)
-43пїЅ63 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 26H "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"; 1пїЅ255
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 26H "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"; 1пїЅ255
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+18 – Купюроприемник поддерживается
+19 – Клавиатура НИ поддерживается
+20 – Контрольная лента поддерживается
+21 – Подкладной документ поддерживается
+22 – Поддержка команд нефискального документа
+23 – Поддержка протокола Кассового Ядра (cashcore)
+24 – Ведущие нули в ИНН
+25 – Ведущие нули в РНМ
+26 – Переворачивать байты при печати линии
+27 – Блокировка ККТ по неверному паролю налогового инспектора
+28 – Поддержка альтернативного нижнего уровня протокола ККТ
+29 – Поддержка переноса строк символом '\n' (код 10) в командах печати
+строк 12H, 17H, 2FH
+30 – Поддержка переноса строк номером шрифта (коды 1…9) в команде
+печати строк 2FH
+31 – Поддержка переноса строк символом '\n' (код 10) в фискальных
+командах 80H…87H, 8AH, 8BH
+32 – Поддержка переноса строк номером шрифта (коды 1…9) в
+фискальных командах 80H…87H, 8AH, 8BH
+33 – Права "СТАРШИЙ КАССИР" (28) на снятие отчетов: X,
+операционных регистров, по отделам, по налогам, по кассирам,
+почасового, по товарам
+34 – Поддержка Бит 3 "слип чек" в командах печати: строк 12H, 17H, 2FH,
+расширенной графики 4DH, C3H, графической линии C5H; поддержка
+поля "результат последней печати" в команде 10H короткого запроса
+состояния ККТ
+35 – Поддержка блочной загрузки графики в команде C4H
+36 – Поддержка команды 6BH "Возврат названия ошибоки"
+37 – Поддержка флагов печати для команд печати расширенной графики
+C3H и печати графической линии C5H
+38 – Зарезервировано
+39 – Поддержка МФП
+40 – Поддержка ЭКЛЗ5
+41 – Печать графики с масштабированием (команда 4FH)
+42 – Загрузка и печать графики-512 (команды 4DH, 4EH)
+43…63 – Зарезервированы
+- Ширина печати шрифтом 1 (1 байт)
+  0 – запросить командой 26H "Прочитать параметры шрифта"; 1…255
+- Ширина печати шрифтом 2 (1 байт)
+  0 – запросить командой 26H "Прочитать параметры шрифта"; 1…255
+- Номер первой печатаемой линии в графике (1 байт)
   0, 1, 2
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+- Количество цифр в ИНН (1 байт)
   12, 13, 14
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+- Количество цифр в РНМ (1 байт)
   8, 10
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 8, 14
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 10, 12, 14
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  00000000пїЅ99999999
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  00000000пїЅ99999999
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ "BLUETOOTH пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Bluetooth (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 1пїЅ255
-- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 1пїЅ255
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (N/LEN16)(2 пїЅпїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; >>1пїЅ65535
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ) (1 пїЅпїЅпїЅпїЅ)
-  40 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 64, 72 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-- пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 (1 пїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; 64
-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 (2 пїЅпїЅпїЅпїЅпїЅ)
-  0 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+- Количество цифр в длинном РНМ (1 байт)
+  0 – длинный РНМ не поддерживается; 8, 14
+- Количество цифр в длинном заводском номере (1 байт)
+  0 – длинный заводской номер не поддерживается; 10, 12, 14
+- Пароль налогового инспектора по умолчанию (4 байта)
+  00000000…99999999
+- Пароль сист.админа по умолчанию (4 байта)
+  00000000…99999999
+- Номер таблицы "BLUETOOTH БЕСПРОВОДНОЙ МОДУЛЬ" настроек Bluetooth (1 байт)
+  0 – таблица не поддерживается; 1…255
+- Номер поля "НАЧИСЛЕНИЕ НАЛОГОВ" (1 байт)
+  0 – поле не поддерживается; 1…255
+- Максимальная длина команды (N/LEN16)(2 байта)
+  0 – по умолчанию; >>1…65535
+- Ширина произвольной графической линии в байтах (печать
+  одномерного штрих-кода) (1 байт)
+  40 – для узких принтеров; 64, 72 – для широких принтеров
+- Ширина графической линии в буфере графики-512 (1 байт)
+  0 – поле не поддерживается; 64
+- Количество линий в буфере графики-512 (2 байта)
+  0 – поле не поддерживается
 
 *******************************************************************************)
 
@@ -9098,48 +9097,48 @@ begin
     CheckMinLength(Answer, 8);
     FillChar(R, Sizeof(R), 0);
     R.FlagsValue := BinToInt(Answer, 1, 8);
-    R.Flags.CapJrnNearEndSensor := TestBit(R.FlagsValue, 0);      // 0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapRecNearEndSensor := TestBit(R.FlagsValue, 1);      // 1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapJrnEmptySensor := TestBit(R.FlagsValue, 2);        // 2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapRecEmptySensor := TestBit(R.FlagsValue, 3);        // 3 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapCoverSensor := TestBit(R.FlagsValue, 4);           // 4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapJrnLeverSensor := TestBit(R.FlagsValue, 5);        // 5 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapRecLeverSensor := TestBit(R.FlagsValue, 6);        // 6 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapSlpNearEndSensor := TestBit(R.FlagsValue, 7);      // 7 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapSlpEmptySensor := TestBit(R.FlagsValue, 8);        // 8 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapPresenter := TestBit(R.FlagsValue, 9);             // 9 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapPresenterCommands := TestBit(R.FlagsValue, 10);    // 10 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapEJNearFull := TestBit(R.FlagsValue, 11);           // 11 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-    R.Flags.CapEJ := TestBit(R.FlagsValue, 12);                   // 12 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapCutter := TestBit(R.FlagsValue, 13);               // 13 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapDrawerStateAsPaper := TestBit(R.FlagsValue, 14);   // 14 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapDrawerSensor := TestBit(R.FlagsValue, 15);         // 15 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapPrsInSensor := TestBit(R.FlagsValue, 16);          // 16 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapPrsOutSensor := TestBit(R.FlagsValue, 17);         // 17 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapBillAcceptor := TestBit(R.FlagsValue, 18);         // 18 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapTaxKeyPad := TestBit(R.FlagsValue, 19);            // 19 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapJrnPresent := TestBit(R.FlagsValue, 20);           // 20 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapSlpPresent := TestBit(R.FlagsValue, 21);           // 21 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapNonfiscalDoc := TestBit(R.FlagsValue, 22);         // 22 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapCashCore := TestBit(R.FlagsValue, 23);             // 23 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (cashcore)
-    R.Flags.CapInnLeadingZero := TestBit(R.FlagsValue, 24);       // 24 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
-    R.Flags.CapRnmLeadingZero := TestBit(R.FlagsValue, 25);       // 25 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
-    R.Flags.SwapGraphicsLine := TestBit(R.FlagsValue, 26);        // 26 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapTaxPasswordLock := TestBit(R.FlagsValue, 27);      // 27 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapProtocol2 := TestBit(R.FlagsValue, 28);            // 28 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-    R.Flags.CapLFInPrintText := TestBit(R.FlagsValue, 29);        // 29 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH
-    R.Flags.CapFontInPrintText := TestBit(R.FlagsValue, 30);      // 30 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2FH
-    R.Flags.CapLFInFiscalCommands := TestBit(R.FlagsValue, 31);   // 31 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
-    R.Flags.CapFontInFiscalCommands := TestBit(R.FlagsValue, 32); // 32 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
-    R.Flags.CapTopCashierReports := TestBit(R.FlagsValue, 33);    // 33 пїЅ пїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" (28) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: X, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapSlpInPrintCommands := TestBit(R.FlagsValue, 34);   // 34 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 3 "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH,пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, C3H, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H; пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    R.Flags.CapGraphicsC4 := TestBit(R.FlagsValue, 35);           // 35 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C4H
-    R.Flags.CapCommand6B := TestBit(R.FlagsValue, 36);            // 36 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 6BH "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
-    R.Flags.CapFlagsGraphicsEx := TestBit(R.FlagsValue, 37);      // 37 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C3H пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H
-    R.Flags.CapMFP := TestBit(R.FlagsValue, 39);                  // 39 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-    R.Flags.CapEJ5 := TestBit(R.FlagsValue, 40);                  // 40 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ5
-    R.Flags.CapScaleGraphics := TestBit(R.FlagsValue, 41);        // 41 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4FH)
-    R.Flags.CapGraphics512 := TestBit(R.FlagsValue, 42);          // 42 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, 4EH)
+    R.Flags.CapJrnNearEndSensor := TestBit(R.FlagsValue, 0);      // 0 – Весовой датчик контрольной ленты
+    R.Flags.CapRecNearEndSensor := TestBit(R.FlagsValue, 1);      // 1 – Весовой датчик чековой ленты
+    R.Flags.CapJrnEmptySensor := TestBit(R.FlagsValue, 2);        // 2 – Оптический датчик контрольной ленты
+    R.Flags.CapRecEmptySensor := TestBit(R.FlagsValue, 3);        // 3 – Оптический датчик чековой ленты
+    R.Flags.CapCoverSensor := TestBit(R.FlagsValue, 4);           // 4 – Датчик крышки
+    R.Flags.CapJrnLeverSensor := TestBit(R.FlagsValue, 5);        // 5 – Рычаг термоголовки контрольной ленты
+    R.Flags.CapRecLeverSensor := TestBit(R.FlagsValue, 6);        // 6 – Рычаг термоголовки чековой ленты
+    R.Flags.CapSlpNearEndSensor := TestBit(R.FlagsValue, 7);      // 7 – Верхний датчик подкладного документа
+    R.Flags.CapSlpEmptySensor := TestBit(R.FlagsValue, 8);        // 8 – Нижний датчик подкладного документа
+    R.Flags.CapPresenter := TestBit(R.FlagsValue, 9);             // 9 – Презентер поддерживается
+    R.Flags.CapPresenterCommands := TestBit(R.FlagsValue, 10);    // 10 – Поддержка команд работы с презентером
+    R.Flags.CapEJNearFull := TestBit(R.FlagsValue, 11);           // 11 – Флаг заполнения ЭКЛЗ
+    R.Flags.CapEJ := TestBit(R.FlagsValue, 12);                   // 12 – ЭКЛЗ поддерживается
+    R.Flags.CapCutter := TestBit(R.FlagsValue, 13);               // 13 – Отрезчик поддерживается
+    R.Flags.CapDrawerStateAsPaper := TestBit(R.FlagsValue, 14);   // 14 – Состояние ДЯ как датчик бумаги в презентере
+    R.Flags.CapDrawerSensor := TestBit(R.FlagsValue, 15);         // 15 – Датчик денежного ящика
+    R.Flags.CapPrsInSensor := TestBit(R.FlagsValue, 16);          // 16 – Датчик бумаги на входе в презентер
+    R.Flags.CapPrsOutSensor := TestBit(R.FlagsValue, 17);         // 17 – Датчик бумаги на выходе из презентера
+    R.Flags.CapBillAcceptor := TestBit(R.FlagsValue, 18);         // 18 – Купюроприемник поддерживается
+    R.Flags.CapTaxKeyPad := TestBit(R.FlagsValue, 19);            // 19 – Клавиатура НИ поддерживается
+    R.Flags.CapJrnPresent := TestBit(R.FlagsValue, 20);           // 20 – Контрольная лента поддерживается
+    R.Flags.CapSlpPresent := TestBit(R.FlagsValue, 21);           // 21 – Подкладной документ поддерживается
+    R.Flags.CapNonfiscalDoc := TestBit(R.FlagsValue, 22);         // 22 – Поддержка команд нефискального документа
+    R.Flags.CapCashCore := TestBit(R.FlagsValue, 23);             // 23 – Поддержка протокола Кассового Ядра (cashcore)
+    R.Flags.CapInnLeadingZero := TestBit(R.FlagsValue, 24);       // 24 – Ведущие нули в ИНН
+    R.Flags.CapRnmLeadingZero := TestBit(R.FlagsValue, 25);       // 25 – Ведущие нули в РНМ
+    R.Flags.SwapGraphicsLine := TestBit(R.FlagsValue, 26);        // 26 – Переворачивать байты при печати линии
+    R.Flags.CapTaxPasswordLock := TestBit(R.FlagsValue, 27);      // 27 – Блокировка ККТ по неверному паролю налогового инспектора
+    R.Flags.CapProtocol2 := TestBit(R.FlagsValue, 28);            // 28 – Поддержка альтернативного нижнего уровня протокола ККТ
+    R.Flags.CapLFInPrintText := TestBit(R.FlagsValue, 29);        // 29 – Поддержка переноса строк символом '\n' (код 10) в командах печати строк 12H, 17H, 2FH
+    R.Flags.CapFontInPrintText := TestBit(R.FlagsValue, 30);      // 30 – Поддержка переноса строк номером шрифта (коды 1…9) в команде печати строк 2FH
+    R.Flags.CapLFInFiscalCommands := TestBit(R.FlagsValue, 31);   // 31 – Поддержка переноса строк символом '\n' (код 10) в фискальных командах 80H…87H, 8AH, 8BH
+    R.Flags.CapFontInFiscalCommands := TestBit(R.FlagsValue, 32); // 32 – Поддержка переноса строк номером шрифта (коды 1…9) в фискальных командах 80H…87H, 8AH, 8BH
+    R.Flags.CapTopCashierReports := TestBit(R.FlagsValue, 33);    // 33 – Права "СТАРШИЙ КАССИР" (28) на снятие отчетов: X, операционных регистров, по отделам, по налогам, по кассирам, почасового, по товарам
+    R.Flags.CapSlpInPrintCommands := TestBit(R.FlagsValue, 34);   // 34 – Поддержка Бит 3 "слип чек" в командах печати: строк 12H, 17H, 2FH,расширенной графики 4DH, C3H, графической линии C5H; поддержка
+    R.Flags.CapGraphicsC4 := TestBit(R.FlagsValue, 35);           // 35 – Поддержка блочной загрузки графики в команде C4H
+    R.Flags.CapCommand6B := TestBit(R.FlagsValue, 36);            // 36 – Поддержка команды 6BH "Возврат названия ошибоки"
+    R.Flags.CapFlagsGraphicsEx := TestBit(R.FlagsValue, 37);      // 37 – Поддержка флагов печати для команд печати расширенной графики C3H и печати графической линии C5H
+    R.Flags.CapMFP := TestBit(R.FlagsValue, 39);                  // 39 – Поддержка МФП
+    R.Flags.CapEJ5 := TestBit(R.FlagsValue, 40);                  // 40 – Поддержка ЭКЛЗ5
+    R.Flags.CapScaleGraphics := TestBit(R.FlagsValue, 41);        // 41 – Печать графики с масштабированием (команда 4FH)
+    R.Flags.CapGraphics512 := TestBit(R.FlagsValue, 42);          // 42 – Загрузка и печать графики-512 (команды 4DH, 4EH)
 
     if Length(Answer) < 9 then Exit;
     R.Font1Width := Ord(Answer[9]);
@@ -9175,19 +9174,19 @@ begin
 end;
 
 (******************************************************************************
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+  Сформировать отчёт о регистрации ККТ
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF06h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 40 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ : 12 пїЅпїЅпїЅпїЅ ASCII
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ: 20 пїЅпїЅпїЅпїЅ ASCII
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+  Код команды FF06h . Длина сообщения: 40 байт.
+  Пароль системного администратора: 4 байта
+  ИНН : 12 байт ASCII
+  Регистрационный номер ККТ: 20 байт ASCII
+  Код налогообложения: 1 байт
+  Режим работы: 1 байт
 
-  пїЅпїЅпїЅпїЅпїЅ: FF06h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 9 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+  Ответ: FF06h Длина сообщения: 9 байт.
+  Код ошибки: 1 байт
+  Номер ФД: 4 байта
+  Фискальный признак: 4 байта
 
 ******************************************************************************)
 
@@ -9308,14 +9307,14 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF3пїЅh . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 10 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF3пїЅh пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 5 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ STLV
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ
+Запросить фискальный документ в TLV формате
+Код команды FF3Аh . Длина сообщения: 10 байт.
+  Пароль системного администратора: 4 байта
+  Номер фискального документа: 4 байта
+Ответ: FF3Аh Длина сообщения: 5 байт.
+  Код ошибки: 1 байт
+  Тип фискального документа: 2 байта STLV
+  Длина фискального документа: 2 байта
 *)
 
 function TFiscalPrinterDevice.FSReadDocument(var P: TFSReadDocument): Integer;
@@ -9334,12 +9333,12 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF3Bh . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF3Bh пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1+N пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ:1 пїЅпїЅпїЅпїЅ
-  TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: N пїЅпїЅпїЅпїЅ
+Чтение TLV фискального документа
+Код команды FF3Bh . Длина сообщения: 6 байт.
+  Пароль системного администратора: 4 байта
+Ответ: FF3Bh Длина сообщения: 1+N байт.
+  Код ошибки:1 байт
+  TLV структура: N байт
 
 *)
 
@@ -9377,7 +9376,7 @@ begin
     Client.Timeout := Parameters.EkmServerTimeout;
     SaleEnabled := Client.ReadSaleEnabled(Barcode.GTIN, Barcode.Serial);
     if not SaleEnabled then
-      raiseError(E_SALE_NOT_ENABLED, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      raiseError(E_SALE_NOT_ENABLED, _('Продажа товара запрещена'));
   finally
     Client.Free;
   end;
@@ -9557,7 +9556,7 @@ begin
           end;
 
         21:
-          // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 'пїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'
+          // Проверка на формат 'СС-ЦЦЦЦЦЦ-ССССССССССС'
           if IsMatch(Barcode, '\w{2}-\d{6}-\w{11}') then
             BarcodeType := KTN_RF;
 
@@ -9609,11 +9608,11 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF35h . пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅ: FF35h пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+Начать формирование чека коррекции
+Код команды FF35h . Длина сообщения: 6 байт.
+Пароль системного администратора: 4 байта
+Ответ: FF35h Длина сообщения: 1 байт.
+Код ошибки: 1 байт
 *)
 
 function TFiscalPrinterDevice.FSStartCorrectionReceipt: Integer;
@@ -9689,41 +9688,41 @@ begin
 end;
 
 (******************************************************************************
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  Проверка маркированного товара
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF61h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 10+X+Y пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (4+X+Y пїЅпїЅпїЅпїЅ)
+  Код команды 	FF61h. Длина сообщения: 10+X+Y байт.
+  Пароль оператора (4 байта)
+  Входные данные (4+X+Y байт)
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ:
+  Состав входных данных:
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  0	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2003
-  1	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2102 (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ "0")
-  2	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (X)	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
-  3	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ TLV пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ TLV
-  4	X пїЅпїЅпїЅпїЅ	пїЅпїЅ	пїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  4+X	Y пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅ TLV	пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-            пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ 2003), пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-            пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2108 (пїЅпїЅпїЅпїЅ) пїЅ 1023 (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+  Смещение	Длина	Параметр	Значение
+  0	1 байт	Планируемый статус	Тег 2003
+  1	1 байт	Режим обработки	Тег 2102 (сейчас всегда "0")
+  2	1 байт	Длина кода маркировки (КМ) в байтах (X)	Полная длина КМ
+  3	1 байт	Длина списка TLV в байтах	Полная длина списка TLV
+  4	X байт	КМ	Сам КМ, как он был прочитан сканером
+  4+X	Y байт	Список TLV	Если планируется частичное выбытие маркированного
+            товара (согласно с тегом 2003), то необходимо сформировать буфер
+            из тегов 2108 (мера) и 1023 (количество) и передать его здесь
 
-  пїЅпїЅпїЅпїЅпїЅ:		FF61h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 9+X пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (6+N пїЅпїЅпїЅпїЅ)
+  Ответ:		FF61h. Длина сообщения: 9+X байт.
+  Код ошибки (1 байт)
+  Результат проверки (6+N байт)
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
+  Состав данных результата проверки:
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  0	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2004
-  1	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  2	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅ 2100
-  3	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-            пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ "0"
-  4	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-            пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅпїЅ 0x20, пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-            пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅ
-  5	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅ 2106	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  6	N пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	TLV List	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  Смещение	Длина	Параметр	Значение	Примечание
+  0	1 байт	Статус локальной проверки	Тег 2004
+  1	1 байт	Причина, по которой не была проведена локальная проверка
+  2	1 байт	Распознанный тип КМ	Тег 2100
+  3	1 байт	Длина дополнительных параметров	Длина данных, идущих далее
+            Если автономный режим или если сервер не ответил в течение таймаута, то "0"
+  4	1 байт	Код ответа ФН на команду онлайн-проверки
+            В соответствии и вводом ошибки ФН	Если 0x20, то в следующем байте
+            возвращается причина в соответствии с Примечанием 2 ниже
+  5	1 байт	Результат проверки КМ	Тег 2106	Только если сервер ответил без ошибок
+  6	N байт	Список реквизитов ответа сервера	TLV List	Только если сервер ответил без ошибок
 
 ******************************************************************************)
 
@@ -9758,13 +9757,13 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+  Синхронизировать регистры со счётчиком ФН
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF62h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-    пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF62h. Длина сообщения: 6 байт.
+    Пароль системного администратора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ: 		FF62h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ.
-      пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+  Ответ: 		FF62h. Длина сообщения: 3 байта.
+      Код ошибки (1 байт)
 
 ******************************************************************************)
 
@@ -9779,23 +9778,23 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ
+  Запрос ресурса свободной памяти в ФН
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF63h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF63h. Длина сообщения: 6 байт.
+  Пароль системного администратора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ: 		FF63h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 5 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 30 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ3 (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-  1 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ.
-  2 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 30 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
-      пїЅпїЅпїЅпїЅпїЅ 30 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
-  3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-      пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ
-      пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  Ответ: 		FF63h. Длина сообщения: 11 байт.
+  Код ошибки (1 байт)
+  Ресурс данных 5 летнего хранения 1 (4 байта)
+  Ресурс данных 30 дневного хранения 2 (4 байта)
+  Ресурс для хранения уведомлений о реализации маркированного товара3 (1 байт)
+  Примечание:
+  1 - Ориентировочное количество документов, которые можно создать в ФН.
+  2 - Размер свободной области (в килобайтах) для записи документов 30 дней хранения.
+      После 30 дней работы значение может колебаться на постоянном уровне.
+  3 - Процент заполнения области хранения уведомлений о реализации маркированных
+      товаров для ОИСМ. Параметр не возвращается если ФН зарегистрирован в
+      режиме без поддержки работы с маркированным товарами.
 
 ******************************************************************************)
 
@@ -9816,16 +9815,16 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ TLV пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  Передача в ФН TLV из буфера
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF64h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF64h. Длина сообщения: 6 байт.
+  Пароль системного администратора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ: 		FF64h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 250 пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  Ответ: 		FF64h. Длина сообщения: 3 байта.
+  Код ошибки (1 байт)
+  Примечание:
+  Позволяет передать в ФН предварительно загруженную в буфер TLV структуру.
+  Позволяет передать TLV длиннее 250 байт. Буфер тот же что и для проверки маркировки.
 
 ******************************************************************************)
 
@@ -9839,14 +9838,14 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Получить случайную последовательность
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF65h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF65h. Длина сообщения: 6 байт.
+  Пароль оператора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ: 		FF65h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 19 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ (16 пїЅпїЅпїЅпїЅ)
+  Ответ: 		FF65h. Длина сообщения: 19 байт.
+  Код ошибки (1 байт)
+  Данные (16 байт)
 
 ******************************************************************************)
 
@@ -9859,13 +9858,13 @@ begin
 end;
 
 (******************************************************************************
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF66h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 22 пїЅпїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (16 пїЅпїЅпїЅпїЅ)
+  Авторизоваться
+  Код команды 	FF66h. Длина сообщения: 22 байта.
+  Пароль оператора (4 байта)
+  Данные для авторизации (16 байт)
 
-  пїЅпїЅпїЅпїЅпїЅ: 		FF66h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+  Ответ: 		FF66h. Длина сообщения: 3 байта.
+  Код ошибки (1 байт)
 
 ******************************************************************************)
 
@@ -9879,55 +9878,55 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Привязка маркированного товара к позиции
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF67h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 7+N пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (N пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ)
+  Код команды 	FF67h. Длина сообщения: 7+N байт.
+  Пароль оператора (4 байта)
+  Длина кода маркировки (1 байт)
+  Данные маркировки (N байт)
+  Признак ОСУ (1 байт) 1 Объемно-сортовой учет (ОСУ)
 
-  пїЅпїЅпїЅпїЅпїЅ: 		FF67h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6+(6+N)4 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ) 2
-  пїЅпїЅпїЅ Data Matrix (1 пїЅпїЅпїЅпїЅ) 3
-  0 - пїЅпїЅ 88
-  1 - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  2 - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  3 - пїЅпїЅ 44
-  0 xFF- GS-1 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (6+N пїЅпїЅпїЅпїЅ)4 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1)
+  Ответ: 		FF67h. Длина сообщения: 6+(6+N)4 байт.
+  Код ошибки (1 байт)
+  Распознанный тип кода (2 байта) 2
+  Тип Data Matrix (1 байт) 3
+  0 - КМ 88
+  1 - КМ симметричный
+  2 - КМ Табачный
+  3 - КМ 44
+  0 xFF- GS-1 без маркировки
+  Результат проверки (6+N байт)4 может отсутствовать (см. Примечание 1)
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-  1 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0xFF.
-  2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Примечание:
+  1 - Может отсутствовать. Для реализации позиции по ОСУ надо передать значение 0xFF.
+  2 - Таблица допустимых значений:
+  Тип кода	Значение
   EAN8	0x45 0x08
   EAN13	0x45 0x0D
   ITF14	0x49 0x0E
   GS-1 Data Matrix		0x44 0x4D
-  RF пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	0x52 0x46
-  пїЅпїЅпїЅпїЅпїЅ-3	0xC5 0x14
-  пїЅпїЅпїЅпїЅпїЅ-3	0xC5 0x1E
-  пїЅпїЅпїЅ EAN8		0x4F 0x08
-  пїЅпїЅпїЅ EAN13	0x4F 0x0D
-  пїЅпїЅпїЅ GTIN ITF14	0x4F 0x0E
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ	0x00 0x00
-  3 - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ GS-1 Data Matrix, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0.
-  4 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF61h "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF67h.
+  RF метка меховых изделий	0x52 0x46
+  ЕГАИС-3	0xC5 0x14
+  ЕГАИС-3	0xC5 0x1E
+  ОСУ EAN8		0x4F 0x08
+  ОСУ EAN13	0x4F 0x0D
+  ОСУ GTIN ITF14	0x4F 0x0E
+  Нераспознанный код	0x00 0x00
+  3 - Поле имеет смысл только если код распознан как GS-1 Data Matrix, в противном случае принимает значение 0.
+  4 - В случае если код маркировки не проверялся ранее командой FF61h "Проверка маркированного товара", ККТ сама её подаст и добывит ответ на неё к ответу на команду FF67h.
 
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
+  Состав данных результата проверки:
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  0	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2004
-  1	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅ
-  2	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅ 2100
-  3	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ "0"
-  4	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅпїЅ 0x20, пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0xFF, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
-  5	1 пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅ 2106	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  6	N пїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	TLV List	пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  Смещение	Длина	Параметр	Значение	Примечание
+  0	1 байт	Статус локальной проверки	Тег 2004
+  1	1 байт	Причина, по которой не была проведена локальная проверка	См. Примечание 2 ниже
+  2	1 байт	Распознанный тип КМ	Тег 2100
+  3	1 байт	Длина дополнительных параметров	Длина данных, идущих далее	Если автономный режим, то "0"
+  4	1 байт	Код ответа ФН на команду онлайн-проверки	В соответствии и вводом ошибки ФН	Если 0x20, то в следующем байте возвращается причина в соответствии с Примечанием 3 ниже
+  Значение 0xFF, если сервер не ответил в течение таймаута.
+  5	1 байт	Результат проверки КМ	Тег 2106	Только если сервер ответил без ошибок
+  6	N байт	Список реквизитов ответа сервера	TLV List	Только если сервер ответил без ошибок
 
 ******************************************************************************)
 
@@ -9967,33 +9966,33 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF68h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ:		FF68h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 13 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+  Получить состояние по передаче уведомлений о реализации маркированных товаров
+  Код команды 	FF68h. Длина сообщения: 6 байт.
+  Пароль оператора (4 байта)
+  Ответ:		FF68h. Длина сообщения: 13 байт.
+  Код ошибки (1 байт)
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1	0 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ;
-  1 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-  2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint16, LE	2	0, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint32, LE	4	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	DATE_TIME	5	0, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
+  Наименование	Тип	Длина	Описание
+  Состояние по передачи уведомлений	Byte	1	0 - нет активного обмена;
+  1 - начато чтение уведомления;
+  2 - ожидание квитанции на уведомление;
+  Количество уведомлений в очереди	Uint16, LE	2	0, если на все уведомления была получена квитанция
+  Номер текущего уведомления	Uint32, LE	4	Номер уведомления для передачи, или уведомления, на которое ожидается квитанция
+  Дата и время текущего уведомления	DATE_TIME	5	0, если на все уведомления получена квитанция
+  Процент заполнения области хранения уведомлений	Byte	1
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ)
+  Код ошибки (1 байт) может принимать следующие значения:
+  Код ответа	Описание	Комментарий (действия ККТ)
 
-  00h	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  00h	Нет ошибки
 
-  02h	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ
-      пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-      пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "1" - "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ": пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
-      пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  02h	Неверное состояние ФН	ФН был активирован в автономном режиме или уже
+      начато чтение уведомления и состояние по передаче уведомлений имеет
+      значение "1" - "начато чтение уведомления": необходимо завершить или
+      отменить начатое чтение уведомления
 
-  32h	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ
-      пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  32h	Запрещена работа с маркированными товарами	При регистрации ФН не был
+      указан признак работы с маркированными товарами
 
 ******************************************************************************)
 
@@ -10017,15 +10016,15 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF69H
+  Принять или отвергнуть введенный код маркировки FF69H
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF69h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 7 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ : 1 пїЅпїЅпїЅпїЅ. 0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 1 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ.
+  Код команды FF69h. Длина сообщения: 7 байт.
+  Пароль оператора: 4 байта
+  Решение : 1 байт. 0 - отвергнуть, 1 - принять, 2 - очистить буфер КМ
+  Команду необходимо подавать после проверки каждого КМ.
 
-  пїЅпїЅпїЅпїЅпїЅ: FF69h	    пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+  Ответ: FF69h	    Длина сообщения: 1 байт.
+  Код ошибки: 1 байт
 
 ******************************************************************************)
 
@@ -10045,51 +10044,50 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Запрос статуса по работе с кодами маркировки
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF70h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF70h. Длина сообщения: 6 байт.
+  Пароль оператора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ:		FF70h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (8 пїЅпїЅпїЅпїЅ)
+  Ответ:		FF70h. Длина сообщения: 11 байт.
+  Код ошибки (1 байт)
+  Статус работы с кодами маркировки (8 байт)
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Byte	1	0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    1 - пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ B1h
-    3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ B5h
-    4 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ B6h
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-    0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    1 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-    2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ	Byte	1	пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ" пїЅпїЅпїЅпїЅ
+  Наименование	Тип	Длина	Описание
+  Состояние по проверке КМ	Byte	1	0 - Таблица проверки КМ переполнена
+    1 - Нет КМ на проверке
+    2 - Передан КМ в команде B1h
+    3 - Сформирован запрос о коде маркировки при помощи команды B5h
+    4 - Получен и передан в ФН ответ на запрос при помощи команды B6h
+  Состояние по формированию уведомления о реализации маркированного товара	Byte	1
+    0 - Уведомление о реализации маркированного товара не формируется
+    1 - Начато формирование уведомления о реализации маркированного товара
+    2 - Формирование уведомлений заблокировано из-за переполнения области временного хранения
+  Флаги разрешения команд работы с КМ	Byte	1	См. таблицу "Флаги разрешения команд работы с КМ" ниже
+  Количество сохранённых результатов проверки КМ	Byte	1
+  Количество КМ, результаты проверки которых сохранены в ФН командой B2h c кодом "1"
+  Количество КМ, включенных в уведомление о реализации маркированного товара	Byte	1
+  Предупреждение о заполнении области хранения уведомлений о реализации маркированного товара	Byte	1
+    В этом параметре ФН информирует ККТ о заполнении области хранения уведомлений о реализации маркированного товара.
+    Возможные следующие значения параметра:
+    0 - Область заполнена менее чем на 50%
+    1 - Область заполнена от 50 до 80%
+    2 - Область заполнена от 80 до 90%
+    3 - Область заполнена более чем на 90%
+    4 - Область полностью заполнена, формирование новых уведомлений невозможно
+  Количество уведомлений в очереди	Uint16, LE	2
+    Количество неподтверждённых или невыгруженных уведомлений о реализации маркированного товара
+  Флаги разрешения команд работы с КМ
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	Byte	1
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ B2h c пїЅпїЅпїЅпїЅпїЅ "1"
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	Byte	1
-    пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-    0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ 50%
-    1 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 50 пїЅпїЅ 80%
-    2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 80 пїЅпїЅ 90%
-    3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ 90%
-    4 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ	Uint16, LE	2
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ
-
-  пїЅпїЅпїЅ 7	пїЅпїЅпїЅ 6	пїЅпїЅпїЅ 5	пїЅпїЅпїЅ 4	пїЅпїЅпїЅ 3	пїЅпїЅпїЅ 2	пїЅпїЅпїЅ 1	пїЅпїЅпїЅ 0	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Бит 7	Бит 6	Бит 5	Бит 4	Бит 3	Бит 2	Бит 1	Бит 0	Код разрешенной команды
   0	0	0	0	0	0	0	1	B1h
   0	0	0	0	0	0	1	0	B2h
   0	0	0	0	0	1	0	0	B3h
   0	0	0	0	1	0	0	0	B5h
   0	0	0	1	0	0	0	0	B6h
-  0	0	1	0	0	0	0	0	B7h пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 1
-  0	1	0	0	0	0	0	0	B7h пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2
-  1	0	0	0	0	0	0	0	B7h пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 3
+  0	0	1	0	0	0	0	0	B7h с дополнительным кодом 1
+  0	1	0	0	0	0	0	0	B7h с дополнительным кодом 2
+  1	0	0	0	0	0	0	0	B7h с дополнительным кодом 3
 
 ******************************************************************************)
 
@@ -10115,16 +10113,16 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
+  Начать выгрузку уведомлений о реализации маркированных товаров (в автономном режиме)
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF71h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF71h. Длина сообщения: 6 байт.
+  Пароль оператора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ:		FF71h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
+  Ответ:		FF71h. Длина сообщения: 11 байт.
+  Код ошибки (1 байт)
+  Общее число уведомлений (2 байта)
+  Номер первого уведомления (4 байта)
+  Размер первого уведомления (2 байта)
 
 ******************************************************************************)
 
@@ -10146,26 +10144,26 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
+  Прочитать блок уведомления (в автономном режиме)
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF72h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+  Код команды 	FF72h. Длина сообщения: 6 байт.
+  Пароль оператора: 4 байта
 
-  пїЅпїЅпїЅпїЅпїЅ:		FF72h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11+N пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (N пїЅпїЅпїЅпїЅ)
+  Ответ:		FF72h. Длина сообщения: 11+N байт.
+  Код ошибки (1 байт)
+  Номер текущего уведомления (4 байта)
+  Полный размер текущего уведомления (2 байта)
+  Смещение от начала текущего уведомления (2 байта)
+  Блок данных (N байт)
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 128 пїЅпїЅпїЅпїЅ).
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF71h.
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ.
-  пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF71h пїЅ
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
+  Примечание:
+  ККТ выполняет поблочное чтение всех доступных уведомлений
+  (максимально ККТ может прочитать блок 128 байт).
+  Следует вызывать команду до получения ошибки "Нет данных" или на основании
+  общего числа уведомлений, полученного подачей команды FF71h.
+  Допускается прочитать лишь часть уведомлений и подтвердить их.
+  В любой момент до подтверждения чтения можно вызвать команду FF71h и
+  начать чтение неподтвержденных уведомлений заново.
 
 ******************************************************************************)
 
@@ -10188,15 +10186,15 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
+  Подтвердить выгрузку уведомления (в автономном режиме)
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF73h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 14 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF72h
-  CRC16 (4 пїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  Код команды 	FF73h. Длина сообщения: 14 байт.
+  Пароль оператора (4 байта)
+  Номер уведомления (4 байта) получается из ответа на команду FF72h
+  CRC16 (4 байта) контрольная сумма уведомления
 
-  пїЅпїЅпїЅпїЅпїЅ:		FF73h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
+  Ответ:		FF73h. Длина сообщения: 3 байта.
+  Код ошибки (1 байт)
 
 ******************************************************************************)
 
@@ -10212,14 +10210,14 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+  Запрос исполнения ФН
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF74h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 6 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF74h. Длина сообщения: 6 байт.
+  Пароль оператора (4 байта)
 
-  пїЅпїЅпїЅпїЅпїЅ:		FF74h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 51 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ  (48 пїЅпїЅпїЅпїЅ)  ASCII
+  Ответ:		FF74h. Длина сообщения: 51 байт.
+  Код ошибки (1 байт)
+  Строка исполнения ФН  (48 байт)  ASCII
 
 ******************************************************************************)
 
@@ -10238,14 +10236,14 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ
+  Запрос общего размера данных документа в ФН
 
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 	FF75h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 14 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅ:		FF75h. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 11 пїЅпїЅпїЅпїЅ.
-  пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (1 пїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ ( 4 пїЅпїЅпїЅпїЅпїЅ)
-  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ ( 4 пїЅпїЅпїЅпїЅпїЅ)
+  Код команды 	FF75h. Длина сообщения: 14 байт.
+  Пароль оператора (4 байта)
+  Ответ:		FF75h. Длина сообщения: 11 байт.
+  Код ошибки (1 байт)
+  Размер в байтах текущего документа для ОФД ( 4 байта)
+  Размер в байтах текущего уведомления о реализации маркированных товаров для ОИСМ ( 4 байта)
 
 ******************************************************************************)
 
@@ -10349,7 +10347,7 @@ procedure TFiscalPrinterDevice.CheckPrinterStatus;
 
   function GetStateErrorMessage(const Mode: Integer): WideString;
   begin
-    Result := Tnt_WideFormat('%s: %d, %s', [_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'), Mode, GetModeText(Mode)]);
+    Result := Tnt_WideFormat('%s: %d, %s', [_('Невозможно изменить состояние'), Mode, GetModeText(Mode)]);
   end;
 
 const

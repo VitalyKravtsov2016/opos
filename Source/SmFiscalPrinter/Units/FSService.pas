@@ -104,7 +104,7 @@ end;
 procedure TFSService.ThreadProc(Sender: TObject);
 begin
   try
-    if Device.GetDeviceMetrics.DeviceName = 'О©╫О©╫О©╫О©╫О©╫-О©╫О©╫О©╫О©╫О©╫О©╫-О©╫' then
+    if Device.GetDeviceMetrics.DeviceName = 'ьрпху-лнаюик-т' then
     begin
       FParams.Host := FDevice.ReadTableStr(15, 1, 1);
       FParams.Port := FDevice.ReadTableInt(15, 1, 2);

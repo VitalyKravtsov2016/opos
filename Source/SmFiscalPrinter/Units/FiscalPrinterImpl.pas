@@ -1089,21 +1089,21 @@ begin
     Device.AmountDecimalPlaces := 0;
 
   // PhysicalDeviceName
-  FOposDevice.PhysicalDeviceName := Tnt_WideFormat('%s, пїЅ %s', [
+  FOposDevice.PhysicalDeviceName := Tnt_WideFormat('%s, № %s', [
     FDeviceMetrics.DeviceName, Status.SerialNumber]);
   Logger.Debug('PhysicalDeviceName: ' + FOposDevice.PhysicalDeviceName);
 
   // PhysicalDeviceDescription
   FOposDevice.PhysicalDeviceDescription :=
-    Tnt_WideFormat('%s, пїЅ %s, %s: %s.%s.%d %s, %s: %s.%s.%d %s', [
+    Tnt_WideFormat('%s, № %s, %s: %s.%s.%d %s, %s: %s.%s.%d %s', [
     FDeviceMetrics.DeviceName,
     Status.SerialNumber,
-    _('пїЅпїЅ пїЅпїЅ'),
+    _('ПО ФР'),
     Status.FirmwareVersionHi,
     Status.FirmwareVersionLo,
     Status.FirmwareBuild,
     PrinterDateToStr(Status.FirmwareDate),
-    _('пїЅпїЅ пїЅпїЅ'),
+    _('ПО ФП'),
     Status.FMVersionHi,
     Status.FMVersionLo,
     Status.FMBuild,
@@ -1671,7 +1671,7 @@ procedure TFiscalPrinterImpl.CheckEndDay;
 begin
   if Device.ReadPrinterStatus.Mode = ECRMODE_24OVER then
     raiseExtendedError(OPOS_EFPTR_DAY_END_REQUIRED,
-    _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24 пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Z пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+    _('Истекли 24 часа. Распечатайте Z отчет и попробуйте снова'));
 end;
 
 procedure TFiscalPrinterImpl.CheckCapSlpFiscalDocument;
@@ -1744,48 +1744,48 @@ begin
     // Cover opened
     if FCapCoverSensor and PrinterFlags.CoverOpened then
     begin
-      Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      Lines.Add(_('Крышка открыта'));
     end;
     // Receipt paper
     if FCapRecPresent then
     begin
       if FCapRecEmptySensor and PrinterFlags.RecEmpty then
-        Lines.Add(_('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+        Lines.Add(_('Нет чековой ленты'));
 
       if FCapRecNearEndSensor and PrinterFlags.RecNearEnd then
-        Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+        Lines.Add(_('Чековая лента близка к завершению'));
 
       if Device.GetModel.CapRecLever and PrinterFlags.RecLeverUp then
-        Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+        Lines.Add(_('Поднят рычаг чековой ленты'));
     end;
     // Journal paper
     if FCapJrnPresent then
     begin
       if FCapJrnEmptySensor and PrinterFlags.JrnEmpty then
-      Lines.Add(_('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+      Lines.Add(_('Нет контрольной ленты'));
 
       if FCapJrnNearEndSensor and PrinterFlags.JrnNearEnd then
-        Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+        Lines.Add(_('Контрольная лента близка к завершению'));
 
       if Device.GetModel.CapJrnLever and PrinterFlags.JrnLeverUp then
-        Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+        Lines.Add(_('Поднят рычаг контрольной ленты'));
     end;
     // EJ
     if (PrinterFlags.EJPresent and PrinterFlags.EJNearEnd) then
-      Lines.Add(_('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      Lines.Add(_('ЭКЛЗ близка к заполнению'));
 
     // FM
     if FMFlags.Overflow then
-      Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'));
+      Lines.Add(_('Переполнение ФП'));
 
     if FMFlags.LowBattery then
-      Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'));
+      Lines.Add(_('Низкое напряжение батареи ФП'));
 
     if FMFlags.LastRecordCorrupted then
-      Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      Lines.Add(_('Последняя запись ФП повреждена'));
 
     if FMFlags.Is24HoursLeft then
-      Lines.Add(_('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24 пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ'));
+      Lines.Add(_('Истекли 24 часа в ФП'));
 
     if Lines.Count <> 0 then
     begin
@@ -2239,16 +2239,16 @@ begin
 end;
 
 (*
-1.	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ).
-    пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ Z-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+1.	Добавляем в драйвер настройку, отключающую синхронизацию времени по
+    команде ОПОС, и включающую автоматическую синхронизацию при открытии
+    смены (перед собственно открытием).
+    Это чтобы с момента снятия Z-отчёта прошло чуть больше времени.
 
-2.	пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-    пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ N пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
-    пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+2.	Если при переводе времени в ФН обнаруживается запись с более поздним
+    временем - выводим модальное окно с предложением либо подождать N времени,
+    либо отменить синхронизацию.
 
-3.	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+3.	Как вариант - третий вариант настройки, отключающий кнопку отмены синхронизации.
 *)
 
 procedure TFiscalPrinterImpl.UpdatePrinterDate;
@@ -2328,7 +2328,7 @@ begin
       HeaderTypeNone: ;
       HeaderTypePrinter:
       begin
-        Device.PrintDocHeader('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ', 1);
+        Device.PrintDocHeader('НЕФИСКАЛЬНЫЙ ЧЕК', 1);
       end;
     end;
     Result := ClearResult;
@@ -2349,7 +2349,7 @@ begin
     CheckEnabled;
     CheckState(FPTR_PS_MONITOR);
     if not FCapTrainingMode then
-      RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      RaiseOposException(OPOS_E_ILLEGAL, _('Режим тренировки не поддерживается'));
 
     FTrainingModeActive := True;
     FReceiptPrinter := TTrainingReceiptPrinter.Create(Printer);
@@ -2373,7 +2373,7 @@ begin
         CheckHealthExternal;
 
       OPOS_CH_INTERACTIVE:
-        RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+        RaiseOposException(OPOS_E_ILLEGAL, _('Не поддерживается'));
     else
       InvalidParameterValue('Level', IntToStr(Level));
     end;
@@ -2483,13 +2483,13 @@ end;
 
 (******************************************************************************
 
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2:
-  20 пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ)
-  21 пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-  22 пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ
-  23 пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ
-  24 пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
-  25 пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+  Таблица 2:
+  20 строка - фискальный признак (ФП)
+  21 строка - дата и время фискализации
+  22 строка - РНК
+  23 строка - ЗНК
+  24 строка - признак автономности чека
+  25 строка - общая сумма
 
 ******************************************************************************)
 
@@ -3022,7 +3022,7 @@ function TFiscalPrinterImpl.GetTotalizer(VatID, OptArgs: Integer;
 
   procedure TotalizerNotSupported;
   begin
-    RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+    RaiseOposException(OPOS_E_ILLEGAL, _('Счетчик не поддерживается'));
   end;
 
 begin
@@ -3148,14 +3148,14 @@ begin
   if (Station and FPTR_S_RECEIPT) <> 0 then
   begin
     if not FCapRecPresent then
-      RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      RaiseOposException(OPOS_E_ILLEGAL, _('Нет чекового принтера'));
     PrinterStation := PrinterStation + PRINTER_STATION_REC;
   end;
 
   if (Station and FPTR_S_JOURNAL) <> 0 then
   begin
     if not FCapJrnPresent then
-      RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ'));
+      RaiseOposException(OPOS_E_ILLEGAL, _('Нет принтера контрольной ленты'));
     PrinterStation := PrinterStation + PRINTER_STATION_JRN;
   end;
 
@@ -3648,7 +3648,7 @@ begin
   try
     CheckState(FPTR_PS_MONITOR);
     case ReportType of
-      FPTR_RT_ORDINAL: RaiseOposException(OPOS_E_ILLEGAL, _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      FPTR_RT_ORDINAL: RaiseOposException(OPOS_E_ILLEGAL, _('Не поддерживается'));
       FPTR_RT_DATE:
       begin
         DateReport.ReportType := PRINTER_REPORT_TYPE_FULL;
@@ -4678,13 +4678,13 @@ function TFiscalPrinterImpl.ReadFSParameter(ParamID: Integer;
   const pString: WideString): WideString;
 
   (*
-  7.1.8 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+  7.1.8 Формат квитанции, при выдаче из Архива ФН
   ------------------------------------------------
-  пїЅпїЅпїЅпїЅ                        пїЅпїЅпїЅ            пїЅпїЅпїЅпїЅпїЅ
+  Поле                        Тип            Длина
   ------------------------------------------------
-  пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ                DATE_TIME      5
-  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ      DATA           18
-  пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ                    Uint32, LE     4
+  Дата и время                DATE_TIME      5
+  Фискальный признак ОФД      DATA           18
+  Номер ФД                    Uint32, LE     4
   ------------------------------------------------
   *)
 
