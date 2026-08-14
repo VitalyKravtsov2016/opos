@@ -1,0 +1,52 @@
+eck
+[11.08.2026 15:51:28.466] [00022796] [DEBUG] TDrvFR FNOpenCheck(): -70
+[11.08.2026 15:51:28.467] [00022796] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.474] [00022796] [DEBUG] TDrvFR Set_Quantity = 1
+[11.08.2026 15:51:28.477] [00022796] [DEBUG] TDrvFR Set_Price = 10
+[11.08.2026 15:51:28.483] [00022796] [DEBUG] TDrvFR Set_Summ1 = 10
+[11.08.2026 15:51:28.485] [00022796] [DEBUG] TDrvFR Set_Department = 1
+[11.08.2026 15:51:28.489] [00022796] [DEBUG] TDrvFR Set_CheckType = 1
+[11.08.2026 15:51:28.492] [00022796] [DEBUG] TDrvFR Set_PaymentTypeSign = 4
+[11.08.2026 15:51:28.506] [00022796] [DEBUG] TDrvFR Set_PaymentItemSign = 1
+[11.08.2026 15:51:28.509] [00022796] [DEBUG] TDrvFR Set_StringForPrinting = item
+[11.08.2026 15:51:28.517] [00022796] [DEBUG] TDrvFR Set_TaxValueEnabled = False
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TDrvFR FNOperation()
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter DoSend: 10 1E 00 00 00
+[11.08.2026 15:51:28.520] [00022796] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter Команда: 10h, Короткий запрос состояния
+[11.08.2026 15:51:28.520] [00022796] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TDBReceiptFilePlugin BeforeCommand.begin 10
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TDBReceiptFilePlugin BeforeCommand.end 10
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter On connect routine
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter Command OK: 0010
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter OpenPort
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TComPort Open COM12: 115200
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TPrinterProtocol SetCmdTimeout: 2000
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TComPort SetCmdTimeout 2000
+[11.08.2026 15:51:28.520] [00022796] [DEBUG] TPrinterProtocol -> 05
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol <- 15
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol -> 02 05 10 1E 00 00 00 0B
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol <- 06
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol SetCmdTimeout: 5000
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TComPort SetCmdTimeout 5000
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol <- 02
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol <- 10
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol SetCmdTimeout: 2000
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TComPort SetCmdTimeout 2000
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol <- 10 00 01 02 00 02 00 00 64 DC 00 00 00 00 00 00 B9
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TPrinterProtocol -> 06
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.begin
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.end
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDBReceiptFilePlugin AfterCommand.begin 10
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDBReceiptFilePlugin AfterCommand.end 10
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter Unlock
+[11.08

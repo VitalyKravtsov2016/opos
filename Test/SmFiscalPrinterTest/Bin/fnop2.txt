@@ -1,0 +1,25 @@
+= 30
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter DoSend: FF 46 1E 00 00 00 01 40 42 0F 00 00 00 E8 03 00 00 00 FF FF FF FF FF FF FF FF FF FF 00 01 04 01 69 74 65 6D
+[11.08.2026 15:51:28.533] [00022796] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter Команда: FF46h, Операция V2
+[11.08.2026 15:51:28.533] [00022796] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDBReceiptFilePlugin BeforeCommand.begin FF46
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDBReceiptFilePlugin BeforeCommand.end FF46
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:51:28.533] [00022796] [DEBUG] TFiscalPrinter On connect routine
+[11.08.2026 15:51:28.533] [00022796] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.535] [00022796] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.535] [00022796] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.begin
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.end
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TDriverState.Assign
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.579] [00022796] [DEBUG] TFiscalPrinter Destroy

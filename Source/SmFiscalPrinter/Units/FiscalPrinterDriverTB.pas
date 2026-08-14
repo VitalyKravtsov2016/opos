@@ -784,8 +784,9 @@ begin
   Driver.Timeout := Parameters.ByteTimeout;
   Driver.Password := Integer(GetUsrPassword);
   Driver.PointPosition := True; // 2 decimal places
-  if Parameters.ModelID >= 0 then
-    Driver.ModelID := Parameters.ModelID;
+  // Do not assign Driver.ModelID from Parameters.ModelID:
+  // Parameters.ModelID is the OPOS Models.xml id; forcing it into DrvFR
+  // makes OpenCheck/FNOperation return -70 ("СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ РґСЂР°Р№РІРµСЂРѕРј").
 end;
 
 procedure VersionChars(const Version: WideString; var Hi, Lo: Char);
@@ -1983,9 +1984,9 @@ begin
     if FSReadCommStatus(R) = 0 then
     begin
       PrintText(PRINTER_STATION_REC, StringOfChar('-', GetPrintWidth));
-      PrintLines('КОЛИЧЕСТВО СООБЩЕНИЙ ДЛЯ ОФД:', IntToStr(R.DocumentCount));
-      PrintLines('НОМЕР ПЕРВОГО ДОКУМЕНТА ДЛЯ ОФД:', IntToStr(R.DocumentNumber));
-      PrintLines('ДАТА ПЕРВОГО ДОКУМЕНТА:', PrinterDateTimeToStr2(R.DocumentDate));
+      PrintLines('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ:', IntToStr(R.DocumentCount));
+      PrintLines('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ:', IntToStr(R.DocumentNumber));
+      PrintLines('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:', PrinterDateTimeToStr2(R.DocumentDate));
       Break;
     end;
     Sleep(1000)
@@ -2474,6 +2475,8 @@ end;
 ******************************************************************************)
 
 function TFiscalPrinterDriverTB.OpenReceipt(ReceiptType: Byte): Integer;
+const
+  E_DRV_NOT_SUPPORTED = -70; // "СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ РґСЂР°Р№РІРµСЂРѕРј"
 var
   Answer: AnsiString;
 begin
@@ -2484,6 +2487,21 @@ begin
   // Fallback when DrvFR reports OpenCheck unsupported for FN model
   if Result <> 0 then
     Result := ExecuteData(#$8D + IntToBin(GetUsrPassword, 4) + Chr(ReceiptType), Answer);
+  // Align COM ModelID with device UModel and retry once (avoids -70 from stale ModelID).
+  if Result = E_DRV_NOT_SUPPORTED then
+  begin
+    Driver.ModelID := Driver.UModel;
+    Driver.CheckType := ReceiptType;
+    Result := Driver.OpenCheck;
+    if Result <> 0 then
+      Result := ExecuteData(#$8D + IntToBin(GetUsrPassword, 4) + Chr(ReceiptType), Answer);
+  end;
+  // FN receipts are opened by the first FNOperation; do not fail OpenReceipt on -70.
+  if (Result = E_DRV_NOT_SUPPORTED) and CapFiscalStorage then
+  begin
+    FLogger.Debug('OpenReceipt: -70 ignored, FN document opens on first item');
+    Result := 0;
+  end;
   if Result = 0 then
     FFilter.OpenReceipt(ReceiptType);
 end;
@@ -5304,6 +5322,8 @@ begin
 end;
 
 function TFiscalPrinterDriverTB.FSSale2(P: TFSSale2): Integer;
+const
+  E_DRV_NOT_SUPPORTED = -70;
 begin
   P.Text := PrintItemText(P.Text);
   DoConnect;
@@ -5320,6 +5340,11 @@ begin
   Driver.PaymentItemSign := P.PaymentItem;
   Driver.StringForPrinting := P.Text;
   Result := Driver.FNOperation;
+  if Result = E_DRV_NOT_SUPPORTED then
+  begin
+    Driver.ModelID := Driver.UModel;
+    Result := Driver.FNOperation;
+  end;
 end;
 
 function TFiscalPrinterDriverTB.FSReadRegTag(var R: TFSReadRegTagCommand): Integer;
@@ -6262,48 +6287,48 @@ begin
     CheckMinLength(Answer, 8);
     FillChar(R, Sizeof(R), 0);
     R.FlagsValue := BinToInt(Answer, 1, 8);
-    R.Flags.CapJrnNearEndSensor := TestBit(R.FlagsValue, 0);      // 0 – Весовой датчик контрольной ленты
-    R.Flags.CapRecNearEndSensor := TestBit(R.FlagsValue, 1);      // 1 – Весовой датчик чековой ленты
-    R.Flags.CapJrnEmptySensor := TestBit(R.FlagsValue, 2);        // 2 – Оптический датчик контрольной ленты
-    R.Flags.CapRecEmptySensor := TestBit(R.FlagsValue, 3);        // 3 – Оптический датчик чековой ленты
-    R.Flags.CapCoverSensor := TestBit(R.FlagsValue, 4);           // 4 – Датчик крышки
-    R.Flags.CapJrnLeverSensor := TestBit(R.FlagsValue, 5);        // 5 – Рычаг термоголовки контрольной ленты
-    R.Flags.CapRecLeverSensor := TestBit(R.FlagsValue, 6);        // 6 – Рычаг термоголовки чековой ленты
-    R.Flags.CapSlpNearEndSensor := TestBit(R.FlagsValue, 7);      // 7 – Верхний датчик подкладного документа
-    R.Flags.CapSlpEmptySensor := TestBit(R.FlagsValue, 8);        // 8 – Нижний датчик подкладного документа
-    R.Flags.CapPresenter := TestBit(R.FlagsValue, 9);             // 9 – Презентер поддерживается
-    R.Flags.CapPresenterCommands := TestBit(R.FlagsValue, 10);    // 10 – Поддержка команд работы с презентером
-    R.Flags.CapEJNearFull := TestBit(R.FlagsValue, 11);           // 11 – Флаг заполнения ЭКЛЗ
-    R.Flags.CapEJ := TestBit(R.FlagsValue, 12);                   // 12 – ЭКЛЗ поддерживается
-    R.Flags.CapCutter := TestBit(R.FlagsValue, 13);               // 13 – Отрезчик поддерживается
-    R.Flags.CapDrawerStateAsPaper := TestBit(R.FlagsValue, 14);   // 14 – Состояние ДЯ как датчик бумаги в презентере
-    R.Flags.CapDrawerSensor := TestBit(R.FlagsValue, 15);         // 15 – Датчик денежного ящика
-    R.Flags.CapPrsInSensor := TestBit(R.FlagsValue, 16);          // 16 – Датчик бумаги на входе в презентер
-    R.Flags.CapPrsOutSensor := TestBit(R.FlagsValue, 17);         // 17 – Датчик бумаги на выходе из презентера
-    R.Flags.CapBillAcceptor := TestBit(R.FlagsValue, 18);         // 18 – Купюроприемник поддерживается
-    R.Flags.CapTaxKeyPad := TestBit(R.FlagsValue, 19);            // 19 – Клавиатура НИ поддерживается
-    R.Flags.CapJrnPresent := TestBit(R.FlagsValue, 20);           // 20 – Контрольная лента поддерживается
-    R.Flags.CapSlpPresent := TestBit(R.FlagsValue, 21);           // 21 – Подкладной документ поддерживается
-    R.Flags.CapNonfiscalDoc := TestBit(R.FlagsValue, 22);         // 22 – Поддержка команд нефискального документа
-    R.Flags.CapCashCore := TestBit(R.FlagsValue, 23);             // 23 – Поддержка протокола Кассового Ядра (cashcore)
-    R.Flags.CapInnLeadingZero := TestBit(R.FlagsValue, 24);       // 24 – Ведущие нули в ИНН
-    R.Flags.CapRnmLeadingZero := TestBit(R.FlagsValue, 25);       // 25 – Ведущие нули в РНМ
-    R.Flags.SwapGraphicsLine := TestBit(R.FlagsValue, 26);        // 26 – Переворачивать байты при печати линии
-    R.Flags.CapTaxPasswordLock := TestBit(R.FlagsValue, 27);      // 27 – Блокировка ККТ по неверному паролю налогового инспектора
-    R.Flags.CapProtocol2 := TestBit(R.FlagsValue, 28);            // 28 – Поддержка альтернативного нижнего уровня протокола ККТ
-    R.Flags.CapLFInPrintText := TestBit(R.FlagsValue, 29);        // 29 – Поддержка переноса строк символом '\n' (код 10) в командах печати строк 12H, 17H, 2FH
-    R.Flags.CapFontInPrintText := TestBit(R.FlagsValue, 30);      // 30 – Поддержка переноса строк номером шрифта (коды 1…9) в команде печати строк 2FH
-    R.Flags.CapLFInFiscalCommands := TestBit(R.FlagsValue, 31);   // 31 – Поддержка переноса строк символом '\n' (код 10) в фискальных командах 80H…87H, 8AH, 8BH
-    R.Flags.CapFontInFiscalCommands := TestBit(R.FlagsValue, 32); // 32 – Поддержка переноса строк номером шрифта (коды 1…9) в фискальных командах 80H…87H, 8AH, 8BH
-    R.Flags.CapTopCashierReports := TestBit(R.FlagsValue, 33);    // 33 – Права "СТАРШИЙ КАССИР" (28) на снятие отчетов: X, операционных регистров, по отделам, по налогам, по кассирам, почасового, по товарам
-    R.Flags.CapSlpInPrintCommands := TestBit(R.FlagsValue, 34);   // 34 – Поддержка Бит 3 "слип чек" в командах печати: строк 12H, 17H, 2FH,расширенной графики 4DH, C3H, графической линии C5H; поддержка
-    R.Flags.CapGraphicsC4 := TestBit(R.FlagsValue, 35);           // 35 – Поддержка блочной загрузки графики в команде C4H
-    R.Flags.CapCommand6B := TestBit(R.FlagsValue, 36);            // 36 – Поддержка команды 6BH "Возврат названия ошибоки"
-    R.Flags.CapFlagsGraphicsEx := TestBit(R.FlagsValue, 37);      // 37 – Поддержка флагов печати для команд печати расширенной графики C3H и печати графической линии C5H
-    R.Flags.CapMFP := TestBit(R.FlagsValue, 39);                  // 39 – Поддержка МФП
-    R.Flags.CapEJ5 := TestBit(R.FlagsValue, 40);                  // 40 – Поддержка ЭКЛЗ5
-    R.Flags.CapScaleGraphics := TestBit(R.FlagsValue, 41);        // 41 – Печать графики с масштабированием (команда 4FH)
-    R.Flags.CapGraphics512 := TestBit(R.FlagsValue, 42);          // 42 – Загрузка и печать графики-512 (команды 4DH, 4EH)
+    R.Flags.CapJrnNearEndSensor := TestBit(R.FlagsValue, 0);      // 0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapRecNearEndSensor := TestBit(R.FlagsValue, 1);      // 1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapJrnEmptySensor := TestBit(R.FlagsValue, 2);        // 2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapRecEmptySensor := TestBit(R.FlagsValue, 3);        // 3 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapCoverSensor := TestBit(R.FlagsValue, 4);           // 4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapJrnLeverSensor := TestBit(R.FlagsValue, 5);        // 5 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapRecLeverSensor := TestBit(R.FlagsValue, 6);        // 6 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapSlpNearEndSensor := TestBit(R.FlagsValue, 7);      // 7 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapSlpEmptySensor := TestBit(R.FlagsValue, 8);        // 8 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapPresenter := TestBit(R.FlagsValue, 9);             // 9 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapPresenterCommands := TestBit(R.FlagsValue, 10);    // 10 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapEJNearFull := TestBit(R.FlagsValue, 11);           // 11 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+    R.Flags.CapEJ := TestBit(R.FlagsValue, 12);                   // 12 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapCutter := TestBit(R.FlagsValue, 13);               // 13 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapDrawerStateAsPaper := TestBit(R.FlagsValue, 14);   // 14 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapDrawerSensor := TestBit(R.FlagsValue, 15);         // 15 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapPrsInSensor := TestBit(R.FlagsValue, 16);          // 16 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapPrsOutSensor := TestBit(R.FlagsValue, 17);         // 17 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapBillAcceptor := TestBit(R.FlagsValue, 18);         // 18 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapTaxKeyPad := TestBit(R.FlagsValue, 19);            // 19 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapJrnPresent := TestBit(R.FlagsValue, 20);           // 20 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapSlpPresent := TestBit(R.FlagsValue, 21);           // 21 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapNonfiscalDoc := TestBit(R.FlagsValue, 22);         // 22 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapCashCore := TestBit(R.FlagsValue, 23);             // 23 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (cashcore)
+    R.Flags.CapInnLeadingZero := TestBit(R.FlagsValue, 24);       // 24 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
+    R.Flags.CapRnmLeadingZero := TestBit(R.FlagsValue, 25);       // 25 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
+    R.Flags.SwapGraphicsLine := TestBit(R.FlagsValue, 26);        // 26 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapTaxPasswordLock := TestBit(R.FlagsValue, 27);      // 27 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapProtocol2 := TestBit(R.FlagsValue, 28);            // 28 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+    R.Flags.CapLFInPrintText := TestBit(R.FlagsValue, 29);        // 29 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH
+    R.Flags.CapFontInPrintText := TestBit(R.FlagsValue, 30);      // 30 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2FH
+    R.Flags.CapLFInFiscalCommands := TestBit(R.FlagsValue, 31);   // 31 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
+    R.Flags.CapFontInFiscalCommands := TestBit(R.FlagsValue, 32); // 32 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
+    R.Flags.CapTopCashierReports := TestBit(R.FlagsValue, 33);    // 33 пїЅ пїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" (28) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: X, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapSlpInPrintCommands := TestBit(R.FlagsValue, 34);   // 34 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 3 "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH,пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, C3H, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H; пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    R.Flags.CapGraphicsC4 := TestBit(R.FlagsValue, 35);           // 35 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C4H
+    R.Flags.CapCommand6B := TestBit(R.FlagsValue, 36);            // 36 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 6BH "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
+    R.Flags.CapFlagsGraphicsEx := TestBit(R.FlagsValue, 37);      // 37 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C3H пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H
+    R.Flags.CapMFP := TestBit(R.FlagsValue, 39);                  // 39 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+    R.Flags.CapEJ5 := TestBit(R.FlagsValue, 40);                  // 40 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ5
+    R.Flags.CapScaleGraphics := TestBit(R.FlagsValue, 41);        // 41 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4FH)
+    R.Flags.CapGraphics512 := TestBit(R.FlagsValue, 42);          // 42 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, 4EH)
 
     if Length(Answer) < 9 then Exit;
     R.Font1Width := Ord(Answer[9]);
@@ -6490,7 +6515,7 @@ begin
     Client.Timeout := Parameters.EkmServerTimeout;
     SaleEnabled := Client.ReadSaleEnabled(Barcode.GTIN, Barcode.Serial);
     if not SaleEnabled then
-      raiseError(E_SALE_NOT_ENABLED, _('Продажа товара запрещена'));
+      raiseError(E_SALE_NOT_ENABLED, _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
   finally
     Client.Free;
   end;

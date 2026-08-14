@@ -1,0 +1,54 @@
+EBUG] TPrinterProtocol -> 02 06 FE E7 00 00 00 00 1F
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TPrinterProtocol <- 06
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 30000
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TComPort SetCmdTimeout 30000
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TPrinterProtocol <- 02
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TPrinterProtocol <- 42
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 2000
+[11.08.2026 15:49:42.759] [00022784] [DEBUG] TComPort SetCmdTimeout 2000
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TPrinterProtocol <- FE 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 BC
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TPrinterProtocol -> 06
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.begin
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.end
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TDBReceiptFilePlugin AfterCommand.begin FE
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TDBReceiptFilePlugin AfterCommand.end FE
+[11.08.2026 15:49:42.775] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:42.776] [00022784] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:49:42.776] [00022784] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:49:42.776] [00022784] [DEBUG] TDrvFR ReadFeatureLicenses(): 0
+[11.08.2026 15:49:42.779] [00022784] [DEBUG] TDrvFR Get_ResultCodeDescription: Ошибок нет
+[11.08.2026 15:49:42.785] [00022784] [DEBUG] TDrvFR Get_License: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+[11.08.2026 15:49:42.977] [00022784] [DEBUG] TDrvFR Set_CheckType = 0
+[11.08.2026 15:49:42.981] [00022784] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:49:42.981] [00022784] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:49:42.981] [00022784] [DEBUG] TFiscalPrinter DoSend: 10 1E 00 00 00
+[11.08.2026 15:49:42.981] [00022784] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:49:42.981] [00022784] [DEBUG] TFiscalPrinter Команда: 10h, Короткий запрос состояния
+[11.08.2026 15:49:42.982] [00022784] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TDBReceiptFilePlugin BeforeCommand.begin 10
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TDBReceiptFilePlugin BeforeCommand.end 10
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TFiscalPrinter On connect routine
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TFiscalPrinter Command OK: 0010
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TFiscalPrinter OpenPort
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TComPort Open COM12: 115200
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 2000
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TComPort SetCmdTimeout 2000
+[11.08.2026 15:49:42.982] [00022784] [DEBUG] TPrinterProtocol -> 05
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 15
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol -> 02 05 10 1E 00 00 00 0B
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 06
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 5000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TComPort SetCmdTimeout 5000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 02
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 10
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 2000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TComPort SetCmdTimeout 2000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 10 00 01 02 00 02 00 00 64 DC 00 00 00 00 00 00 B9
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol -> 06
+[11.08.2026 15:49:43.0

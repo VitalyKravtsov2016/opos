@@ -1,0 +1,15 @@
+коммерческ cp1251 idx=-1
+коммерческ utf-8 idx=-1
+коммерческ utf-16le idx=-1
+законодательн cp1251 idx=-1
+законодательн utf-8 idx=-1
+законодательн utf-16le idx=-1
+LicenseCommercial cp1251 idx=-1
+LicenseCommercial utf-8 idx=-1
+LicenseCommercial utf-16le idx=-1
+CommercialStatus cp1251 idx=-1
+CommercialStatus utf-8 idx=-1
+CommercialStatus utf-16le idx=-1
+функциональн cp1251 idx=-1
+функциональн utf-8 idx=13303054
+функциональн utf-16le idx=-1

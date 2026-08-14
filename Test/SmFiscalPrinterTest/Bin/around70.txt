@@ -1,0 +1,61 @@
+15:38:56.990] [00019996] [DEBUG] TDrvFR Get_LicenseIsPresent: True
+[11.08.2026 15:38:57.001] [00019996] [DEBUG] TDrvFR Get_ECRMode: 2
+[11.08.2026 15:38:57.001] [00019996] [DEBUG] TDrvFR Get_ResultCodeDescription: Ошибок нет
+[11.08.2026 15:38:57.006] [00019996] [DEBUG] TDrvFR Set_Password = 1
+[11.08.2026 15:38:57.006] [00019996] [DEBUG] TDrvFR GetECRStatus()
+[11.08.2026 15:38:57.006] [00019996] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter DoSend: 11 01 00 00 00
+[11.08.2026 15:38:57.007] [00019996] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter Команда: 11h, Запрос состояния
+[11.08.2026 15:38:57.007] [00019996] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TDriverState.Assign
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TDBReceiptFilePlugin BeforeCommand.begin 11
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TDBReceiptFilePlugin BeforeCommand.end 11
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TDriverState.Assign
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter AfterCommand.end Password = 1
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter On connect routine
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter Command OK: 0011
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter OpenPort
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TComPort Open COM12: 115200
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TPrinterProtocol SetCmdTimeout: 3000
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TComPort SetCmdTimeout 3000
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TPrinterProtocol -> 05
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TPrinterProtocol <- 15
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TPrinterProtocol -> 02 05 11 01 00 00 00 15
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TPrinterProtocol <- 06
+[11.08.2026 15:38:57.007] [00019996] [DEBUG] TPrinterProtocol SetCmdTimeout: 5000
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TComPort SetCmdTimeout 5000
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TPrinterProtocol <- 02
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TPrinterProtocol <- 32
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TPrinterProtocol SetCmdTimeout: 3000
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TComPort SetCmdTimeout 3000
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TPrinterProtocol <- 11 00 01 31 30 64 00 0B 08 1A 01 01 00 02 00 02 00 01 31 30 01 00 0B 08 1A 0B 08 1A 0F 26 39 45 40 E2 01 00 01 00 D0 07 01 0F 00 00 00 00 00 00 00 00 71
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TPrinterProtocol -> 06
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDriverState.Assign
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.begin
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.end
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDBReceiptFilePlugin AfterCommand.begin 11
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDBReceiptFilePlugin AfterCommand.end 11
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDriverState.Assign
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TFiscalPrinter AfterCommand.end Password = 1
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDrvFR GetECRStatus(): 0
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDrvFR Get_FMFlags: 69
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDrvFR Get_LicenseIsPresent: True
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDrvFR Get_ECRMode: 2
+[11.08.2026 15:38:57.008] [00019996] [DEBUG] TDrvFR Get_ResultCodeDescription: Ошибок нет
+[11.08.2026 15:38:57.031] [00019996] [DEBUG] TDrvFR Get_FM1IsPresent: True
+[11.08.2026 15:38:57.039] [00019996] [DEBUG] TDrvFR Get_IsFMSessionOpen: True
+[11.08.2026 15:38:57.039] [00019996] [DEBUG] TDrvFR Get_LicenseIsPresent: True
+[11.08.2026 15:38:57.050] [00019996] [DEBUG] TDrvFR ReadFeatureLicenses()
+[11.08.2026 15:38:57.050] [00019996] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:38:57.050] [00019996] [DEBUG] TFiscalPrinter DoSend: FE E7 00 00 00 00
+[11.08.2026 15:38:57.051] [00019996] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:38:57.051] [00019996] [DEBUG] TFiscalPrinter Команда: FEh, Сервисная команда
+[11.08.2026 15:38:57.051] [00019996] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:38:57.051] [00019996] [DEBUG] TDriverState.Assign
+[11.08.2026 15:38:57.051] [00019996] [DEBUG] TDBReceiptFilePlugin BeforeCommand.begin FE
+[11.08.2026 15:38:57.051] [00019996] [DEBUG] TDBReceiptFilePlugin BeforeCommand.end FE
+[11.08.2026 15:38:57.051] [00019996] [DEBUG] TDriverStat

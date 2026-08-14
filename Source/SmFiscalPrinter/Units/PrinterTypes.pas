@@ -17,29 +17,29 @@ const
   ///////////////////////////////////////////////////////////////////////////
   // KTN constants
 
-  // КН Код неопределенного идентификатора товара 00h 00h
+  // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 00h 00h
   KTN_UNKNOWN = 0;
-  // EAN-8, UPC-E (E8) Идентификатор товара по формату EAN-8 45h 08h
+  // EAN-8, UPC-E (E8) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ EAN-8 45h 08h
   KTN_EAN8 = $4508;
-  // EAN-13, UPC-A (E13) Идентификатор товара по формату EAN-13 45h 0Dh
+  // EAN-13, UPC-A (E13) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ EAN-13 45h 0Dh
   KTN_EAN13 = $450D;
-  // ITF-14 (I14) Идентификатор товара по формату ITF-14 49h 0Eh
+  // ITF-14 (I14) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ITF-14 49h 0Eh
   KTN_ITF14 = $490E;
-  // GS1 Data Matrix (DM) Идентификатор товара по формату GS1 Data Matrix или
-  // Data Matrix маркировки товаров 44h 4Dh
+  // GS1 Data Matrix (DM) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ GS1 Data Matrix пїЅпїЅпїЅ
+  // Data Matrix пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 44h 4Dh
   KTN_DM = $444D;
-  // Изделия из натурального меха (RF)
-  // Идентификатор товара по формату маркированной
-  // продукции изделий из натурального меха 52h 46h
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (RF)
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 52h 46h
   KTN_RF = $5246;
-  // ЕГАИС 2.0 (Е20) Идентификатор товара по формату 2 версии маркированной
-  // алкогольной продукции в формате PDF417 C5h 14h
+  // пїЅпїЅпїЅпїЅпїЅ 2.0 (пїЅ20) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ PDF417 C5h 14h
   KTN_EGAIS2 = $C514;
-  // ЕГАИС 3.0 (Е30) Идентификатор товара по формату 3 версии маркированной
-  // алкогольной продукции в формате Data Matrix C5h 1Eh
+  // пїЅпїЅпїЅпїЅпїЅ 3.0 (пїЅ30) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Data Matrix C5h 1Eh
   KTN_EGAIS3 = $C51E;
-  // Код товара в формате ТН ВЭД Идентификатор товара по формату классификатора ТН
-  // ВЭД для групп товаров моторного топлива (газообразногои жидкого). 45h 41h
+  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+  // пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ). 45h 41h
   KTN_FUEL = $4541;
 
   /////////////////////////////////////////////////////////////////////////////
@@ -95,9 +95,9 @@ const
 
 
 
-  PrinterDiscountText   = 'СКИДКА';
-  PrinterChargeText     = 'НАДБАВКА';
-  PrinterItemVoidText   = 'СТОРНО';
+  PrinterDiscountText   = 'пїЅпїЅпїЅпїЅпїЅпїЅ';
+  PrinterChargeText     = 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
+  PrinterItemVoidText   = 'пїЅпїЅпїЅпїЅпїЅпїЅ';
 
   /////////////////////////////////////////////////////////////////////////////
   // Command codes
@@ -463,9 +463,9 @@ type
   { TLongFiscResult }
 
   TLongFiscResult = packed record
-    FiscNumber: Byte;       // Fiscalization/Refiscalization number(1 byte) 1…16
-    LeftNumber: Byte;       // Quantity of refiscalizations left in FM (1 byte) 0…15
-    DayNumber: Word;      // Last daily totals record number in FM (2 bytes) 0000…2100
+    FiscNumber: Byte;       // Fiscalization/Refiscalization number(1 byte) 1пїЅ16
+    LeftNumber: Byte;       // Quantity of refiscalizations left in FM (1 byte) 0пїЅ15
+    DayNumber: Word;      // Last daily totals record number in FM (2 bytes) 0000пїЅ2100
     Date: TPrinterDate;     // Fiscalization/Refiscalization date (3 bytes) DD-MM-YY
   end;
 
@@ -635,16 +635,16 @@ type
   TDayRange = packed record
     Date1: TPrinterDate;        // First day date (3 bytes) DD-MM-YY
     Date2: TPrinterDate;        // Last day date (3 bytes) DD-MM-YY
-    Number1: Word;              // First day number (2 bytes) 0000…2100
-    Number2: Word;              // Last day number (2 bytes) 0000…2100
+    Number1: Word;              // First day number (2 bytes) 0000пїЅ2100
+    Number2: Word;              // Last day number (2 bytes) 0000пїЅ2100
   end;
 
   { TFiscalizationResult }
 
   TFiscalizationResult = packed record
-    FiscNumber: Byte;           // Fiscalization (refiscalization) number  (1 byte) 1…16
-    LeftFiscCount: Byte;        // Refiscalizations left count (1 byte) 0…15
-    LastDayNumber: Word;      // Last closed day number(2 bytes) 0000…2100
+    FiscNumber: Byte;           // Fiscalization (refiscalization) number  (1 byte) 1пїЅ16
+    LeftFiscCount: Byte;        // Refiscalizations left count (1 byte) 0пїЅ15
+    LastDayNumber: Word;      // Last closed day number(2 bytes) 0000пїЅ2100
     Date: TPrinterDate;         // Fiscalilzation (refiscalization) date (3 bytes) DD-MM-YY
   end;
 
@@ -666,16 +666,16 @@ type
 
   TFiscInfo = packed record
     Password: DWORD;    // Password (4 bytes)
-    PrinterID: Int64;   // ECRRN (5 bytes) 0000000000…9999999999
-    FiscalID: Int64;    // Taxpayer ID (6 byte) 000000000000…999999999999
-    DayNumber: Word;  // Day number before fiscalization (refiscalization) (2 bytes) 0000…2100
+    PrinterID: Int64;   // ECRRN (5 bytes) 0000000000пїЅ9999999999
+    FiscalID: Int64;    // Taxpayer ID (6 byte) 000000000000пїЅ999999999999
+    DayNumber: Word;  // Day number before fiscalization (refiscalization) (2 bytes) 0000пїЅ2100
     Date: TPrinterDate; // Fiscalization (refiscalization) date (3 bytes) DD-MM-YY
   end;
 
   { TDocResult }
 
   TDocResult = packed record
-    OperatorNumber: Byte; // Operator number (1 byte) 1…30
+    OperatorNumber: Byte; // Operator number (1 byte) 1пїЅ30
     DocumentNumber: WORD; // Transparent document number (2 bytes)
   end;
 
@@ -684,7 +684,7 @@ type
   TSlipParams = packed record
     DocType: Byte;              // Document type (1 byte) '0' - sale, '1' - buy, '2' - sale refund, '3' - buy refund
     DupType: Byte;              // Duplicate type (1 byte) '0' - columns, '1' - line blocks
-    DupCount: Byte;             // Duplicate count (1 byte) 0…5
+    DupCount: Byte;             // Duplicate count (1 byte) 0пїЅ5
     DupOffset1: Byte;           // Spacing between original and 1-st duplicate (1 byte) *
     DupOffset2: Byte;           // Spacing between 1-st and 2-nd duplicate (1 byte) *
     DupOffset3: Byte;           // Spacing between 2-nd and 3-d duplicate (1 byte) *
@@ -710,7 +710,7 @@ type
   TStdSlipParams = packed record
     DocType: Byte;              // Document type (1 byte) '0' - sale, '1' - buy, '2' - sale refund, '3' - buy refund
     DupType: Byte;              // Duplicate type (1 byte) '0' - columns, '1' - WideString blocks
-    DupCount: Byte;             // Duplicate count (1 byte) 0…5
+    DupCount: Byte;             // Duplicate count (1 byte) 0пїЅ5
     DupOffset1: Byte;           // Spacing between original and 1-st duplicate (1 byte) *
     DupOffset2: Byte;           // Spacing between 1-st and 2-nd duplicate (1 byte) *
     DupOffset3: Byte;           // Spacing between 2-nd and 3-d duplicate (1 byte) *
@@ -722,11 +722,11 @@ type
 
   TSlipOperation = packed record
     QuantityFormat: Byte;       // Quantitiy format (1 byte) '0' - without digits after delimeter, '1' - with digits after delimeter
-    LineCount: Byte;            // Operation line count (1 byte) 1…3
-    TextLine: Byte;             // Text line number (1 byte) 0…3, '0' - do not print
-    QuantityLine: Byte;         // Quantity times price line number (1 byte) 0…3, '0' - do not print
-    SummLine: Byte;             // Sum line number (1 byte) 1…3
-    DepartmentLine: Byte;       // Department line number (1 byte) 1…3
+    LineCount: Byte;            // Operation line count (1 byte) 1пїЅ3
+    TextLine: Byte;             // Text line number (1 byte) 0пїЅ3, '0' - do not print
+    QuantityLine: Byte;         // Quantity times price line number (1 byte) 0пїЅ3, '0' - do not print
+    SummLine: Byte;             // Sum line number (1 byte) 1пїЅ3
+    DepartmentLine: Byte;       // Department line number (1 byte) 1пїЅ3
     TextFont: Byte;             // Text WideString font number (1 byte)
     QuantityFont: Byte;         // Quantity font numter (1 byte)
     MultSignFont: Byte;         // Multiplication sign font number (1 byte)
@@ -760,13 +760,13 @@ type
     Quantity: Double;           // Quantity (5 bytes)
     Price: Int64;               // Price (5 bytes)
     Amount: Int64;              // Amount (5 bytes)
-    Department: Byte;           // Department (1 byte) 0…16
-    Tax: Byte;                  // Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax group
+    Department: Byte;           // Department (1 byte) 0пїЅ16
+    Tax: Byte;                  // Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
     Charge: Int64;
     Discount: Int64;
     Barcode: Int64;
-    Text: WideString;               // Название товара
-    AdjText: WideString;            // Название скидки или надбавки
+    Text: WideString;               // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    AdjText: WideString;            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     Parameter1: WideString;
     Parameter2: WideString;
     Parameter3: WideString;
@@ -786,9 +786,9 @@ type
     Price: Int64;       // Price (5 bytes)
     Total: Int64;
     TaxAmount: Int64;
-    Department: Byte;   // Department (1 byte) 0…16
-    Tax: Byte;          // Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Text: WideString;         // Название товара
+    Department: Byte;   // Department (1 byte) 0пїЅ16
+    Tax: Byte;          // Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Text: WideString;         // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     UnitName: WideString;
     PaymentType: Byte;
     PaymentItem: Byte;
@@ -806,21 +806,21 @@ type
   TPriceReg = packed record
     Quantity: Int64;    // Quantity (5 bytes)
     Price: Int64;       // Price (5 bytes)
-    Department: Byte;   // Department (1 byte) 0…16
-    Tax1: Byte;         // Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax2: Byte;         // Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax group
+    Department: Byte;   // Department (1 byte) 0пїЅ16
+    Tax1: Byte;         // Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax2: Byte;         // Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
     Text: WideString;   // Text (40 byte)
   end;
 
   { TSlipDiscountParams }
 
   TSlipDiscountParams = packed record
-    LineCount: Byte;    // Transaction line count (1 byte) 1…2
-    TextLine: Byte;     // Text WideString line number (1 byte) 0…2, '0' - do not print
-    NameLine: Byte;     // Transaction name line number (1 byte) 1…2
-    AmountLine: Byte;   // Sum line number (1 byte) 1…2
+    LineCount: Byte;    // Transaction line count (1 byte) 1пїЅ2
+    TextLine: Byte;     // Text WideString line number (1 byte) 0пїЅ2, '0' - do not print
+    NameLine: Byte;     // Transaction name line number (1 byte) 1пїЅ2
+    AmountLine: Byte;   // Sum line number (1 byte) 1пїЅ2
     TextFont: Byte;     // Text WideString font number (1 byte)
     NameFont: Byte;     // Transaction name font number (1 byte)
     AmountFont: Byte;   // Sum font number (1 byte)
@@ -837,11 +837,11 @@ type
     OperationType: Byte; // Operation type (1 byte) '0' - discount, '1' - charge
     LineNumber: Byte;    // First discount/charge element vertical position (1 byte)
     Amount: Int64;       // Sum (5 bytes)
-    Department: Byte;    // Department (1 byte) 0…16
-    Tax1: Byte;          // Tax 1 (1 byte) '0' - not, '1'…'4' - tax group
-    Tax2: Byte;          // Tax 2 (1 byte) '0' - not, '1'…'4' - tax group
-    Tax3: Byte;          // Tax 3 (1 byte) '0' - not, '1'…'4' - tax group
-    Tax4: Byte;          // Tax 4 (1 byte) '0' - not, '1'…'4' - tax group
+    Department: Byte;    // Department (1 byte) 0пїЅ16
+    Tax1: Byte;          // Tax 1 (1 byte) '0' - not, '1'пїЅ'4' - tax group
+    Tax2: Byte;          // Tax 2 (1 byte) '0' - not, '1'пїЅ'4' - tax group
+    Tax3: Byte;          // Tax 3 (1 byte) '0' - not, '1'пїЅ'4' - tax group
+    Tax4: Byte;          // Tax 4 (1 byte) '0' - not, '1'пїЅ'4' - tax group
     Text: WideString;        // Text (40 byte)
   end;
 
@@ -852,19 +852,19 @@ type
     Amount2: Int64;     // Payment type 2 sum (5 bytes)
     Amount3: Int64;     // payment type 3 sum (5 bytes)
     Amount4: Int64;     // Payment type 4 sum (5 bytes)
-    PercentDiscount: WORD;      // Receipt discount in value 0 to 99.99 % (2 bytes) 0000…9999
-    Tax1: Byte;         // Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax2: Byte;         // Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax group
+    PercentDiscount: WORD;      // Receipt discount in value 0 to 99.99 % (2 bytes) 0000пїЅ9999
+    Tax1: Byte;         // Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax2: Byte;         // Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
     Text: WideString;       // Text (40 byte)
   end;
 
   { TCloseReceiptResult }
 
   TCloseReceiptResult = packed record
-    OperatorNumber: Byte;       // Operator number (1 byte) 1…30
-    Change: Int64;              // Change (5 bytes) 0000000000…9999999999
+    OperatorNumber: Byte;       // Operator number (1 byte) 1пїЅ30
+    Change: Int64;              // Change (5 bytes) 0000000000пїЅ9999999999
   end;
 
   { TSlipCloseParams }
@@ -877,11 +877,11 @@ type
 
   TAmountOperation = packed record
     Amount: Int64;      // Sum (5 bytes)
-    Department: Byte;   // Department (1 byte) 0…16
-    Tax1: Byte;         // Tax 1 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax2: Byte;         // Tax 2 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'…'4' - tax group
-    Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'…'4' - tax group
+    Department: Byte;   // Department (1 byte) 0пїЅ16
+    Tax1: Byte;         // Tax 1 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax2: Byte;         // Tax 2 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax3: Byte;         // Tax 3 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
+    Tax4: Byte;         // Tax 4 (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
     Text: WideString;       // Text (40 byte)
   end;
 
@@ -890,19 +890,19 @@ type
   TReceiptDiscount2 = packed record
     Discount: Int64;      // Discount (5 bytes)
     Charge: Int64;        // Charge (5 bytes)
-    Tax: Byte;            // Tax  (1 byte) '0' - no tax, '1'…'4' - tax group
+    Tax: Byte;            // Tax  (1 byte) '0' - no tax, '1'пїЅ'4' - tax group
     Text: WideString;         // Text (40 byte)
   end;
 
   { TDeviceMetrics }
 
   TDeviceMetrics = packed record
-    DeviceType: Byte;           // Device type (1 byte) 0…255
-    DeviceSubtype: Byte;        // Device suptype (1 byte) 0…255
-    ProtocolVersion: Byte;      // Device protocol version (1 byte) 0…255
-    ProtocolSubVersion: Byte;   // Device protocol subversion (1 byte) 0…255
-    Model: Byte;                // Device model (1 byte) 0…255
-    Language: Byte;             // Device language (1 byte) 0…255 Russian - 0; English - 1;
+    DeviceType: Byte;           // Device type (1 byte) 0пїЅ255
+    DeviceSubtype: Byte;        // Device suptype (1 byte) 0пїЅ255
+    ProtocolVersion: Byte;      // Device protocol version (1 byte) 0пїЅ255
+    ProtocolSubVersion: Byte;   // Device protocol subversion (1 byte) 0пїЅ255
+    Model: Byte;                // Device model (1 byte) 0пїЅ255
+    Language: Byte;             // Device language (1 byte) 0пїЅ255 Russian - 0; English - 1;
     DeviceName: WideString;         // Device name - WideString of characters in WIN1251.
   end;
 
@@ -921,11 +921,11 @@ type
   { TEJStatus1 }
 
   TEJStatus1 = packed record
-    DocAmount: Int64;           // Last KPK document total KPK (5 bytes) 0000000000…9999999999
+    DocAmount: Int64;           // Last KPK document total KPK (5 bytes) 0000000000пїЅ9999999999
     DocDate: TPrinterDate;      // Last KPK date (3 bytes) DD-MM-YY
     DocTime: TEJTime;           // Last KPK time (2 bytes) HH-MM
-    DocNumber: DWORD;           // Last KPK number (4 bytes) 00000000…99999999
-    EJNumber: Int64;            // EJ serial number (5 bytes) 0000000000…9999999999
+    DocNumber: DWORD;           // Last KPK number (4 bytes) 00000000пїЅ99999999
+    EJNumber: Int64;            // EJ serial number (5 bytes) 0000000000пїЅ9999999999
     Flags: TEJFlags;            // EJ flags (1 byte)
   end;
 
@@ -995,23 +995,23 @@ type
   TReceiptFormat = record
     Valid: Boolean;
     Enabled: Boolean;
-    TextItem: TReceiptFormatItem;            // НАИМЕНОВАНИЕ В ОПЕРАЦИИ
-    QuantityItem: TReceiptFormatItem;        // КОЛИЧЕСТВО X ЦЕНУ В ОПЕРАЦИИ
-    DepartmentItem: TReceiptFormatItem;      // СЕКЦИЯ В ОПЕРАЦИИ
-    AmountItem: TReceiptFormatItem;          // СТОИМОСТЬ В ОПЕРАЦИИ
-    StornoItem: TReceiptFormatItem;          // НАДПИСЬ СТОРНО В ОПЕРАЦИИ
-    DscText: TReceiptFormatItem;             // ТЕКСТ В СКИДКЕ
-    DscName: TReceiptFormatItem;             // НАДПИСЬ СКИДКА
-    DscAmount: TReceiptFormatItem;           // СУММА СКИДКИ
-    CrgText: TReceiptFormatItem;             // ТЕКСТ В НАДБАВКЕ
-    CrgName: TReceiptFormatItem;             // НАДПИСЬ НАДБАВКА
-    CrgAmount: TReceiptFormatItem;           // СУММА НАДБАВКИ
-    DscStornoText: TReceiptFormatItem;       // ТЕКСТ В СТОРНО СКИДКИ
-    DscStornoName: TReceiptFormatItem;       // НАДПИСЬ СТОРНО СКИДКИ
-    DscStornoAmount: TReceiptFormatItem;     // СУММА СТОРНО СКИДКИ
-    CrgStornoText: TReceiptFormatItem;       // ТЕКСТ В СТОРНО НАДБАВКИ
-    CrgStornoName: TReceiptFormatItem;       // НАДПИСЬ СТОРНО НАДБАВКИ
-    CrgStornoAmount: TReceiptFormatItem;     // СУММА СТОРНО НАДБАВКИ
+    TextItem: TReceiptFormatItem;            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    QuantityItem: TReceiptFormatItem;        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ X пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    DepartmentItem: TReceiptFormatItem;      // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    AmountItem: TReceiptFormatItem;          // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    StornoItem: TReceiptFormatItem;          // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    DscText: TReceiptFormatItem;             // пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    DscName: TReceiptFormatItem;             // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    DscAmount: TReceiptFormatItem;           // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    CrgText: TReceiptFormatItem;             // пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CrgName: TReceiptFormatItem;             // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CrgAmount: TReceiptFormatItem;           // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    DscStornoText: TReceiptFormatItem;       // пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    DscStornoName: TReceiptFormatItem;       // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    DscStornoAmount: TReceiptFormatItem;     // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    CrgStornoText: TReceiptFormatItem;       // пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CrgStornoName: TReceiptFormatItem;       // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CrgStornoAmount: TReceiptFormatItem;     // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   end;
 
   TTextAlignment = (taLeft, taCenter, taRight);
@@ -1077,21 +1077,21 @@ type
   { TFSCalcReport }
 
   TFSCalcReport = record
-    DocNumber: Integer;             // Номер ФД: 4 байта
-    FiscalSign: Integer;            // Фискальный признак: 4 байта
-    OutstandDocCount: Integer;      // Количество неподтверждённых документов: 4 байта
-    OutstandDocDate: TPrinterDate;  // Дата первого неподтверждённого документа: 3 байта ГГ,ММ,ДД
+    DocNumber: Integer;             // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+    FiscalSign: Integer;            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+    OutstandDocCount: Integer;      // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+    OutstandDocDate: TPrinterDate;  // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 3 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ,пїЅпїЅ,пїЅпїЅ
   end;
 
   { TFSWriteStatus }
 
   TFSWriteStatus = record
-    IsConnected: Boolean;       // Бит 0 – транспортное соединение установлено
-    HasMessageToSend: Boolean;  // Бит 1 – есть сообщение для передачи в ОФД
-    IsWaitForTicket: Boolean;   // Бит 2 – ожидание ответного сообщения (квитанции) от ОФД
-    IsServerCommand: Boolean;   // Бит 3 – есть команда от ОФД
-    ConnParamsChanged: Boolean; // Бит 4 – изменились настройки соединения с ОФД
-    IsWaitForAnswer: Boolean;   // Бит 5 – ожидание ответа на команду от ОФД
+    IsConnected: Boolean;       // пїЅпїЅпїЅ 0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    HasMessageToSend: Boolean;  // пїЅпїЅпїЅ 1 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
+    IsWaitForTicket: Boolean;   // пїЅпїЅпїЅ 2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅ пїЅпїЅпїЅ
+    IsServerCommand: Boolean;   // пїЅпїЅпїЅ 3 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ
+    ConnParamsChanged: Boolean; // пїЅпїЅпїЅ 4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
+    IsWaitForAnswer: Boolean;   // пїЅпїЅпїЅ 5 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ
   end;
 
   { TFSCommStatus }
@@ -1114,35 +1114,35 @@ type
   TFSCorrectionReceipt = record
     RecType: Byte;
     Total: Int64;
-    ResultCode: Integer;      // Код ошибки: 1 байт
-    ReceiptNumber: Integer;   // Номер чека: 2 байта
-    DocumentNumber: Integer;  // Номер ФД: 4 байта
-    DocumentMac: Integer;     // Фискальный признак: 4 байт
+    ResultCode: Integer;      // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+    ReceiptNumber: Integer;   // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ
+    DocumentNumber: Integer;  // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+    DocumentMac: Integer;     // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅ
   end;
 
   { TFSCorrectionReceipt2 }
 
   TFSCorrectionReceipt2 = record
-    CorrectionType: Byte; // Тип коррекции :1 байт
-    CalculationSign: Int64; // Признак расчета:1байт
-    Amount1: Int64; // Сумма расчёта :5 байт
-    Amount2: Int64; // Сумма по чеку наличными:5 байт
-    Amount3: Int64; // Сумма по чеку электронными:5 байт
-    Amount4: Int64; // Сумма по чеку предоплатой:5 байт
-    Amount5: Int64; // Сумма по чеку постоплатой:5 байт
-    Amount6: Int64; // Сумма по чеку встречным представлением:5 байт
-    Amount7: Int64; // Сумма НДС 20%:5 байт
-    Amount8: Int64; // Сумма НДС 10%:5 байт
-    Amount9: Int64; // Сумма расчёта по ставке 0%:5 байт
-    Amount10: Int64; // Сумма расчёта по чеку без НДС:5 байт
-    Amount11: Int64; // Сумма расчёта по расч. ставке 20/120:5 байт
-    Amount12: Int64; // Сумма расчёта по расч. ставке 10/110:5 байт
-    TaxType: Byte; // Применяемая система налогообложения:1байт
+    CorrectionType: Byte; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ :1 пїЅпїЅпїЅпїЅ
+    CalculationSign: Int64; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:1пїЅпїЅпїЅпїЅ
+    Amount1: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ :5 пїЅпїЅпїЅпїЅ
+    Amount2: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
+    Amount3: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
+    Amount4: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
+    Amount5: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
+    Amount6: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
+    Amount7: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 20%:5 пїЅпїЅпїЅпїЅ
+    Amount8: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 10%:5 пїЅпїЅпїЅпїЅ
+    Amount9: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 0%:5 пїЅпїЅпїЅпїЅ
+    Amount10: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ:5 пїЅпїЅпїЅпїЅ
+    Amount11: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ 20/120:5 пїЅпїЅпїЅпїЅ
+    Amount12: Int64; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ 10/110:5 пїЅпїЅпїЅпїЅ
+    TaxType: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:1пїЅпїЅпїЅпїЅ
 
-    ResultCode: Integer;      // Код ошибки: 1 байт
-    ReceiptNumber: Integer;   // Номер чека: 2 байта
-    DocumentNumber: Integer;  // Номер ФД: 4 байта
-    DocumentMac: Integer;     // Фискальный признак: 4 байт
+    ResultCode: Integer;      // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+    ReceiptNumber: Integer;   // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: 2 пїЅпїЅпїЅпїЅпїЅ
+    DocumentNumber: Integer;  // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 4 пїЅпїЅпїЅпїЅпїЅ
+    DocumentMac: Integer;     // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 4 пїЅпїЅпїЅпїЅ
   end;
 
   { TFSTicket }
@@ -1150,9 +1150,9 @@ type
   TFSTicket = record
     Number: Integer;
     Data: WideString;
-    Date: TPrinterDateTime;   // Дата и время             DATE_TIME      5
-    DocumentMac: WideString;      // Фискальный признак ОФД   DATA           18
-    DocumentNum: Integer;     // Номер ФД                 Uint32, LE     4
+    Date: TPrinterDateTime;   // пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ             DATE_TIME      5
+    DocumentMac: WideString;      // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ   DATA           18
+    DocumentNum: Integer;     // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ                 Uint32, LE     4
   end;
 
   { TFSCloseReceiptParams2 }
@@ -1160,7 +1160,7 @@ type
   TFSCloseReceiptParams2 = record
     Payments: TPayments;
     Discount: Byte;
-    // 1..10 — как FF76/FNCloseCheckEx3; 11..12 — НДС 22% / 22/122 (FNCloseCheckEx4)
+    // 1..10 пїЅ пїЅпїЅпїЅ FF76/FNCloseCheckEx3; 11..12 пїЅ пїЅпїЅпїЅ 22% / 22/122 (FNCloseCheckEx4)
     TaxAmount: array [1..12] of Int64;
     TaxSystem: Byte;
     Text: WideString;
@@ -1179,48 +1179,48 @@ type
   { TPrinterParameters2Flags }
 
   TPrinterParameters2Flags = record
-    CapJrnNearEndSensor: Boolean;   // 0 – Весовой датчик контрольной ленты
-    CapRecNearEndSensor: Boolean;   // 1 – Весовой датчик чековой ленты
-    CapJrnEmptySensor: Boolean;     // 2 – Оптический датчик контрольной ленты
-    CapRecEmptySensor: Boolean;     // 3 – Оптический датчик чековой ленты
-    CapCoverSensor: Boolean;        // 4 – Датчик крышки
-    CapJrnLeverSensor: Boolean;     // 5 – Рычаг термоголовки контрольной ленты
-    CapRecLeverSensor: Boolean;     // 6 – Рычаг термоголовки чековой ленты
-    CapSlpNearEndSensor: Boolean;   // 7 – Верхний датчик подкладного документа
-    CapSlpEmptySensor: Boolean;     // 8 – Нижний датчик подкладного документа
-    CapPresenter: Boolean;          // 9 – Презентер поддерживается
-    CapPresenterCommands: Boolean;  // 10 – Поддержка команд работы с презентером
-    CapEJNearFull: Boolean;         // 11 – Флаг заполнения ЭКЛЗ
-    CapEJ: Boolean;                 // 12 – ЭКЛЗ поддерживается
-    CapCutter: Boolean;             // 13 – Отрезчик поддерживается
-    CapDrawerStateAsPaper: Boolean; // 14 – Состояние ДЯ как датчик бумаги в презентере
-    CapDrawerSensor: Boolean;       // 15 – Датчик денежного ящика
-    CapPrsInSensor: Boolean;        // 16 – Датчик бумаги на входе в презентер
-    CapPrsOutSensor: Boolean;       // 17 – Датчик бумаги на выходе из презентера
-    CapBillAcceptor: Boolean;       // 18 – Купюроприемник поддерживается
-    CapTaxKeyPad: Boolean;          // 19 – Клавиатура НИ поддерживается
-    CapJrnPresent: Boolean;         // 20 – Контрольная лента поддерживается
-    CapSlpPresent: Boolean;         // 21 – Подкладной документ поддерживается
-    CapNonfiscalDoc: Boolean;       // 22 – Поддержка команд нефискального документа
-    CapCashCore: Boolean;           // 23 – Поддержка протокола Кассового Ядра (cashcore)
-    CapInnLeadingZero: Boolean;     // 24 – Ведущие нули в ИНН
-    CapRnmLeadingZero: Boolean;     // 25 – Ведущие нули в РНМ
-    SwapGraphicsLine: Boolean;      // 26 – Переворачивать байты при печати линии
-    CapTaxPasswordLock: Boolean;    // 27 – Блокировка ККТ по неверному паролю налогового инспектора
-    CapProtocol2: Boolean;          // 28 – Поддержка альтернативного нижнего уровня протокола ККТ
-    CapLFInPrintText: Boolean;      // 29 – Поддержка переноса строк символом '\n' (код 10) в командах печати строк 12H, 17H, 2FH
-    CapFontInPrintText: Boolean;  // 30 – Поддержка переноса строк номером шрифта (коды 1…9) в команде печати строк 2FH
-    CapLFInFiscalCommands: Boolean; // 31 – Поддержка переноса строк символом '\n' (код 10) в фискальных командах 80H…87H, 8AH, 8BH
-    CapFontInFiscalCommands: Boolean; // 32 – Поддержка переноса строк номером шрифта (коды 1…9) в фискальных командах 80H…87H, 8AH, 8BH
-    CapTopCashierReports: Boolean;   // 33 – Права "СТАРШИЙ КАССИР" (28) на снятие отчетов: X, операционных регистров, по отделам, по налогам, по кассирам, почасового, по товарам
-    CapSlpInPrintCommands: Boolean;      // 34 – Поддержка Бит 3 "слип чек" в командах печати: строк 12H, 17H, 2FH,расширенной графики 4DH, C3H, графической линии C5H; поддержка
-    CapGraphicsC4: Boolean;           // 35 – Поддержка блочной загрузки графики в команде C4H
-    CapCommand6B: Boolean;            // 36 – Поддержка команды 6BH "Возврат названия ошибоки"
-    CapFlagsGraphicsEx: Boolean;      // 37 – Поддержка флагов печати для команд печати расширенной графики C3H и печати графической линии C5H
-    CapMFP: Boolean;                  // 39 – Поддержка МФП
-    CapEJ5: Boolean;                  // 40 – Поддержка ЭКЛЗ5
-    CapScaleGraphics: Boolean;        // 41 – Печать графики с масштабированием (команда 4FH)
-    CapGraphics512: Boolean;          // 42 – Загрузка и печать графики-512 (команды 4DH, 4EH)
+    CapJrnNearEndSensor: Boolean;   // 0 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapRecNearEndSensor: Boolean;   // 1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapJrnEmptySensor: Boolean;     // 2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapRecEmptySensor: Boolean;     // 3 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapCoverSensor: Boolean;        // 4 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    CapJrnLeverSensor: Boolean;     // 5 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapRecLeverSensor: Boolean;     // 6 пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapSlpNearEndSensor: Boolean;   // 7 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapSlpEmptySensor: Boolean;     // 8 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapPresenter: Boolean;          // 9 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapPresenterCommands: Boolean;  // 10 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapEJNearFull: Boolean;         // 11 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+    CapEJ: Boolean;                 // 12 пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapCutter: Boolean;             // 13 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapDrawerStateAsPaper: Boolean; // 14 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapDrawerSensor: Boolean;       // 15 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapPrsInSensor: Boolean;        // 16 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapPrsOutSensor: Boolean;       // 17 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapBillAcceptor: Boolean;       // 18 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapTaxKeyPad: Boolean;          // 19 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapJrnPresent: Boolean;         // 20 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapSlpPresent: Boolean;         // 21 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapNonfiscalDoc: Boolean;       // 22 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapCashCore: Boolean;           // 23 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (cashcore)
+    CapInnLeadingZero: Boolean;     // 24 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
+    CapRnmLeadingZero: Boolean;     // 25 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ
+    SwapGraphicsLine: Boolean;      // 26 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    CapTaxPasswordLock: Boolean;    // 27 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapProtocol2: Boolean;          // 28 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+    CapLFInPrintText: Boolean;      // 29 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH
+    CapFontInPrintText: Boolean;  // 30 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2FH
+    CapLFInFiscalCommands: Boolean; // 31 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\n' (пїЅпїЅпїЅ 10) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
+    CapFontInFiscalCommands: Boolean; // 32 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ 1пїЅ9) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 80HпїЅ87H, 8AH, 8BH
+    CapTopCashierReports: Boolean;   // 33 пїЅ пїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ" (28) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: X, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapSlpInPrintCommands: Boolean;      // 34 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 3 "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ" пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ 12H, 17H, 2FH,пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, C3H, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H; пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    CapGraphicsC4: Boolean;           // 35 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C4H
+    CapCommand6B: Boolean;            // 36 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 6BH "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
+    CapFlagsGraphicsEx: Boolean;      // 37 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ C3H пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ C5H
+    CapMFP: Boolean;                  // 39 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+    CapEJ5: Boolean;                  // 40 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ5
+    CapScaleGraphics: Boolean;        // 41 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4FH)
+    CapGraphics512: Boolean;          // 42 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-512 (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4DH, 4EH)
   end;
 
   { TPrinterParameters2 }
@@ -1290,37 +1290,37 @@ type
   { TFSCheckItemCode }
 
   TFSCheckItemCode = record
-    ItemStatus: Byte; // Планируемый статус	Тег 2003
-    ProcessMode: Byte; // Режим обработки	Тег 2102 (сейчас всегда "0")
-    CMData: AnsiString; // Сам КМ, как он был прочитан сканером
-    TLVData: AnsiString; // Список TLV
+    ItemStatus: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2003
+    ProcessMode: Byte; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2102 (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ "0")
+    CMData: AnsiString; // пїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    TLVData: AnsiString; // пїЅпїЅпїЅпїЅпїЅпїЅ TLV
   end;
 
   { TFSCheckItemResult }
 
   TFSCheckItemResult = record
-    LocalCheckResult: Byte; // Статус локальной проверки	Тег 2004
-    LocalCheckError: Byte; // Причина, по которой не была проведена локальная проверка
-    SymbolicType: Byte; // Распознанный тип КМ	Тег 2100
-    DataLength: Byte; // Длина дополнительных параметров
-    FSResultCode: Byte; // Код ответа ФН на команду онлайн-проверки
-    ServerCheckStatus: Byte; // Результат проверки КМ	Тег 2106
-    ServerTLVData: AnsiString; // Список реквизитов ответа сервера
+    LocalCheckResult: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅ 2004
+    LocalCheckError: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    SymbolicType: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅ 2100
+    DataLength: Byte; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    FSResultCode: Byte; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    ServerCheckStatus: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ	пїЅпїЅпїЅ 2106
+    ServerTLVData: AnsiString; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   end;
 
   { TFSReadMemoryResult }
 
   TFSReadMemoryResult = record
-    FreeDocCount: DWORD; // Ресурс данных 5 летнего хранения 1 (4 байта)
-    FreeMemorySizeInKB: DWORD; // Ресурс данных 30 дневного хранения 2 (4 байта)
-    UsedMCTicketStorageInPercents: Byte; // Ресурс для хранения уведомлений о реализации маркированного товара3 (1 байт)
+    FreeDocCount: DWORD; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 5 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 (4 пїЅпїЅпїЅпїЅпїЅ)
+    FreeMemorySizeInKB: DWORD; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 30 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 (4 пїЅпїЅпїЅпїЅпїЅ)
+    UsedMCTicketStorageInPercents: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ3 (1 пїЅпїЅпїЅпїЅ)
   end;
 
   { TFSBindItemCode }
 
   TFSBindItemCode = record
-    Code: AnsiString; // Данные маркировки
-    IsAccounted: Boolean; // Объемно-сортовой учет (ОСУ)
+    Code: AnsiString; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    IsAccounted: Boolean; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ)
   end;
 
   { TFSBindItemCodeResult }
@@ -1334,54 +1334,54 @@ type
   { TFSTicketStatus }
 
   TFSTicketStatus = record
-    TicketStatus: Byte; // Состояние по передачи уведомлений
-    TicketCount: Integer; // Количество уведомлений в очереди
-    TicketNumber: Integer; // Номер текущего уведомления
-    TicketDate: TPrinterDateTime; // Дата и время текущего уведомления
-    TicketStorageUsageInPercents: Byte; // Процент заполнения области хранения уведомлений
+    TicketStatus: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    TicketCount: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    TicketNumber: Integer; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    TicketDate: TPrinterDateTime; // пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    TicketStorageUsageInPercents: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   end;
 
   { TFSMarkStatus }
 
   TFSMarkStatus = record
-    MarkCheckStatus: Byte; // Состояние по проверке КМ
-    TicketStatus: Byte; // Состояние по формированию уведомления о реализации маркированного товара
-    CommandFlags: Byte; // Флаги разрешения команд работы с КМ
-    MCSavedCount: Byte; // Количество сохранённых результатов проверки КМ
-    MCTicketCount: Byte; // Количество КМ, включенных в уведомление о реализации маркированного товара
-    TicketStorageStatus: Byte; // Предупреждение о заполнении области хранения уведомлений
-    TicketCount: Integer; // Количество уведомлений в очереди
+    MarkCheckStatus: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+    TicketStatus: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    CommandFlags: Byte; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ
+    MCSavedCount: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+    MCTicketCount: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    TicketStorageStatus: Byte; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    TicketCount: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   end;
 
   { TFSTicketParams }
 
   TFSTicketParams = record
-    TicketCount: Integer; // Общее число уведомлений (2 байта)
-    FirstTicketNumber: Integer; // Номер первого уведомления (4 байта)
-    FirstTicketSize: Integer; // Размер первого уведомления (2 байта)
+    TicketCount: Integer; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
+    FirstTicketNumber: Integer; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+    FirstTicketSize: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
   end;
 
   { TFSTicketData }
 
   TFSTicketData = record
-    Number: Integer; // Номер текущего уведомления (4 байта)
-    Size: Integer; // Полный размер текущего уведомления (2 байта)
-    Offset: Integer; // Смещение от начала текущего уведомления (2 байта)
-    Data: AnsiString; // Блок данных (N байт)
+    Number: Integer; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ)
+    Size: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
+    Offset: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (2 пїЅпїЅпїЅпїЅпїЅ)
+    Data: AnsiString; // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (N пїЅпїЅпїЅпїЅ)
   end;
 
   { TFSTicketNumber }
 
   TFSTicketNumber = record
-    Number: Integer; // Номер уведомления (4 байта) получается из ответа на команду FF72h
-    Crc16: Integer; // CRC16 (4 байта) контрольная сумма уведомления
+    Number: Integer; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (4 пїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ FF72h
+    Crc16: Integer; // CRC16 (4 пїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   end;
 
   { TFSDocSize }
 
   TFSDocSize = record
-    DocSize: Integer; // Размер в байтах текущего документа для ОФД ( 4 байта)
-    TicketSize: Integer; // Размер в байтах текущего уведомления о реализации маркированных товаров для ОИСМ ( 4 байта)
+    DocSize: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ ( 4 пїЅпїЅпїЅпїЅпїЅ)
+    TicketSize: Integer; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ ( 4 пїЅпїЅпїЅпїЅпїЅ)
   end;
 
 
@@ -1397,89 +1397,89 @@ const
   ///////////////////////////////////////////////////////////////////////////////
   // ItemStatus constants
 
-  SMFP_ITEM_STATUS_FORMED      = 1; // 1 - "Сформирован".Не выдан регистратору.
-  SMFP_ITEM_STATUS_READY       = 2; // 2 - "Готов". Выдан регистратору, но не применен.
-  SMFP_ITEM_STATUS_ISSUED      = 3; // 3 - "Выдан". КМ выдан ТС для нанесения. Применение не подтверждено.
-  SMFP_ITEM_STATUS_RELEASED    = 4; // 4 - "Выпущен". КМ нанесен на товар или упаковку, правильность нанесения кода подтверждена, маркированный товар произведен.
-  SMFP_ITEM_STATUS_NOTUSED     = 5; // 5 - "Не использован". КМ не был выдан ТС к моменту закрытия заказа.
-  SMFP_ITEM_STATUS_PACKED      = 6; // 6 - "Упакован". Товар или упаковка с данным КМ находится в составе логистической единицы.
-  SMFP_ITEM_STATUS_UNPACKED    = 7; // 7 - "Распакован". Маркированный объект находится в обороте или в употреблении в виде товарной единицы.
-  SMFP_ITEM_STATUS_DROPPED_OUT = 8; // 8 - Выбыл по определенным, известным участникам обращения товара, причинам на этапе производства (например, отобран, как опытный образец для испытаний), оптового или розничного оборота (уничтожен безвозвратно в составе логистической единицы, похищенной, испорченной в совокупности со всем содержимым и т.п.).
-  SMFP_ITEM_STATUS_RETAILED    = 9; // 9 - "Выбыл через розничную сеть".
-  SMFP_ITEM_STATUS_RETAILING   = 10; // 10 - "В состоянии выбытия" (мерный товар).
-  SMFP_ITEM_STATUS_LOST        = 11; // 11 - "Утерян".
-  SMFP_ITEM_STATUS_STOPPED     = 12; // 12 - "Оборот приостановлен".
-  SMFP_ITEM_STATUS_DISABLED    = 13; // 13 - "Оборот запрещен".
-  SMFP_ITEM_STATUS_SOLD        = 14; // 14 - "Потреблен".
-  SMFP_ITEM_STATUS_DUPLICATED  = 15; // 15 - "Дублирован".
+  SMFP_ITEM_STATUS_FORMED      = 1; // 1 - "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ".пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_READY       = 2; // 2 - "пїЅпїЅпїЅпїЅпїЅ". пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_ISSUED      = 3; // 3 - "пїЅпїЅпїЅпїЅпїЅ". пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_RELEASED    = 4; // 4 - "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ". пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_NOTUSED     = 5; // 5 - "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ". пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_PACKED      = 6; // 6 - "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ". пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_UNPACKED    = 7; // 7 - "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ". пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_ITEM_STATUS_DROPPED_OUT = 8; // 8 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ), пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ.пїЅ.).
+  SMFP_ITEM_STATUS_RETAILED    = 9; // 9 - "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ".
+  SMFP_ITEM_STATUS_RETAILING   = 10; // 10 - "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ).
+  SMFP_ITEM_STATUS_LOST        = 11; // 11 - "пїЅпїЅпїЅпїЅпїЅпїЅ".
+  SMFP_ITEM_STATUS_STOPPED     = 12; // 12 - "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ".
+  SMFP_ITEM_STATUS_DISABLED    = 13; // 13 - "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ".
+  SMFP_ITEM_STATUS_SOLD        = 14; // 14 - "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ".
+  SMFP_ITEM_STATUS_DUPLICATED  = 15; // 15 - "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ".
 
   ///////////////////////////////////////////////////////////////////////////////
   // CheckMode constants
 
-  SMFP_CHECK_MODE_FULL    = 0; // 0 - полная проверка.
-  SMFP_CHECK_MODE_ONLINE  = 1; // 1 - только онлайн проверка.
-  SMFP_CHECK_MODE_LOCAL   = 2; // 2 - только локальная проверка.
+  SMFP_CHECK_MODE_FULL    = 0; // 0 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_CHECK_MODE_ONLINE  = 1; // 1 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_CHECK_MODE_LOCAL   = 2; // 2 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
   ///////////////////////////////////////////////////////////////////////////////
   // LocalCheckResult constants
-  // Результат локальной проверки кода маркировки: 1 байт
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
 
-  SMFP_LOCAL_CHECK_SCS      = 0; // 0 - проверка не проводилась, (для симметричной криптографической системы).
-  SMFP_LOCAL_CHECK_OK       = 1; // 1 - код маркировки проверен, достоверный.
-  SMFP_LOCAL_CHECK_FAILED   = 2; // 2 - код маркировки проверен, недостоверный.
-  SMFP_LOCAL_CHECK_ACS      = 3; // 3 - проверка не проводилась, (криптографическая система асимметричная, но в ФН-М нет ключа с идентификатором КПКИЗ.ид)
+  SMFP_LOCAL_CHECK_SCS      = 0; // 0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ).
+  SMFP_LOCAL_CHECK_OK       = 1; // 1 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_LOCAL_CHECK_FAILED   = 2; // 2 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  SMFP_LOCAL_CHECK_ACS      = 3; // 3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅ пїЅпїЅ-пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.пїЅпїЅ)
 
   ///////////////////////////////////////////////////////////////////////////////
   // SellPermission constants
-  // Разрешение на продажу товара от ИСМ: 1 байт.
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ.
 
-  SMFP_SELL_PERMISSION_OK      = 0; // 0 - товар разрешен к продаже
-  SMFP_SELL_PERMISSION_DENIED  = 1; // 1 - товар запрещен к продаже
+  SMFP_SELL_PERMISSION_OK      = 0; // 0 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  SMFP_SELL_PERMISSION_DENIED  = 1; // 1 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
   ///////////////////////////////////////////////////////////////////////////////
   // ServerResult constants
-  // Код ошибки от сервера КМ: 1 байт
+  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
 
-  SMFP_SERVER_RESULT_OK         = 0; // 0 - Статус успешно изменен
-  SMFP_SERVER_RESULT_NODATA     = 1; // 1 - КИЗ отсутствует в базе Серверы СКЗКМ или КИЗ отсутствует в базе ИСМ
-  SMFP_SERVER_RESULT_BADFORMAT  = 2; // 2 - Не корректен формат КИЗ
-  SMFP_SERVER_RESULT_FAILED     = 3; // 3 - Криптографическая проверка КПКИЗ дала отрицательный результат
-  SMFP_SERVER_RESULT_STATUS     = 4; // 4 - КИЗ имеет в базе Серверы СКЗКМ статус не совместимый с запрашиваемым изменением. Например, запрошено изменение статуса "Выбыл в розничной сети" в то время, как товар уже был продан. Иными словами, запрашивается запрещенное изменение статуса кода маркировки
-  SMFP_SERVER_RESULT_ATTACHMENT = 5; // 5 - В списке вложения обнаружены ошибки
+  SMFP_SERVER_RESULT_OK         = 0; // 0 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  SMFP_SERVER_RESULT_NODATA     = 1; // 1 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+  SMFP_SERVER_RESULT_BADFORMAT  = 2; // 2 - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+  SMFP_SERVER_RESULT_FAILED     = 3; // 3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  SMFP_SERVER_RESULT_STATUS     = 4; // 4 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ" пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  SMFP_SERVER_RESULT_ATTACHMENT = 5; // 5 - пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
   ///////////////////////////////////////////////////////////////////////////////
   // SymbolicType constants
-  // Тип символики: 1 байт
-  SMFP_SYMBOLIC_ASYMMETRIC  = 0; // 0 - ассиметричная
-  SMFP_SYMBOLIC_SYMMETRIC   = 1; // 1 - симметричная
-  SMFP_SYMBOLIC_TOBACCO     = 2; // 2 - табачная
+  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 1 пїЅпїЅпїЅпїЅ
+  SMFP_SYMBOLIC_ASYMMETRIC  = 0; // 0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  SMFP_SYMBOLIC_SYMMETRIC   = 1; // 1 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  SMFP_SYMBOLIC_TOBACCO     = 2; // 2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
   /////////////////////////////////////////////////////////////////////////////
-  // Признак способа расчета (тег 1214)
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ 1214)
 
-  PaymentTypeDeposit          = 1;  // 1 Предоплата 100%
-  PaymentTypePartialDeposit   = 2;  // 2 Частичная предоплата
-  PaymentTypeAdvance          = 3;  // 3 Аванс
-  PaymentTypeCash             = 4;  // 4 Полный расчет
-  PaymentTypeCashCredit       = 5;  // 5. Частичный расчет и кредит
-  PaymentTypeCredit           = 6;  // 6. Передача в кредит
-  PaymentTypePayCredit        = 7;  // 7. Оплата кредита
+  PaymentTypeDeposit          = 1;  // 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 100%
+  PaymentTypePartialDeposit   = 2;  // 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentTypeAdvance          = 3;  // 3 пїЅпїЅпїЅпїЅпїЅ
+  PaymentTypeCash             = 4;  // 4 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentTypeCashCredit       = 5;  // 5. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentTypeCredit           = 6;  // 6. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentTypePayCredit        = 7;  // 7. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
   /////////////////////////////////////////////////////////////////////////////
-  // Признак предмета расчета (тег 1212)
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ 1212)
 
-  PaymentItemNormal           = 1; // 1. Товар
-  PaymentItemExcise           = 2; // 2. Подакцизный товар
-  PaymentItemJob              = 3; // 3. Работа
-  PaymentItemService          = 4; // 4. Услуга
-  PaymentItemBet              = 5; // 5. Ставка азартной игры
-  PaymentItemGamePrize        = 6; // 6. Выигрыш азартной игры
-  PaymentItemLotteryBill      = 7; // 7. Лотерейный билет
-  PaymentItemLotteryPrize     = 8; // 8. Выигрыш лотереи
-  PaymentItemIntellect        = 9; // 9. Предоставление РИД
-  PaymentItemPayment          = 10; // 10. Платеж
-  PaymentItemComposite        = 11; // 11. Составной предмет расчета
-  PaymentItemOther            = 12; // 12. Иной предмет расчета
+  PaymentItemNormal           = 1; // 1. пїЅпїЅпїЅпїЅпїЅ
+  PaymentItemExcise           = 2; // 2. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+  PaymentItemJob              = 3; // 3. пїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentItemService          = 4; // 4. пїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentItemBet              = 5; // 5. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+  PaymentItemGamePrize        = 6; // 6. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+  PaymentItemLotteryBill      = 7; // 7. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+  PaymentItemLotteryPrize     = 8; // 8. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentItemIntellect        = 9; // 9. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+  PaymentItemPayment          = 10; // 10. пїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentItemComposite        = 11; // 11. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  PaymentItemOther            = 12; // 12. пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 
 function GetCommandName(Command: Integer): WideString;
@@ -1682,41 +1682,41 @@ end;
 function FSGetErrorTextRus(Code: Integer; const Text: WideString): WideString;
 begin
   case Code of
-    $01: Result := _('ФН: Неизвестная команда, неверный формат посылки или неизвестные параметры');
-    $02: Result := _('ФН: Другое состояние ФН');
-    $03: Result := _('ФН: Отказ ФН');
-    $04: Result := _('ФН: Отказ КС');
-    $05: Result := _('ФН: Параметры команды не соответствуют сроку жизни ФН');
-    $06: Result := _('ФН: Архив ФН переполнен');
-    $07: Result := _('ФН: Неверные дата и/или время');
-    $08: Result := _('ФН: Нет запрошенных данных');
-    $09: Result := _('ФН: Некорректное значение параметров команды');
-    $0A: Result := _('ФН: Некорректная команда');
-    $0B: Result := _('ФН: Неразрешенные реквизиты');
-    $0C: Result := _('ФН: Дублирование данных');
-    $0D: Result := _('ФН: Отсутствуют данные, необходимые для корректного учета в ФН');
-    $0E: Result := _('ФН: Количество позиций в документе превысило допустимый предел');
-    $10: Result := _('ФН: Превышение размеров TLV данных');
-    $11: Result := _('ФН: Нет транспортного соединения');
-    $12: Result := _('ФН: Исчерпан ресурс ФН');
-    $14: Result := _('ФН: Ограничение ресурса ФН');
-    $16: Result := _('ФН: Продолжительность смены более 24 часов');
-    $17: Result := _('ФН: Неверная разница во времени между двумя операцими');
-    $18: Result := _('ФН: Некорректный реквизит, переданный ККТ в ФН');
-    $19: Result := _('ФН: Реквизит не соответствует установкам при регистрации');
-    $20: Result := _('ФН: Ошибка при обработке ответа в ФН');
-    $21: Result := _('Нет связи с ФН. Фатальная ошибка !!!');
-    $23: Result := _('ФН: Отрицательный ответ сервиса обновления ключей проверки КМ');
-    $24: Result := _('ФН: Неизвестный ответ сервиса обновления ключей проверки');
-    $30: Result := _('ФН: ФН не отвечает');
-    $77: Result := _('ФН: Ошибка лицензии');
-    $79: Result := _('ФН: Ошибка часов');
-    $A0: Result := _('ФН: Запрещена работа с маркированным товарами');
-    $A1: Result := _('ФН: Неверная последовательность команд группы Bxh');
-    $A2: Result := _('ФН: Работа с маркированными товарами временно заблокирована');
-    $A3: Result := _('ФН: Переполнена таблица хранения КМ');
-    $AA: Result := _('ФН: В блоке TLV отсутствуют необходимые реквизиты');
-    $AC: Result := _('ФН: В реквизите 2007 содержится КМ, который ранее не проверялся в ФН');
+    $01: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $02: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $03: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $04: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $05: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $06: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $07: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ/пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $08: Result := _('пїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $09: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $0A: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $0B: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $0C: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $0D: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $0E: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $10: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $11: Result := _('пїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $12: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $14: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $16: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 24 пїЅпїЅпїЅпїЅпїЅ');
+    $17: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $18: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $19: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $20: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $21: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ !!!');
+    $23: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $24: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $30: Result := _('пїЅпїЅ: пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $77: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $79: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $A0: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $A1: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ Bxh');
+    $A2: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $A3: Result := _('пїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $AA: Result := _('пїЅпїЅ: пїЅ пїЅпїЅпїЅпїЅпїЅ TLV пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $AC: Result := _('пїЅпїЅ: пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2007 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
   else
     Result := Text;
   end;
@@ -1725,201 +1725,201 @@ end;
 function GetErrorText2Rus(Code: Integer): WideString;
 begin
   case Code of
-    $00: Result := _('Ошибок нет');
-    $01: Result := _('Неисправен накопитель ФП 1, ФП 2 или часы');
-    $02: Result := _('Отсутствует ФП 1');
-    $03: Result := _('Отсутствует ФП 2');
-    $04: Result := _('Некорректные параметры в команде обращения к ФП');
-    $05: Result := _('Нет запрошенных данных');
-    $06: Result := _('ФП в режиме вывода данных');
-    $07: Result := _('Некорректные параметры в команде для данной реализации ФП');
-    $08: Result := _('Команда не поддерживается в данной реализации ФП');
-    $09: Result := _('Некорректная длина команды');
-    $0A: Result := _('Формат данных не BCD');
-    $0B: Result := _('Неисправна ячейка памяти ФП при записи итога');
-    $11: Result := _('Не введена лицензия');
-    $12: Result := _('Заводской номер уже введен');
-    $13: Result := _('Текущая дата меньше даты последней записи в ФП');
-    $14: Result := _('Область сменных итогов ФП переполнена');
-    $15: Result := _('Смена уже открыта');
-    $16: Result := _('Смена не открыта');
-    $17: Result := _('Номер первой смены больше номера последней смены');
-    $18: Result := _('Дата первой смены больше даты последней смены');
-    $19: Result := _('Нет данных в ФП');
-    $1A: Result := _('Область перерегистраций в ФП переполнена');
-    $1B: Result := _('Заводской номер не введен');
-    $1C: Result := _('В заданном диапазоне есть поврежденная запись');
-    $1D: Result := _('Повреждена последняя запись сменных итогов');
-    $1E: Result := _('Область перерегистраций ФП переполнена');
-    $1F: Result := _('Отсутствует память регистров');
-    $20: Result := _('Переполнение денежного регистра при добавлении');
-    $21: Result := _('Вычитаемая сумма больше содержимого денежного регистра');
-    $22: Result := _('Неверная дата');
-    $23: Result := _('Нет записи активизации');
-    $24: Result := _('Область активизаций переполнена');
-    $25: Result := _('Нет активизации с запрашиваемым номером');
-    $26: Result := _('В ФП больше 3 поврежденных записей');
-    $27: Result := _('Повреждение контрольных сумм ФП');
-    $28: Result := _('Переполнение ФП по количество перезапусков ФР');
-    $29: Result := _('Несанкционированная замена ФП');
-    $2F: Result := _('ЭКЛЗ не отвечает');
-    $30: Result := _('ЭКЛЗ ответила NAK');
-    $31: Result := _('ЭКЛЗ: ошибка формата');
-    $32: Result := _('ЭКЛЗ: ошибка контрольной суммы');
-    $33: Result := _('Некорректные параметры в команде');
-    $34: Result := _('Нет данных');
-    $35: Result := _('Некорректный параметр при данных настройках');
-    $36: Result := _('Некорректные параметры в команде для данной реализации');
-    $37: Result := _('Команда не поддерживается в данной реализации');
-    $38: Result := _('Ошибка в ПЗУ');
-    $39: Result := _('Внутренняя ошибка ПО');
-    $3A: Result := _('Переполнение накопления по надбавкам в смене');
-    $3B: Result := _('Переполнение накопления в смене');
-    $3C: Result := _('ЭКЛЗ: Неверный регистрационный номер');
-    $3D: Result := _('Смена не открыта - операция невозможна');
-    $3E: Result := _('Переполнение накопления по секциям в смене');
-    $3F: Result := _('Переполнение накопления по скидкам в смене');
-    $40: Result := _('Переполнение диапазона скидок');
-    $41: Result := _('Переполнение диапазона оплаты наличными');
-    $42: Result := _('Переполнение диапазона оплаты типом 2');
-    $43: Result := _('Переполнение диапазона оплаты типом 3');
-    $44: Result := _('Переполнение диапазона оплаты типом 4');
-    $45: Result := _('Cумма всех типов оплаты меньше итога чека');
-    $46: Result := _('Не хватает наличности в кассе');
-    $47: Result := _('Переполнение накопления по налогам в смене');
-    $48: Result := _('Переполнение итога чека');
-    $49: Result := _('Операция невозможна в открытом чеке данного типа');
-    $4A: Result := _('Открыт чек - операция невозможна');
-    $4B: Result := _('Буфер чека переполнен');
-    $4C: Result := _('Переполнение накопления по обороту налогов в смене');
-    $4D: Result := _('Вносимая безналичной оплатой сумма больше суммы чека');
-    $4E: Result := _('Смена превысила 24 часа');
-    $4F: Result := _('Неверный пароль');
-    $50: Result := _('Идет печать предыдущей команды');
-    $51: Result := _('переполнение накоплений наличными в смене');
-    $52: Result := _('переполнение накоплений по типу оплаты 2 в смене');
-    $53: Result := _('переполнение накоплений по типу оплаты 3 в смене');
-    $54: Result := _('переполнение накоплений по типу оплаты 4 в смене');
-    $55: Result := _('Чек закрыт - операция невозможна');
-    $56: Result := _('Нет документа для повтора');
-    $57: Result := _('ЭКЛЗ: Количество закрытых смен не совпадает с ФП');
-    $58: Result := _('Ожидание команды продолжения печати');
-    $59: Result := _('Документ открыт другим оператором');
-    $5A: Result := _('Скидка превышает накопления в чеке');
-    $5B: Result := _('Переполнение диапазона надбавок');
-    $5C: Result := _('Понижено напряжение 24В');
-    $5D: Result := _('Таблица не определена');
-    $5E: Result := _('Некорректная операция');
-    $5F: Result := _('Отрицательный итог чека');
-    $60: Result := _('Переполнение при умножении');
-    $61: Result := _('Переполнение диапазона цены');
-    $62: Result := _('Переполнение диапазона количества');
-    $63: Result := _('Переполнение диапазона отдела');
-    $64: Result := _('ФП отсутствует');
-    $65: Result := _('Не хватает денег в секции');
-    $66: Result := _('Переполнение денег в секции');
-    $67: Result := _('Ошибка связи с ФП');
-    $68: Result := _('Не хватает денег по обороту налогов');
-    $69: Result := _('Переполнение денег по обороту налогов');
-    $6A: Result := _('Ошибка питания в момент ответа по I2C');
-    $6B: Result := _('Нет чековой ленты');
-    $6C: Result := _('Нет контрольной ленты');
-    $6D: Result := _('Не хватает денег по налогу');
-    $6E: Result := _('Переполнение денег по налогу');
-    $6F: Result := _('Переполнение по выплате в смене');
-    $70: Result := _('Переполнение ФП');
-    $71: Result := _('Ошибка отрезчика');
-    $72: Result := _('Команда не поддерживается в данном подрежиме');
-    $73: Result := _('Команда не поддерживается в данном режиме');
-    $74: Result := _('Ошибка ОЗУ');
-    $75: Result := _('Ошибка питания');
-    $76: Result := _('Ошибка принтера: нет импульсов с тахогенератора');
-    $77: Result := _('Ошибка принтера: нет сигнала с датчиков');
-    $78: Result := _('Замена ПО');
-    $79: Result := _('Замена ФП');
-    $7A: Result := _('Поле не редактируется');
-    $7B: Result := _('Ошибка оборудования');
-    $7C: Result := _('Не совпадает дата');
-    $7D: Result := _('Неверный формат даты');
-    $7E: Result := _('Неверное значение в поле длины');
-    $7F: Result := _('Переполнение диапазона итога');
-    $80: Result := _('Ошибка связи с ФП');
-    $81: Result := _('Ошибка связи с ФП');
-    $82: Result := _('Ошибка связи с ФП');
-    $83: Result := _('Ошибка связи с ФП');
-    $84: Result := _('Переполнение наличности');
-    $85: Result := _('Переполнение по продажам в смене');
-    $86: Result := _('Переполнение по покупкам в смене');
-    $87: Result := _('Переполнение по возвратам продаж в смене');
-    $88: Result := _('Переполнение по возвратам покупок в смене');
-    $89: Result := _('Переполнение по внесению в смене');
-    $8A: Result := _('Переполнение по надбавкам в чеке');
-    $8B: Result := _('Переполнение по скидкам в чеке');
-    $8C: Result := _('Отрицательный итог надбавки в чеке');
-    $8D: Result := _('Отрицательный итог скидки в чеке');
-    $8E: Result := _('Нулевой итог чека');
-    $8F: Result := _('Касса не фискализирована');
-    $90: Result := _('Поле превышает размер установленный в настройках');
-    $91: Result := _('Выход за границу поля печати при данных настройках шрифта');
-    $92: Result := _('Наложение полей');
-    $93: Result := _('Восстановление ОЗУ прошло успешно');
-    $94: Result := _('Исчерпан лимит операций в чеке');
-    $95: Result := _('Неизвестная ошибка ЭКЛЗ');
-    $A0: Result := _('Ошибка связи с ЭКЛЗ');
-    $A1: Result := _('ЭКЛЗ отсутствует');
-    $A2: Result := _('ЭКЛЗ: Некорректный формат или параметр команды');
-    $A3: Result := _('Некорректное состояние ЭКЛЗ');
-    $A4: Result := _('Авария ЭКЛЗ');
-    $A5: Result := _('Авария КС в составе ЭКЛЗ');
-    $A6: Result := _('Исчерпан временной ресурс ЭКЛЗ');
-    $A7: Result := _('ЭКЛЗ переполнена');
-    $A8: Result := _('ЭКЛЗ: Неверные дата или время');
-    $A9: Result := _('ЭКЛЗ: Нет запрошенных данных');
-    $AA: Result := _('Переполнение ЭКЛЗ (отрицательный итог документа)');
-    $AB: Result := _('Превышено количество попыток выполнения подготовки активизации');
-    $AC: Result := _('Неверный код разрешения активизации');
-    $AD: Result := _('Некорректно указан заводской номер ККМ');
-    $AE: Result := _('Некорректно указан ИНН');
-    $AF: Result := _('Некорректно указан номер последней смены');
-    $B0: Result := _('ЭКЛЗ: Переполнение в параметре количество');
-    $B1: Result := _('ЭКЛЗ: Переполнение в параметре сумма');
-    $B2: Result := _('ЭКЛЗ: Уже активизирована');
-    $B3: Result := _('Некорректно указаны дата и время');
+    $00: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ');
+    $01: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 1, пїЅпїЅ 2 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $02: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 1');
+    $03: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 2');
+    $04: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $05: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $06: Result := _('пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $07: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $08: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $09: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $0A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ BCD');
+    $0B: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $11: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $12: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $13: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $14: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $15: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $16: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $17: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $18: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $19: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $1A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $1B: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $1C: Result := _('пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $1D: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $1E: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $1F: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $20: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $21: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $22: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $23: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $24: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $25: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $26: Result := _('пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $27: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $28: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $29: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $2F: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $30: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ NAK');
+    $31: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $32: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $33: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $34: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $35: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $36: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $37: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $38: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ');
+    $39: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $3A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $3B: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $3C: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $3D: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $3E: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $3F: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $40: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $41: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $42: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 2');
+    $43: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 3');
+    $44: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 4');
+    $45: Result := _('CпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $46: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $47: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $48: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $49: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $4A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $4B: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $4C: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $4D: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $4E: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24 пїЅпїЅпїЅпїЅ');
+    $4F: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $50: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $51: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $52: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $53: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3 пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $54: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 4 пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $55: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $56: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $57: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $58: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $59: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $5A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $5B: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $5C: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24пїЅ');
+    $5D: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $5E: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $5F: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $60: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $61: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $62: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $63: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $64: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $65: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $66: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $67: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $68: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $69: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $6A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ I2C');
+    $6B: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $6C: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $6D: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $6E: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $6F: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $70: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $71: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $72: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $73: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $74: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ');
+    $75: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $76: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $77: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $78: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $79: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ');
+    $7A: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $7B: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $7C: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $7D: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $7E: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $7F: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $80: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $81: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $82: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $83: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $84: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $85: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $86: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $87: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $88: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $89: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $8A: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $8B: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $8C: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $8D: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $8E: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $8F: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $90: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $91: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $92: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $93: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $94: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $95: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $A0: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $A1: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $A2: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $A3: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $A4: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $A5: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $A6: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $A7: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $A8: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $A9: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $AA: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)');
+    $AB: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $AC: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $AD: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ');
+    $AE: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ');
+    $AF: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $B0: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $B1: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $B2: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $B3: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ');
 
-    $C0: Result := _('Контроль даты и времени (подтвердите дату и время)');
-    $C1: Result := _('ЭКЛЗ: суточный отчет с гашением прервать нельзя');
-    $C2: Result := _('Превышение напряжения блока питания');
-    $C3: Result := _('Несовпадение итогов чека с ЭКЛЗ');
-    $C4: Result := _('Несовпадение номеров смен');
-    $C5: Result := _('Буфер подкладного документа пуст');
-    $C6: Result := _('Подкладной документ отсутствует');
-    $C7: Result := _('Поле не редактируется в данном режиме');
-    $C8: Result := _('Ошибка связи с принтером');
-    $C9: Result := _('Перегрев печатающей головки');
-    $CA: Result := _('Температура вне условий эксплуатации');
-    $CB: Result := _('Переполнение длинного сквозного номера');
+    $C0: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ)');
+    $C1: Result := _('пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $C2: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $C3: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ');
+    $C4: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $C5: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $C6: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $C7: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $C8: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $C9: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $CA: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $CB: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
 
-    $D0: Result := _('Не распечатана контрольная лента по смене из ЭКЛЗ');
-    $D1: Result := _('Нет данных в буфере');
-    $D2: Result := _('Модем не работает');
-    $D3: Result := _('КМ не может быть декодирован, ошибка формата GS1');
-    $D4: Result := _('Код маркировки фальсифицирован');
-    $D5: Result := _('Ошибка аутентификации');
+    $D0: Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ');
+    $D1: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $D2: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $D3: Result := _('пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ GS1');
+    $D4: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $D5: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
 
-    $E0: Result := _('Ошибка связи с купюроприемником');
-    $E1: Result := _('Купюроприемник занят');
-    $E2: Result := _('Итог чека не соответствует итогу купюроприемника');
-    $E3: Result := _('Ошибка купюроприемника');
-    $E4: Result := _('Итог купюроприемника не нулевой');
+    $E0: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $E1: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $E2: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $E3: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+    $E4: Result := _('пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
 
-    $F0: Result := _('Ошибка передачи в ФП');
-    $F1: Result := _('Ошибка приема от ФП');
-    $F2: Result := _('Истек таймаут приема');
-    $F3: Result := _('Переполнение буфера');
-    $F4: Result := _('Нет запрошенных строк');
-    $F5: Result := _('Переполнение кадра ответа');
+    $F0: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ');
+    $F1: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ');
+    $F2: Result := _('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $F3: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
+    $F4: Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
+    $F5: Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
   else
-    Result := _('Неизвестная ошибка');
+    Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
   end;
 end;
 
@@ -2854,21 +2854,21 @@ function getServerResultCodeText(ServerCode: Integer): WideString;
 begin
   case ServerCode of
     SMFP_SERVER_RESULT_NODATA:
-      Result := _('КИЗ отсутствует в базе Серверы СКЗКМ или КИЗ отсутствует в базе ИСМ');
+      Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ');
 
     SMFP_SERVER_RESULT_BADFORMAT:
-      Result := _('Не корректен формат КИЗ');
+      Result := _('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ');
 
     SMFP_SERVER_RESULT_FAILED:
-      Result := _('Криптографическая проверка КПКИЗ дала отрицательный результат');
+      Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
 
     SMFP_SERVER_RESULT_STATUS:
-      Result := _('КИЗ имеет в базе Серверы СКЗКМ статус не совместимый с запрашиваемым');
+      Result := _('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
 
     SMFP_SERVER_RESULT_ATTACHMENT:
-      Result := _('В списке вложения обнаружены ошибки');
+      Result := _('пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
   else
-    Result := _('Неизвестный код ошибки');
+    Result := _('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
   end;
 end;
 

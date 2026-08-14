@@ -1,0 +1,23 @@
+﻿python : Traceback (most recent call last):
+C:\Users\User\AppData\Local\Temp\ps-script-c6032fb3-6047-4516-aabc-b41bdd96d2ea.ps1:89 знак:1
++ python -c "
++ ~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "<string>", line 7, in <module>
+    print(m.group(0).replace('\n',' ')[:200])
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1251.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u0450' in position 141: character maps to <undefined>
+---
+........................................................................... 83  OpenCheck ╬ЄъЁ√Є№╫хъ ...................................................................................................
+---
+ъшЁютъш ................................................................ 120  FNOpenCheckCorrection ╘═╬ЄъЁ√Є№╫хъ╩юЁЁхъЎшш ..................................................................... 120  FNO
+---
+rsion ╘═╟ряЁюё┬хЁёшш 119  FNMarkingClearBuffer ╘═╬ўшёЄшЄ№┴єЇхЁ╠рЁъшЁютъш 120  FNOpenCheckCorrection ╘═╬ЄъЁ√Є№╫хъ╩юЁЁхъЎшш 120  FNOpenSession ╘═╬ЄъЁ√Є№╤ьхэє 120  FNOperation ╘═╬яхЁрЎш  120  FNPrintDocu
+---
+kPortTimeout ┴ыюъшЁютрЄ№╧юЁЄ╥рщьрєЄ 60  MethodSupported ╠хЄюф╧юффхЁцштрхЄё  47  OpenCheck ╬ЄъЁ√Є№╫хъ 83  OpenDrawer ╬ЄъЁ√Є№─хэхцэ√щ▀∙шъ 60  OpenSession ╬ЄъЁ√Є№╤ьхэє 84  OutputReceipt ┬√фрЄ№╫хъ 69  Pin
+---

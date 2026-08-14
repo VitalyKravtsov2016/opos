@@ -1,0 +1,200 @@
+[11.08.2026 14:37:26.077] [00000664] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 14:37:26.077] [00000664] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:29:23.237] [00015208] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:29:23.434] [00015208] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:29:23.941] [00015208] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:29:23.977] [00015208] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:29:23.977] [00015208] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:29:23.977] [00015208] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:29:23.977] [00015208] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:29:23.977] [00015208] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:29:23.981] [00015208] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:29:24.140] [00015208] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:29:24.140] [00015208] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:29:24.140] [00015208] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:29:24.140] [00015208] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:29:24.140] [00015208] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.279] [00017576] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:29:45.441] [00017576] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:29:45.540] [00017576] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:29:45.571] [00017576] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.571] [00017576] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.571] [00017576] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.571] [00017576] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:29:45.571] [00017576] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:29:45.575] [00017576] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.698] [00017576] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.698] [00017576] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.698] [00017576] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:29:45.700] [00017576] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:29:45.700] [00017576] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:31:15.357] [00002024] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:31:15.758] [00002024] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:31:16.008] [00002024] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:31:16.039] [00002024] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.039] [00002024] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.039] [00002024] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.039] [00002024] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:31:16.039] [00002024] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:31:16.041] [00002024] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.079] [00002024] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.079] [00002024] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.079] [00002024] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:31:16.079] [00002024] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:31:16.079] [00002024] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:36:39.642] [00017224] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:36:40.311] [00017224] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:36:42.586] [00017224] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:36:43.394] [00017224] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:36:43.421] [00017224] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.421] [00017224] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.421] [00017224] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.421] [00017224] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:36:43.421] [00017224] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:36:43.421] [00017224] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.604] [00017224] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.604] [00017224] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.604] [00017224] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:36:43.605] [00017224] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:36:43.605] [00017224] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:38:56.434] [00019996] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:38:56.906] [00019996] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:38:57.051] [00019996] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:38:57.550] [00019996] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:38:57.573] [00019996] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.573] [00019996] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.573] [00019996] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.573] [00019996] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:38:57.573] [00019996] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:38:57.573] [00019996] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.670] [00019996] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.670] [00019996] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.670] [00019996] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:38:57.671] [00019996] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:38:57.671] [00019996] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:39:32.122] [00009952] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:39:32.437] [00009952] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:39:33.150] [00009952] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:39:33.173] [00009952] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.173] [00009952] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.173] [00009952] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.173] [00009952] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:39:33.173] [00009952] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:39:33.220] [00009952] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.322] [00009952] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:39:33.349] [00009952] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.350] [00009952] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.350] [00009952] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.350] [00009952] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:39:33.350] [00009952] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:39:33.350] [00009952] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.371] [00009952] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:39:33.374] [00009952] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.374] [00009952] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.374] [00009952] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.374] [00009952] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:39:33.374] [00009952] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:39:33.375] [00009952] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.404] [00009952] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:39:33.428] [00009952] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.428] [00009952] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.428] [00009952] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.428] [00009952] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:39:33.428] [00009952] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:39:33.459] [00009952] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.690] [00009952] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:39:33.718] [00009952] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.718] [00009952] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.718] [00009952] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.718] [00009952] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:39:33.718] [00009952] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:39:33.718] [00009952] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.978] [00009952] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.978] [00009952] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.978] [00009952] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:39:33.979] [00009952] [DEBUG] TDrvFR ReadLicense(): -70
+[11.08.2026 15:42:14.599] [00012712] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:42:14.671] [00012712] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:42:14.791] [00012712] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:42:15.030] [00012712] [DEBUG] TDrvFR FNOpenCheck()
+[11.08.2026 15:42:15.031] [00012712] [DEBUG] TDrvFR FNOpenCheck(): -9
+[11.08.2026 15:42:15.039] [00012712] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:42:15.063] [00012712] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:42:15.063] [00012712] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:42:15.063] [00012712] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:42:15.064] [00012712] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:42:15.064] [00012712] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:42:15.064] [00012712] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:46:21.688] [00020368] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:46:21.772] [00020368] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:46:21.982] [00020368] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:46:22.003] [00020368] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.003] [00020368] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.003] [00020368] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.003] [00020368] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:46:22.003] [00020368] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:46:22.006] [00020368] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.012] [00020368] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:46:22.077] [00020368] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:46:22.088] [00020368] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.088] [00020368] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.088] [00020368] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.088] [00020368] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:46:22.088] [00020368] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:46:22.088] [00020368] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:46:22.311] [00020368] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:46:38.311] [00003132] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:47:13.713] [00001652] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:47:13.963] [00001652] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:47:13.975] [00001652] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:47:13.975] [00001652] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:47:13.975] [00001652] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:47:13.975] [00001652] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:47:13.975] [00001652] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:47:13.984] [00001652] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:49:42.583] [00022784] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:49:42.745] [00022784] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:49:42.981] [00022784] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:49:43.001] [00022784] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:49:43.001] [00022784] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:49:43.001] [00022784] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:49:43.001] [00022784] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:49:43.001] [00022784] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:49:43.001] [00022784] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.026] [00022796] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:51:28.090] [00022796] [DEBUG] TDrvFR Get_CapOpenCheck: True
+[11.08.2026 15:51:28.296] [00022796] [DEBUG] TDrvFR Set_MethodName = OpenCheck
+[11.08.2026 15:51:28.353] [00022796] [DEBUG] TDrvFR Set_MethodName = FNOpenCheck
+[11.08.2026 15:51:28.423] [00022796] [DEBUG] TDrvFR FNOpenCheck()
+[11.08.2026 15:51:28.425] [00022796] [DEBUG] TDrvFR FNOpenCheck(): -9
+[11.08.2026 15:51:28.435] [00022796] [DEBUG] TDrvFR FNOpenCheck()
+[11.08.2026 15:51:28.466] [00022796] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.466] [00022796] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.466] [00022796] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.466] [00022796] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:51:28.466] [00022796] [DEBUG] TDrvFR FNOpenCheck(): -70
+[11.08.2026 15:51:28.467] [00022796] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.533] [00022796] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.535] [00022796] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.535] [00022796] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TDrvFR FNOperation(): -70
+[11.08.2026 15:51:28.535] [00022796] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:51:53.782] [00012600] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:51:54.065] [00012600] [DEBUG] TFiscalPrinter Command OK: FEE6
+[11.08.2026 15:52:15.622] [00003160] [DEBUG] TCommandSender Команда: F7h, Запрос параметров модели
+[11.08.2026 15:52:15.704] [00003160] [DEBUG] TFiscalPrinter Command OK: FEE6
+[11.08.2026 15:52:16.375] [00003160] [DEBUG] TFiscalPrinter Command OK: FEE7
+[11.08.2026 15:52:16.753] [00003160] [DEBUG] TDrvFR OpenCheck()
+[11.08.2026 15:52:16.787] [00003160] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.787] [00003160] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.787] [00003160] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.787] [00003160] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:52:16.787] [00003160] [DEBUG] TDrvFR OpenCheck(): -70
+[11.08.2026 15:52:16.791] [00003160] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.795] [00003160] [DEBUG] TDrvFR FNOpenCheck()
+[11.08.2026 15:52:16.801] [00003160] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.801] [00003160] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.801] [00003160] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:52:16.801] [00003160] [DEBUG] TFiscalPrinter DrvOpenCheck
+[11.08.2026 15:52:16.801] [00003160] [DEBUG] TDrvFR FNOpenCheck(): -70
+[11.08.2026 15:52:16.801] [00003160] [DEBUG] TDrvFR Get_ResultCodeDescription: Устройство не поддерживается драйвером

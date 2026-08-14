@@ -1,0 +1,76 @@
+PAT ^.*ModelID.*$ count 71
+[11.08.2026 14:35:16.827] [00015400] [DEBUG] TDrvFR Set_ModelID = 0
+[11.08.2026 14:37:24.027] [00000664] [DEBUG] TDrvFR Set_ModelID = 0
+[11.08.2026 14:37:24.030] [00000664] [DEBUG] TDrvFR Set_ModelID = 0
+[11.08.2026 14:37:26.010] [00000664] [DEBUG] TDrvFR Set_ModelID = 27
+[11.08.2026 14:37:26.060] [00000664] [DEBUG] TDrvFR Set_ModelID = 27
+[11.08.2026 15:36:40.308] [00017224] [DEBUG] TDrvFR Get_ModelID: 0
+[11.08.2026 15:38:56.901] [00019996] [DEBUG] TDrvFR Get_ModelID: 0
+[11.08.2026 15:39:32.394] [00009952] [DEBUG] TDrvFR Get_ModelID: 0
+[11.08.2026 15:39:33.110] [00009952] [DEBUG] TDrvFR Get_ModelID: 0
+[11.08.2026 15:39:33.138] [00009952] [DEBUG] TDrvFR Set_ModelID = 0
+[11.08.2026 15:39:33.322] [00009952] [DEBUG] TDrvFR Set_ModelID = 1
+[11.08.2026 15:39:33.363] [00009952] [DEBUG] TDrvFR Set_ModelID = 27
+[11.08.2026 15:39:33.404] [00009952] [DEBUG] TDrvFR Set_ModelID = 76
+[11.08.2026 15:39:33.690] [00009952] [DEBUG] TDrvFR Set_ModelID = 251
+[11.08.2026 15:46:22.522] [00020368] [DEBUG] TDrvFR Get_ModelID: 0
+----
+PAT ^.*UModel.*$ count 57
+[11.08.2026 14:33:58.969] [00019044] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 14:35:16.761] [00015400] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 14:35:16.827] [00015400] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 14:37:23.943] [00000664] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 14:37:24.027] [00000664] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 14:37:24.030] [00000664] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 14:37:25.963] [00000664] [DEBUG] TDrvFR Get_UModel: 27
+[11.08.2026 14:37:26.010] [00000664] [DEBUG] TDrvFR Get_UModel: 27
+[11.08.2026 14:37:26.060] [00000664] [DEBUG] TDrvFR Get_UModel: 27
+[11.08.2026 15:29:23.413] [00015208] [DEBUG] TDrvFR Get_UModel: 247
+[11.08.2026 15:29:45.432] [00017576] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 15:36:40.303] [00017224] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 15:38:56.886] [00019996] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 15:39:32.388] [00009952] [DEBUG] TDrvFR Get_UModel: 0
+[11.08.2026 15:46:22.613] [00020368] [DEBUG] TDrvFR Get_UModel: 0
+----
+PAT ^.*UDescription.*$ count 51
+[31.07.2026 15:51:25.795] [00012128] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 13:19:11.586] [00011404] [DEBUG] TDrvFR Get_UDescription: SHTRIH-M FR
+[11.08.2026 14:01:05.604] [00003648] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:02:14.499] [00013904] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:02:45.076] [00007704] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:02:49.275] [00016420] [DEBUG] TDrvFR Get_UDescription: SHTRIH-M FR
+[11.08.2026 14:02:54.805] [00002216] [DEBUG] TDrvFR Get_UDescription: SHTRIH-M FR
+[11.08.2026 14:24:43.250] [00019356] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:25:24.256] [00001512] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:26:11.216] [00004716] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:33:58.881] [00019044] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:35:16.761] [00015400] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:37:23.943] [00000664] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+[11.08.2026 14:37:25.963] [00000664] [DEBUG] TDrvFR Get_UDescription: SHTRIH-M FR
+[11.08.2026 15:39:32.422] [00009952] [DEBUG] TDrvFR Get_UDescription: ШТРИХ-M-01Ф         
+----
+PAT ^.*FCh.*$ count 564
+[11.08.2026 15:42:14.629] [00012712] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:46:21.686] [00020368] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:46:21.717] [00020368] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:46:38.308] [00003132] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:46:38.331] [00003132] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:47:13.711] [00001652] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:47:13.739] [00001652] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:49:42.581] [00022784] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:49:42.607] [00022784] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:51:28.023] [00022796] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:51:28.049] [00022796] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:51:53.780] [00012600] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:51:53.807] [00012600] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+[11.08.2026 15:52:15.621] [00003160] [DEBUG] TFiscalPrinter Команда: FCh, Получить тип устройства
+[11.08.2026 15:52:15.649] [00003160] [DEBUG] TCommandSender Команда: FCh, Получить тип устройства
+----
+PAT ^.*Get_ModelNames.*$ count 6
+[31.07.2026 15:48:23.927] [00020956] [DEBUG] TDrvFR Get_ModelNames: 
+[31.07.2026 15:48:24.208] [00020956] [DEBUG] TDrvFR Get_ModelNames: SHTRIH-M FR
+[11.08.2026 14:24:42.990] [00019356] [DEBUG] TDrvFR Get_ModelNames: ШТРИХ-M-01Ф
+[11.08.2026 14:25:24.248] [00001512] [DEBUG] TDrvFR Get_ModelNames: ШТРИХ-M-01Ф
+[11.08.2026 15:39:33.122] [00009952] [DEBUG] TDrvFR Get_ModelNames: ШТРИХ-M-01Ф
+[11.08.2026 15:46:22.533] [00020368] [DEBUG] TDrvFR Get_ModelNames: ШТРИХ-M-01Ф
+----

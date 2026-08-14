@@ -1,0 +1,36 @@
+15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 15
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol -> 02 05 10 1E 00 00 00 0B
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 06
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 5000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TComPort SetCmdTimeout 5000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 02
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 10
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol SetCmdTimeout: 2000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TComPort SetCmdTimeout 2000
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol <- 10 00 01 02 00 02 00 00 64 DC 00 00 00 00 00 00 B9
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TPrinterProtocol -> 06
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.begin
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.end
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDBReceiptFilePlugin AfterCommand.begin 10
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDBReceiptFilePlugin AfterCommand.end 10
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter Unlock
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter Lock
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter DoSend: 8D 1E 00 00 00 00
+[11.08.2026 15:49:43.000] [00022784] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter Команда: 8Dh, Открыть чек
+[11.08.2026 15:49:43.000] [00022784] [ INFO] TFiscalPrinter ------------------------------------------------------------
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDBReceiptFilePlugin BeforeCommand.begin 8D
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDBReceiptFilePlugin BeforeCommand.end 8D
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter AfterCommand.end Password = 30
+[11.08.2026 15:49:43.000] [00022784] [DEBUG] TFiscalPrinter On connect routine
+[11.08.2026 15:49:43.001] [00022784] [ERROR] TFiscalPrinter Handle Exception [EDriverError] Устройство не поддерживается драйвером
+[11.08.2026 15:49:43.001] [00022784] [ERROR] TFiscalPrinter -70 Устройство не поддерживается драйвером
+[11.08.2026 15:49:43.001] [00022784] [ERROR] TFiscalPrinter (-70) Устройство не поддерживается драйвером
+[11.08.2026 15:49:43.001] [00022784] [DEBUG] TDriverState.Assign
+[11.08.2026 15:49:43.001] [00022784] [DEBUG] TFirmwareUpdatePlugin.AfterCommand.begin
+[11.08.2026 15:49:43.001] [00022784] [DEBUG] 

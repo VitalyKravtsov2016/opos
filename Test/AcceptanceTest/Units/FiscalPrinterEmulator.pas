@@ -68,6 +68,7 @@ type
     function GetModelID: Byte; virtual;
     function GetDeviceName: AnsiString; virtual;
     function GetSerialNumber: AnsiString; virtual;
+    function BuildF7Flags: Int64; virtual;
     function BuildF7Body: AnsiString; virtual;
     function IsCloseReceiptCommand(CommandCode: Integer): Boolean; virtual;
     function GetEmulatorKind: TFrEmulatorKind; virtual;
@@ -96,7 +97,7 @@ type
     function BuildF7Body: AnsiString; override;
   end;
 
-  { PosCenter DrvKKT: FF45 / FF76 / FF7B (Ex4), model 247, extended F7 }
+  { PosCenter DrvKKT: FF45 / FF76 / FF7B (Ex4), model 247, extended F7 + license bits }
 
   TPosCenterFrEmulator = class(TFiscalPrinterEmulator)
   protected
@@ -116,11 +117,13 @@ type
     function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
   end;
 
-  { RR-Electro KKTDrv }
+  { RR-Electro KKTDrv: model 3 = РР-01Ф (см. Номера моделей ККТ) }
 
   TRRElectroFrEmulator = class(TFiscalPrinterEmulator)
   protected
     function GetEmulatorKind: TFrEmulatorKind; override;
+    function GetModelID: Byte; override;
+    function GetDeviceName: AnsiString; override;
     function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
   end;
 
@@ -214,11 +217,27 @@ begin
   Result := '0212280008053991';
 end;
 
+function TFiscalPrinterEmulator.BuildF7Flags: Int64;
+begin
+  // Protocol F7 type=1, bits 57/58 (PosCenter v1.23 / RR A.2.0):
+  // 57 — commercial license valid
+  // 58 — legislative license valid
+  // Also enable common FN capabilities used by DrvFR/KKTDrv.
+  Result :=
+    (Int64(1) shl 22) or  // CapNonfiscalDoc
+    (Int64(1) shl 23) or  // CapCashCore
+    (Int64(1) shl 43) or  // CapFN
+    (Int64(1) shl 47) or  // CapFN1.1
+    (Int64(1) shl 54) or  // CapVAT22
+    (Int64(1) shl 57) or  // commercial license valid
+    (Int64(1) shl 58);    // legislative license valid
+end;
+
 function TFiscalPrinterEmulator.BuildF7Body: AnsiString;
 begin
-  // Short generic F7 (flags + fonts + passwords + graphics)
+  // F7 type=1 body: 8-byte flags + fonts/passwords/graphics
   Result :=
-    IntToBin(0, 8) +
+    IntToBin(BuildF7Flags, 8) +
     #42 + #42 +
     #0 +
     #12 + #12 +
@@ -420,6 +439,10 @@ function TFiscalPrinterEmulator.BuildAnswer(CommandCode: Integer;
 begin
   if CommandCode >= $FF00 then
     Result := #$FF + AnsiChar(CommandCode and $FF) + Body
+  else if CommandCode >= $FE00 then
+    // PosCenter DrvFR treats answer as: FE <error> <data...>
+    // (subcommand is not echoed; echoing it makes error=0xE7=231).
+    Result := #$FE + Body
   else
     Result := AnsiChar(CommandCode) + Body;
 end;
@@ -434,6 +457,8 @@ begin
 
   if CommandCode >= $FF00 then
     Line := Format('FF%.2X %s', [CommandCode and $FF, StrToHex(Payload)])
+  else if CommandCode >= $FE00 then
+    Line := Format('FE%.2X %s', [CommandCode and $FF, StrToHex(Payload)])
   else
     Line := Format('%.2X %s', [CommandCode, StrToHex(Payload)]);
 
@@ -464,6 +489,14 @@ begin
     if Length(Payload) < 2 then
       Exit;
     Code := $FF00 + Ord(Payload[2]);
+    Data := Copy(Payload, 3, MaxInt);
+  end else
+  if Ord(Payload[1]) = $FE then
+  begin
+    // Extended FE-prefix commands (license etc.): FE <sub> <data...>
+    if Length(Payload) < 2 then
+      Exit;
+    Code := $FE00 + Ord(Payload[2]);
     Data := Copy(Payload, 3, MaxInt);
   end else
   begin
@@ -510,12 +543,16 @@ begin
           AnsiChar(D) + AnsiChar(M) + AnsiChar(Y mod 100) +
           AnsiChar(D) + AnsiChar(M) + AnsiChar(Y mod 100) +
           AnsiChar(H) + AnsiChar(N) + AnsiChar(S) +
-          #$40 +
+          // FMFlags: bit0 FM1, bit2 LicenseEntered, bit6 DayOpened/IsFMSessionOpen
+          #$45 +
           IntToBin(123456, 4) +
           IntToBin(FDayNumber, 2) +
           IntToBin(2000, 2) +
           #1 + #15 +
-          #0#0#0#0#0#0;
+          #0#0#0#0#0#0 +
+          // With F7 bit23 (CashCore) PosCenter expects 50-byte 11h answer:
+          // +2 bytes = high word of 6-byte serial.
+          #0#0;
         Result := BuildAnswer(Code, Body);
       end;
 
@@ -676,6 +713,37 @@ begin
         Result := BuildAnswer(Code, Body);
       end;
 
+    // FE-prefix license/feature queries (see FREmul EmulFECommands;
+    // PosCenter answer framing: FE <error> <data>, without subcode echo).
+    $FEE6:
+      begin
+        // WriteFeatureLicenses: accept and ACK
+        Body := #0;
+        Result := BuildAnswer(Code, Body);
+      end;
+    $FEE7:
+      begin
+        // ReadFeatureLicenses: error + 64 data bytes
+        Body := #0 + StringOfChar(#0, 64);
+        Result := BuildAnswer(Code, Body);
+      end;
+    $FEEF:
+      begin
+        Body := #0 + StringOfChar(#0, 60);
+        Result := BuildAnswer(Code, Body);
+      end;
+    $FEEC:
+      begin
+        Body := #0 + IntToBin(153, 4);
+        Result := BuildAnswer(Code, Body);
+      end;
+    $FEF4:
+      begin
+        Body := #0 +
+          IntToBin(0, 8) + IntToBin(0, 8) + IntToBin(0, 8) + IntToBin(0, 8);
+        Result := BuildAnswer(Code, Body);
+      end;
+
   else
     begin
       Body := #0 + StringOfChar(#0, 128);
@@ -816,7 +884,8 @@ end;
 
 function TPosCenterFrEmulator.GetModelID: Byte;
 begin
-  Result := 247;
+  // ModelID=0 matches PosCenter DrvFR licensed model name (ШТРИХ-M-01Ф).
+  Result := 0;
 end;
 
 function TPosCenterFrEmulator.GetDeviceName: AnsiString;
@@ -826,10 +895,18 @@ begin
 end;
 
 function TPosCenterFrEmulator.BuildF7Body: AnsiString;
+var
+  Flags: Int64;
 begin
-  // Real PosCenter F7 from DrvKKT.log (extended), CapCashCore cleared
+  // Real PosCenter F7 dump (5A A0 40 03 20 EC C1 01 ...) plus:
+  // bit23 CapCashCore, bit57 commercial license, bit58 legislative license.
+  Flags := $01C1EC200340A05A;
+  Flags := Flags or
+    (Int64(1) shl 23) or
+    (Int64(1) shl 57) or
+    (Int64(1) shl 58);
   Result :=
-    #$5A#$A0#$00#$03#$20#$EC#$C1#$01 +
+    IntToBin(Flags, 8) +
     #$0C#$18#$01#$0C#$10 +
     #$00#$00#$00#$00#$00 +
     #$00#$1E#$00#$00#$00 +
@@ -869,6 +946,19 @@ end;
 function TRRElectroFrEmulator.GetEmulatorKind: TFrEmulatorKind;
 begin
   Result := ekRRElectro;
+end;
+
+function TRRElectroFrEmulator.GetModelID: Byte;
+begin
+  // Код модели ККТ 0003 = РР-01Ф
+  // (Номера моделей_только_ККТ_271125.docx)
+  Result := 3;
+end;
+
+function TRRElectroFrEmulator.GetDeviceName: AnsiString;
+begin
+  // cp1251: РР-01Ф + padding
+  Result := #$D0#$D0'-01'#$D4'              ';
 end;
 
 function TRRElectroFrEmulator.IsCloseReceiptCommand(CommandCode: Integer): Boolean;
