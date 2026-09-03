@@ -214,7 +214,11 @@ uses
   FiscalPrinterDevice in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDevice.pas',
   untDriver in '..\..\Source\Shared\untDriver.pas',
   DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
-  BinUtils in '..\..\Source\Shared\BinUtils.pas';
+  BinUtils in '..\..\Source\Shared\BinUtils.pas',
+  FiscalPrinterDriverRR in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDriverRR.pas',
+  untDriverRR in '..\..\Source\Shared\untDriverRR.pas',
+  KKTDrvLib_TLB in '..\..\Source\Shared\KKTDrvLib_TLB.pas',
+  FiscalPrinterDriverTB in '..\..\Source\SmFiscalPrinter\Units\FiscalPrinterDriverTB.pas';
 
 {$R *.RES}
 {$R ..\..\Source\SmFiscalPrinter\SmFiscalPrinter.TLB}

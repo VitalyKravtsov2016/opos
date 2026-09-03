@@ -14,7 +14,7 @@ uses
   untDriver,
   PrinterTypes, BinStream, StringUtils,
   SerialPort, PrinterTable, LogFile, ByteUtils, FiscalPrinterTypes,
-  DeviceTables, PrinterModel, XmlModelReader, 
+  DeviceTables, PrinterModel, XmlModelReader,
   CommunicationError, VersionInfo, DefaultModel, DriverTypes,
   TableParameter, DebugUtils, ClassLogger, DriverError,
   FiscalPrinterStatistics, ParameterValue, EJReportParser,
@@ -29,12 +29,12 @@ type
   TFiscalPrinterDriver = class(TInterfacedObject, IFiscalPrinterDevice)
   private
     FDriver: TDriver;
+    FConnected: Boolean;
     FContext: TDriverContext;
-    FDriverConnected: Boolean;
-    FPortOpened: Boolean;
     function TestCommand(Code: Integer): Boolean;
     function IsSupported(ResultCode: Integer): Boolean;
     function GetBlockSize(BlockSize: Integer): Integer;
+    procedure DoConnect;
   public
     property Driver: TDriver read FDriver;
     procedure SetPrintFlags(Flags: Byte);
@@ -155,7 +155,6 @@ type
     procedure ProgressEvent(Progress: Integer);
     function Is2DBarcode(Symbology: Integer): Boolean;
     procedure Connect;
-    procedure DoConnect;
     procedure Disconnect;
     function WaitForPrinting: TPrinterStatus;
     function ReadPrinterStatus: TPrinterStatus;
@@ -654,8 +653,7 @@ begin
   inherited Create;
   FContext := AContext;
   FDriver := TDriver.Create(nil);
-  FDriverConnected := False;
-  FPortOpened := False;
+  FConnected := False;
   SetLength(FTaxInfo, 4);
   FTLVItems := TStringList.Create;
   FSTLVTag := TTLV.Create(nil);
@@ -676,11 +674,11 @@ end;
 destructor TFiscalPrinterDriver.Destroy;
 begin
   try
-    if FDriverConnected then
+    if FConnected then
       FDriver.Disconnect;
   except
   end;
-  FDriverConnected := False;
+  FConnected := False;
   FLock.Free;
   FFields.Free;
   FTables.Free;
@@ -775,18 +773,11 @@ end;
 
 procedure TFiscalPrinterDriver.DoConnect;
 begin
-  if FDriverConnected then
-    Exit;
-
-  Driver.ConnectionType := DrvFRConnectionLocal;
-  Driver.ComNumber := Parameters.PortNumber;
-  Driver.BaudRate := Parameters.BaudRate;
-  Driver.Timeout := Parameters.ByteTimeout;
-  Driver.Password := Integer(GetUsrPassword);
-  Driver.PointPosition := True; // 2 decimal places
-  // Do not assign Driver.ModelID from Parameters.ModelID:
-  // Parameters.ModelID is the OPOS Models.xml id; forcing it into DrvFR
-  // makes OpenCheck/FNOperation return -70 ("устройство не поддерживается драйвером").
+  if not FConnected then
+  begin
+    Check(Driver.Connect2);
+    FConnected := True;
+  end;
 end;
 
 procedure VersionChars(const Version: WideString; var Hi, Lo: Char);
@@ -853,11 +844,11 @@ end;
 
 procedure TFiscalPrinterDriver.Disconnect;
 begin
-  if FDriverConnected then
+  if FConnected then
   begin
     Driver.Disconnect;
-    FDriverConnected := False;
-    FPortOpened := False;
+    FConnected := False;
+    FIsOnline := False;
     if Assigned(FOnDisconnect) then
       FOnDisconnect(Self);
   end;
@@ -3393,32 +3384,17 @@ begin
   Logger.Debug(Format('OpenPort(COM%d, %d, %d)', [
     GetParameters.PortNumber, GetParameters.BaudRate, GetParameters.ByteTimeout]));
 
-  if not FPortOpened then
-  begin
-    DoConnect;
-    // Connect2 auto-probes model/baud; Connect uses explicit port settings
-    if Parameters.SearchByBaudRateEnabled or Parameters.SearchByPortEnabled then
-      CheckDriver(Driver.Connect2)
-    else
-      CheckDriver(Driver.Connect);
-    FDriverConnected := True;
-    FPortOpened := True;
-  end;
+  DoConnect;
 end;
 
 procedure TFiscalPrinterDriver.ClaimDevice(Timeout: Integer);
 begin
   OpenPort;
-  CheckDriver(Driver.LockPort);
 end;
 
 procedure TFiscalPrinterDriver.ReleaseDevice;
 begin
-  if FPortOpened then
-  begin
-    CheckDriver(Driver.UnlockPort);
-    FPortOpened := False;
-  end;
+  Disconnect;
 end;
 
 procedure TFiscalPrinterDriver.Close;
@@ -3433,16 +3409,7 @@ end;
 
 procedure TFiscalPrinterDriver.ClosePort;
 begin
-  ReleaseDevice;
-  if FDriverConnected then
-  begin
-    Driver.Disconnect;
-    FDriverConnected := False;
-    if Assigned(FOnDisconnect) then
-      FOnDisconnect(Self);
-  end;
-  FPortOpened := False;
-  FIsOnline := False;
+  Disconnect;
 end;
 
 procedure TFiscalPrinterDriver.WriteLogModelParameters(const Model: TPrinterModelRec);
@@ -3484,8 +3451,8 @@ end;
 
 procedure TFiscalPrinterDriver.Check(Code: Integer);
 begin
-  if Code = 0 then Exit;
-  RaiseError(Code, GetErrorText(Code));
+  if Code <> 0 then
+    RaiseError(Code, Driver.ResultCodeDescription);
 end;
 
 function TFiscalPrinterDriver.GetDeviceMetrics: TDeviceMetrics;
@@ -7149,23 +7116,5 @@ begin
 
   WriteTableInt(PRINTER_TABLE_TAX, Tax, 1, Rate);
 end;
-
-(*
-  if not FDriverConnected then
-  begin
-    CheckDriver(Driver.Connect);
-    FDriverConnected := True;
-    FCapFiscalStorage := True;
-    if Parameters.ModelId <> MODEL_ID_WEB_CASSA then
-      FCapFiscalStorage := ReadCapFiscalStorage;
-    FCapDiscount := not FCapFiscalStorage;
-    FCapSubtotalRound := FCapFiscalStorage;
-
-    FIsOnline := True;
-    if Assigned(FOnConnect) then
-      FOnConnect(Self);
-  end;
-
-*)
 
 end.

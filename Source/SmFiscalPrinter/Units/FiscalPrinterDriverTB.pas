@@ -29,9 +29,8 @@ type
   TFiscalPrinterDriverTB = class(TInterfacedObject, IFiscalPrinterDevice)
   private
     FDriver: TDriver;
+    FConnected: Boolean;
     FContext: TDriverContext;
-    FDriverConnected: Boolean;
-    FPortOpened: Boolean;
     function TestCommand(Code: Integer): Boolean;
     function IsSupported(ResultCode: Integer): Boolean;
     function GetBlockSize(BlockSize: Integer): Integer;
@@ -654,8 +653,7 @@ begin
   inherited Create;
   FContext := AContext;
   FDriver := TDriver.Create(nil);
-  FDriverConnected := False;
-  FPortOpened := False;
+  FConnected := False;
   SetLength(FTaxInfo, 4);
   FTLVItems := TStringList.Create;
   FSTLVTag := TTLV.Create(nil);
@@ -676,11 +674,11 @@ end;
 destructor TFiscalPrinterDriverTB.Destroy;
 begin
   try
-    if FDriverConnected then
+    if FConnected then
       FDriver.Disconnect;
   except
   end;
-  FDriverConnected := False;
+  FConnected := False;
   FLock.Free;
   FFields.Free;
   FTables.Free;
@@ -775,18 +773,10 @@ end;
 
 procedure TFiscalPrinterDriverTB.DoConnect;
 begin
-  if FDriverConnected then
+  if FConnected then
     Exit;
 
-  Driver.ConnectionType := DrvFRConnectionLocal;
-  Driver.ComNumber := Parameters.PortNumber;
-  Driver.BaudRate := Parameters.BaudRate;
-  Driver.Timeout := Parameters.ByteTimeout;
-  Driver.Password := Integer(GetUsrPassword);
-  Driver.PointPosition := True; // 2 decimal places
-  // Do not assign Driver.ModelID from Parameters.ModelID:
-  // Parameters.ModelID is the OPOS Models.xml id; forcing it into DrvFR
-  // makes OpenCheck/FNOperation return -70 ("устройство не поддерживается драйвером").
+  Check(Driver.Connect2);
 end;
 
 procedure VersionChars(const Version: WideString; var Hi, Lo: Char);
@@ -853,11 +843,11 @@ end;
 
 procedure TFiscalPrinterDriverTB.Disconnect;
 begin
-  if FDriverConnected then
+  if FConnected then
   begin
     Driver.Disconnect;
-    FDriverConnected := False;
-    FPortOpened := False;
+    FIsOnline := False;
+    FConnected := False;
     if Assigned(FOnDisconnect) then
       FOnDisconnect(Self);
   end;
@@ -3393,17 +3383,7 @@ begin
   Logger.Debug(Format('OpenPort(COM%d, %d, %d)', [
     GetParameters.PortNumber, GetParameters.BaudRate, GetParameters.ByteTimeout]));
 
-  if not FPortOpened then
-  begin
-    DoConnect;
-    // Connect2 auto-probes model/baud; Connect uses explicit port settings
-    if Parameters.SearchByBaudRateEnabled or Parameters.SearchByPortEnabled then
-      CheckDriver(Driver.Connect2)
-    else
-      CheckDriver(Driver.Connect);
-    FDriverConnected := True;
-    FPortOpened := True;
-  end;
+  DoConnect;
 end;
 
 procedure TFiscalPrinterDriverTB.ClaimDevice(Timeout: Integer);
@@ -3414,17 +3394,12 @@ end;
 
 procedure TFiscalPrinterDriverTB.ReleaseDevice;
 begin
-  if FPortOpened then
-  begin
-    CheckDriver(Driver.UnlockPort);
-    FPortOpened := False;
-  end;
+  Disconnect;
 end;
 
 procedure TFiscalPrinterDriverTB.Close;
 begin
   Disconnect;
-  FIsOnline := False;
 end;
 
 procedure TFiscalPrinterDriverTB.Open;
@@ -3434,14 +3409,6 @@ end;
 procedure TFiscalPrinterDriverTB.ClosePort;
 begin
   ReleaseDevice;
-  if FDriverConnected then
-  begin
-    Driver.Disconnect;
-    FDriverConnected := False;
-    if Assigned(FOnDisconnect) then
-      FOnDisconnect(Self);
-  end;
-  FPortOpened := False;
   FIsOnline := False;
 end;
 
@@ -3484,8 +3451,8 @@ end;
 
 procedure TFiscalPrinterDriverTB.Check(Code: Integer);
 begin
-  if Code = 0 then Exit;
-  RaiseError(Code, GetErrorText(Code));
+  if Code <> 0 then
+    RaiseError(Code, Driver.ResultCodeDescription);
 end;
 
 function TFiscalPrinterDriverTB.GetDeviceMetrics: TDeviceMetrics;
@@ -7149,23 +7116,5 @@ begin
 
   WriteTableInt(PRINTER_TABLE_TAX, Tax, 1, Rate);
 end;
-
-(*
-  if not FDriverConnected then
-  begin
-    CheckDriver(Driver.Connect);
-    FDriverConnected := True;
-    FCapFiscalStorage := True;
-    if Parameters.ModelId <> MODEL_ID_WEB_CASSA then
-      FCapFiscalStorage := ReadCapFiscalStorage;
-    FCapDiscount := not FCapFiscalStorage;
-    FCapSubtotalRound := FCapFiscalStorage;
-
-    FIsOnline := True;
-    if Assigned(FOnConnect) then
-      FOnConnect(Self);
-  end;
-
-*)
 
 end.
