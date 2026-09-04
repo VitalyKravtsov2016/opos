@@ -960,6 +960,14 @@ type
     function GetDisplayText: WideString; override;
   end;
 
+  { TReceiptTest36 }
+
+  TReceiptTest36 = class(TDriverTest)
+  public
+    procedure Execute; override;
+    function GetDisplayText: WideString; override;
+  end;
+
 implementation
 
 const
@@ -5430,6 +5438,63 @@ end;
 function TReceiptTest35.GetDisplayText: WideString;
 begin
   Result := 'Refund receipt test 35';
+end;
+
+{ TReceiptTest36 }
+
+function TReceiptTest36.GetDisplayText: WideString;
+begin
+  Result := 'Refund receipt test 36';
+end;
+
+procedure TReceiptTest36.Execute;
+begin
+  Memo.Lines.Clear;
+  Memo.Update;
+  Application.ProcessMessages;
+  // ResetPrinter
+  AddLine('ResetPrinter...');
+  Check(FiscalPrinter.ResetPrinter);
+  AddLine('ResetPrinter: OK');
+
+  AddLine('SetPOSID...');
+  Check(FiscalPrinter.SetPOSID('01', 'Управляющий АЗС TS'));
+  AddLine('SetPOSID: OK');
+
+  AddLine('BeginFiscalReceipt...');
+  FiscalPrinter.FiscalReceiptStation := FPTR_RS_RECEIPT;
+  FiscalPrinter.FiscalReceiptType := FPTR_RT_SALES;
+  Check(FiscalPrinter.BeginFiscalReceipt(False));
+  AddLine('BeginFiscalReceipt: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(30, 72, '4'));
+  AddLine('DirectIO: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(30, 73, '1'));
+  AddLine('DirectIO: OK');
+
+  AddLine('PrintRecItem...');
+  Check(FiscalPrinter.PrintRecItem('Газета Из Рук в Руки', 50, 1000000, 4, 50, ''));
+  AddLine('PrintRecItem: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(65, 2108, '0'));
+  AddLine('DirectIO: OK');
+
+  AddLine('PrintRecTotal...');
+  Check(FiscalPrinter.PrintRecTotal(50, 50, '0'));
+  AddLine('PrintRecTotal: OK');
+
+  Check(FiscalPrinter.PrintRecMessage('Транз.:      65761 '));
+  Check(FiscalPrinter.DirectIO2(14, 0, '17;1;7;0'));
+  Check(FiscalPrinter.DirectIO2(40, 1117, 'noreply@chek.pofd.ru'));
+  Check(FiscalPrinter.DirectIO2(30, 302, '1'));
+
+  AddLine('EndFiscalReceipt...');
+  Check(FiscalPrinter.EndFiscalReceipt(False));
+  AddLine('EndFiscalReceipt: OK');
 end;
 
 end.

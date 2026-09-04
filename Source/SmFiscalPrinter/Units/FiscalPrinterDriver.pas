@@ -1736,7 +1736,6 @@ begin
   FLogger.Debug(Format('DoWriteTable(%d,%d,%d,%s)',
     [Table, Row, Field, StrToHexText(FieldValue)]));
 
-
   Driver.TableNumber := Table;
   Driver.RowNumber := Row;
   Driver.FieldNumber := Field;
@@ -2752,28 +2751,14 @@ end;
 function TFiscalPrinterDriver.WriteTable(
   Table, Row, Field: Integer;
   const FieldValue: WideString): Integer;
-var
-  Data: AnsiString;
-  FieldInfo: TPrinterFieldRec;
 begin
-  Result := 0;
-  //if ReadTableStr(Table, Row, Field) = FieldValue then Exit; { !!! }
-
-  FieldInfo := ReadFieldStructure(Table, Field);
-  if ValidFieldValue(FieldInfo, FieldValue) then
+  Result := DoWriteTable(Table, Row, Field, FieldValue);
+  if Result = 0 then
   begin
-    Data := GetFieldValue(FieldInfo, FieldValue);
-    Result := DoWriteTable(Table, Row, Field, Data);
-    if Result = 0 then
+    if (Table = 17)and(Row = 1)and(Field=7) then
     begin
-      if (Table = 17)and(Row = 1)and(Field=7) then
-      begin
-        FDocPrintMode := StrToInt(FieldValue);
-      end;
+      FDocPrintMode := StrToInt(FieldValue);
     end;
-  end else
-  begin
-    Logger.Error(Format('%s, "%s"', [_('Invalid field value'), FieldValue]));
   end;
 end;
 
