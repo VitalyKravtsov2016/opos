@@ -968,6 +968,14 @@ type
     function GetDisplayText: WideString; override;
   end;
 
+  { TReceiptTest37 }
+
+  TReceiptTest37 = class(TDriverTest)
+  public
+    procedure Execute; override;
+    function GetDisplayText: WideString; override;
+  end;
+
 implementation
 
 const
@@ -5496,5 +5504,73 @@ begin
   Check(FiscalPrinter.EndFiscalReceipt(False));
   AddLine('EndFiscalReceipt: OK');
 end;
+
+{ TReceiptTest37 }
+
+function TReceiptTest37.GetDisplayText: WideString;
+begin
+  Result := 'Refund receipt test 37';
+end;
+
+procedure TReceiptTest37.Execute;
+begin
+  Memo.Lines.Clear;
+  Memo.Update;
+  Application.ProcessMessages;
+  // ResetPrinter
+  AddLine('ResetPrinter...');
+  Check(FiscalPrinter.ResetPrinter);
+  AddLine('ResetPrinter: OK');
+
+  AddLine('SetPOSID...');
+  Check(FiscalPrinter.SetPOSID('01', 'Управляющий АЗС TS'));
+  AddLine('SetPOSID: OK');
+
+  AddLine('BeginFiscalReceipt...');
+  FiscalPrinter.FiscalReceiptStation := FPTR_RS_RECEIPT;
+  FiscalPrinter.FiscalReceiptType := FPTR_RT_SALES;
+  Check(FiscalPrinter.BeginFiscalReceipt(False));
+  AddLine('BeginFiscalReceipt: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(30, 72, '4'));
+  AddLine('DirectIO: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(30, 73, '1'));
+  AddLine('DirectIO: OK');
+
+  AddLine('PrintRecItem...');
+  Check(FiscalPrinter.PrintRecItem('Tboil 95+', 100, 920000, 4, 108.7, ''));
+  AddLine('PrintRecItem: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(65, 2108, '41'));
+  Check(FiscalPrinter.DirectIO2(30, 72, '4'));
+  Check(FiscalPrinter.DirectIO2(30, 73, '1'));
+  AddLine('DirectIO: OK');
+
+  AddLine('PrintRecItem...');
+  Check(FiscalPrinter.PrintRecItem('Тосол  5л TATNEFT', 312.5, 1000000, 4, 312.5, ''));
+  AddLine('PrintRecItem: OK');
+
+  AddLine('DirectIO...');
+  Check(FiscalPrinter.DirectIO2(65, 2108, '0'));
+  AddLine('DirectIO: OK');
+
+  AddLine('PrintRecTotal...');
+  Check(FiscalPrinter.PrintRecTotal(412.5, 412.5, '0'));
+  AddLine('PrintRecTotal: OK');
+
+  Check(FiscalPrinter.PrintRecMessage('Транз.:      65773 '));
+  Check(FiscalPrinter.DirectIO2(14, 0, '17;1;7;0'));
+  Check(FiscalPrinter.DirectIO2(40, 1117, 'noreply@chek.pofd.ru'));
+  Check(FiscalPrinter.DirectIO2(30, 302, '1'));
+
+  AddLine('EndFiscalReceipt...');
+  Check(FiscalPrinter.EndFiscalReceipt(False));
+  AddLine('EndFiscalReceipt: OK');
+end;
+
 
 end.

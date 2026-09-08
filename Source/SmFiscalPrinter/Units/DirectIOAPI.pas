@@ -463,6 +463,4 @@ const
 
 implementation
 
-//GetData(41, 11, '')
-
 end.

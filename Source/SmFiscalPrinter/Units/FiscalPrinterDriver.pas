@@ -5277,15 +5277,15 @@ function TFiscalPrinterDriver.FSSale2(P: TFSSale2): Integer;
 const
   E_DRV_NOT_SUPPORTED = -70;
 begin
-  P.Text := PrintItemText(P.Text);
   DoConnect;
+  P.Text := PrintItemText(P.Text);
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := Abs(P.RecType);
   Driver.Quantity := Abs(P.Quantity);
   Driver.Price := IntToAmount(Abs(P.Price));
   Driver.Summ1 := IntToAmount(Abs(P.Total));
+  Driver.TaxValueEnabled := P.TaxAmount <> $FFFFFFFFFF;
   Driver.TaxValue := IntToAmount(Abs(P.TaxAmount));
-  Driver.TaxValueEnabled := True;
   Driver.Tax1 := Abs(P.Tax);
   Driver.Department := P.Department;
   Driver.PaymentTypeSign := P.PaymentType;
@@ -5298,6 +5298,13 @@ begin
     Result := Driver.FNOperation;
   end;
 end;
+
+(*
+[07.09.2026 11:12:10.167] [00007784] [DEBUG] TPrinterProtocol -> 02 29 FF 46 1E 00 00 00 01 C0 09 0E 00 00 00 18 96 10 00 00
+[07.09.2026 11:12:10.167] [00007784] [DEBUG] TPrinterProtocol -> 40 42 0F 00 00 9C FF FF FF FF 02 01 04 01 54 62 6F 69 6C 20
+[07.09.2026 11:12:10.167] [00007784] [DEBUG] TPrinterProtocol -> 39 35 2B 1A
+
+*)
 
 function TFiscalPrinterDriver.FSReadRegTag(var R: TFSReadRegTagCommand): Integer;
 begin

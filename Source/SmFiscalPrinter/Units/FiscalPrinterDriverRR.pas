@@ -5273,17 +5273,15 @@ function TFiscalPrinterDriverRR.FSSale2(P: TFSSale2): Integer;
 const
   E_DRV_NOT_SUPPORTED = -70;
 begin
-  P.Text := PrintItemText(P.Text);
   DoConnect;
+  P.Text := PrintItemText(P.Text);
   SetDriverPassword(GetUsrPassword);
   Driver.CheckType := Abs(P.RecType);
   Driver.Quantity := Abs(P.Quantity);
-  // Pass kopecks as Currency integer part when PointPosition=False
-  Driver.Price := Abs(P.Price);
-  Driver.Summ1 := Abs(P.Total);
-  Driver.Summ1Enabled := True;
-  Driver.TaxValue := Abs(P.TaxAmount);
-  Driver.TaxValueEnabled := True;
+  Driver.Price := IntToAmount(Abs(P.Price));
+  Driver.Summ1 := IntToAmount(Abs(P.Total));
+  Driver.TaxValueEnabled := P.TaxAmount <> $FFFFFFFFFF;
+  Driver.TaxValue := IntToAmount(Abs(P.TaxAmount));
   Driver.Tax1 := Abs(P.Tax);
   Driver.Department := P.Department;
   Driver.PaymentTypeSign := P.PaymentType;
