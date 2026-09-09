@@ -976,6 +976,14 @@ type
     function GetDisplayText: WideString; override;
   end;
 
+  { TReceiptTest38 }
+
+  TReceiptTest38 = class(TDriverTest)
+  public
+    procedure Execute; override;
+    function GetDisplayText: WideString; override;
+  end;
+
 implementation
 
 const
@@ -5563,6 +5571,54 @@ begin
   AddLine('PrintRecTotal: OK');
 
   Check(FiscalPrinter.PrintRecMessage('Транз.:      65773 '));
+  Check(FiscalPrinter.DirectIO2(14, 0, '17;1;7;0'));
+  Check(FiscalPrinter.DirectIO2(40, 1117, 'noreply@chek.pofd.ru'));
+  Check(FiscalPrinter.DirectIO2(30, 302, '1'));
+
+  AddLine('EndFiscalReceipt...');
+  Check(FiscalPrinter.EndFiscalReceipt(False));
+  AddLine('EndFiscalReceipt: OK');
+end;
+
+{ TReceiptTest38 }
+
+function TReceiptTest38.GetDisplayText: WideString;
+begin
+  Result := 'Receipt test 38';
+end;
+
+procedure TReceiptTest38.Execute;
+begin
+  Memo.Lines.Clear;
+  Memo.Update;
+  Application.ProcessMessages;
+  // ResetPrinter
+  AddLine('ResetPrinter...');
+  Check(FiscalPrinter.ResetPrinter);
+  AddLine('ResetPrinter: OK');
+
+  AddLine('SetPOSID...');
+  Check(FiscalPrinter.SetPOSID('01', 'Управляющий АЗС TS'));
+  AddLine('SetPOSID: OK');
+
+  AddLine('BeginFiscalReceipt...');
+  FiscalPrinter.FiscalReceiptStation := FPTR_RS_RECEIPT;
+  FiscalPrinter.FiscalReceiptType := FPTR_RT_SALES;
+  Check(FiscalPrinter.BeginFiscalReceipt(False));
+  AddLine('BeginFiscalReceipt: OK');
+
+  Check(FiscalPrinter.DirectIO2(30, 72, '4'));
+  Check(FiscalPrinter.DirectIO2(30, 73, '33'));
+  Check(FiscalPrinter.DirectIO2(30, 81, '5'));
+  Check(FiscalPrinter.DirectIO2(30, 80, '01046200026887902155;;XD'#$1D'93X/Dc'));
+  Check(FiscalPrinter.PrintRecItem('Сигареты Ява Золотая Современная', 10023, 1000000, 4, 10023, ''));
+  Check(FiscalPrinter.DirectIO2(65, 1262, '030'));
+  Check(FiscalPrinter.DirectIO2(65, 1263, '21.11.2023'));
+  Check(FiscalPrinter.DirectIO2(65, 1264, '1944'));
+  Check(FiscalPrinter.DirectIO2(65, 1265, 'UUID=&Time='));
+  Check(FiscalPrinter.DirectIO2(65, 2108, '0'));
+  Check(FiscalPrinter.PrintRecTotal(10023, 10023, '0'));
+  Check(FiscalPrinter.PrintRecMessage('Транз.:      65809 '));
   Check(FiscalPrinter.DirectIO2(14, 0, '17;1;7;0'));
   Check(FiscalPrinter.DirectIO2(40, 1117, 'noreply@chek.pofd.ru'));
   Check(FiscalPrinter.DirectIO2(30, 302, '1'));

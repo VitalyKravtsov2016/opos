@@ -2443,51 +2443,11 @@ begin
   Result := Driver.RepeatDocument;
 end;
 
-(******************************************************************************
-
-  Open Receipt
-
-  Command:	8DH. Length: 6 bytes.
-  ?	Operator password (4 bytes)
-  ?	Receipt type (1 byte):		0 - Sale;
-  1 - Buy;
-  2 - Sale Refund;
-  3 - Buy Refund.
-  Answer:		8DH. Length: 3 bytes.
-  ?	Result Code (1 byte)
-  ?	Operator index number (1 byte) 1?30
-
-******************************************************************************)
-
 function TFiscalPrinterDriverRR.OpenReceipt(ReceiptType: Byte): Integer;
-const
-  E_DRV_NOT_SUPPORTED = -70; // "устройство не поддерживается драйвером"
-var
-  Answer: AnsiString;
 begin
   DoConnect;
-  SetDriverPassword(GetUsrPassword);
   Driver.CheckType := ReceiptType;
   Result := Driver.OpenCheck;
-  // Some KKTDrv builds report OpenCheck unsupported for FN models;
-  // fall back to classic 8Dh so protocol matches FiscalPrinterDevice.
-  if Result <> 0 then
-    Result := ExecuteData(#$8D + IntToBin(GetUsrPassword, 4) + Chr(ReceiptType), Answer);
-  // Align COM ModelID with device UModel and retry once (avoids -70 from stale ModelID).
-  if Result = E_DRV_NOT_SUPPORTED then
-  begin
-    Driver.ModelID := Driver.UModel;
-    Driver.CheckType := ReceiptType;
-    Result := Driver.OpenCheck;
-    if Result <> 0 then
-      Result := ExecuteData(#$8D + IntToBin(GetUsrPassword, 4) + Chr(ReceiptType), Answer);
-  end;
-  // FN receipts are opened by the first FNOperation; do not fail OpenReceipt on -70.
-  if (Result = E_DRV_NOT_SUPPORTED) and CapFiscalStorage then
-  begin
-    FLogger.Debug('OpenReceipt: -70 ignored, FN document opens on first item');
-    Result := 0;
-  end;
   if Result = 0 then
     FFilter.OpenReceipt(ReceiptType);
 end;
@@ -6063,15 +6023,11 @@ begin
 end;
 
 function TFiscalPrinterDriverRR.ReadLoaderVersion(var Version: WideString): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  Command := #$FE#$EC#$00#$00#$00#$00;
-  Result := ExecuteData(Command, Answer);
+  Result := Driver.ReadLoaderVersion;
   if Result = 0 then
   begin
-    Version := IntTostr(BinToInt(Answer, 1, 4));
+    Version := Driver.LoaderVersion;
   end;
 end;
 
@@ -6773,37 +6729,23 @@ end;
 
 function TFiscalPrinterDriverRR.FSBindItemCode(P: TFSBindItemCode;
   var R: TFSBindItemCodeResult): Integer;
-var
-  Answer: AnsiString;
-  Command: AnsiString;
 begin
-  // Send FF67 directly (same wire format as FiscalPrinterDevice).
-  // FNBindMarkingItem uses DD+short FF67 and breaks TX log parity.
-  P.Code := CorrectGS1(P.Code);
   DoConnect;
-  SetDriverPassword(FUsrPassword);
-  Command := #$FF#$67 + IntToBin(FUsrPassword, 4) + Chr(Length(P.Code)) + P.Code;
-  if P.IsAccounted then
-    Command := Command + #$FF;
-  Result := ExecuteData(Command, Answer);
+  Driver.BarCode := CorrectGS1(P.Code);
+  Driver.MCOSUSign := P.IsAccounted;
+  Result := Driver.FNSendItemBarcode;
   if Result = 0 then
   begin
-    CheckMinLength(Answer, 3);
-    R.ItemCode := BinToInt(Answer, 1, 2);
-    R.CodeType := BinToInt(Answer, 3, 1);
-    if Length(Answer) >= 7 then
-    begin
-      R.CheckResult.LocalCheckResult := Ord(Answer[4]);
-      R.CheckResult.LocalCheckError := Ord(Answer[5]);
-      R.CheckResult.SymbolicType := Ord(Answer[6]);
-      R.CheckResult.DataLength := Ord(Answer[7]);
-      if R.CheckResult.DataLength > 1 then
-      begin
-        R.CheckResult.FSResultCode := Ord(Answer[8]);
-        R.CheckResult.ServerCheckStatus := Ord(Answer[9]);
-        R.CheckResult.ServerTLVData := Copy(Answer, 10, Length(Answer));
-      end;
-    end;
+    R.ItemCode := Driver.MarkingType;
+    R.CodeType := Driver.MarkingTypeEx;
+
+    R.CheckResult.LocalCheckResult := Driver.CheckItemLocalResult;
+    R.CheckResult.LocalCheckError := Driver.CheckItemLocalError;
+    R.CheckResult.SymbolicType := Driver.MarkingType2;
+    R.CheckResult.DataLength := 0;
+    R.CheckResult.FSResultCode := Driver.KMServerErrorCode;
+    R.CheckResult.ServerCheckStatus := Driver.KMServerCheckingStatus;
+    R.CheckResult.ServerTLVData := Driver.TLVData;
   end;
 end;
 
