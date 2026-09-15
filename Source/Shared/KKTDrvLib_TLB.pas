@@ -19835,7 +19835,7 @@ type
 // *********************************************************************//
 // OLE Control Proxy class declaration
 // Control Name     : TKKTDrv1C
-// Help String      : Ð”Ñ€Ð°Ð¹Ð²ÐµÑ€ Ð¤Ð  1Ð¡
+// Help String      : Äðàéâåð ÔÐ 1Ñ
 // Default Interface: IDrvFR1C
 // Def. Intf. DISP? : No
 // Event   Interface: 

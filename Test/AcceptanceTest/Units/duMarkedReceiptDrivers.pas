@@ -75,7 +75,7 @@ end;
 function TMarkedReceiptDriversTest.EmulatorKindForDriver(DriverType: Integer): TFrEmulatorKind;
 begin
   case DriverType of
-    DriverTypeShtrihDriver: Result := ekPosCenter; // PosCenter / SHTRIH-M DrvFR â†’ FF7B
+    DriverTypeShtrihDriver: Result := ekPosCenter; // PosCenter / SHTRIH-M DrvFR -> FF7B
     DriverTypeRRElectro:    Result := ekRRElectro;
     DriverTypeTorgBalance:  Result := ekTorgBalance;
   else
@@ -134,7 +134,7 @@ begin
   FContext.Parameters.OpenReceiptEnabled := True;
   FContext.Parameters.CheckItemCodeEnabled := False;
   // Do not force ModelID: PosCenter DrvFR 5.21 returns -70
-  // ("ÑƒÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ¾ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°ĞµÑ‚ÑÑ Ğ´Ñ€Ğ°Ğ¹Ğ²ĞµÑ€Ğ¾Ğ¼") for synthetic ModelID values.
+  // ("óñòğîéñòâî íå ïîääåğæèâàåòñÿ äğàéâåğîì") for synthetic ModelID values.
   // Let the driver take UModel from FC answer.
   FContext.Parameters.ModelID := -1;
   FContext.Logger.Enabled := True;
@@ -188,7 +188,7 @@ begin
     Device.Connect;
     Step := 'UpdateInfo';
     // Avoid UpdateInfo against stub FR (fonts/tables/model probe). CapCloseReceipt3
-    // stays false so all drivers close via FF45 â€” comparable TX logs.
+    // stays false so all drivers close via FF45 — comparable TX logs.
     Device.CapFiscalStorage := True;
 
     Step := 'OpenDay';
@@ -260,7 +260,7 @@ begin
     if Line = '' then
       Continue;
     Code := UpperCase(Copy(Line, 1, 4));
-    // Close opcodes differ by FR model (FF45/FF76/FF7B/FF78) â€” exclude from
+    // Close opcodes differ by FR model (FF45/FF76/FF7B/FF78) — exclude from
     // cross-driver parity; they stay in raw *.tx logs.
     if (Copy(Code, 1, 2) = '8D') or
        (Copy(Code, 1, 2) = '80') or
@@ -323,7 +323,7 @@ begin
           FLogs[i].SaveToFile(GetModulePath + Format('fail_%s.tx', [
             StringReplace(Names[i], ' ', '_', [rfReplaceAll])]));
           // PosCenter/TorgBalance DrvFR without commercial license returns -70
-          // on fiscal ops against the stub FR â€” skip parity for that driver.
+          // on fiscal ops against the stub FR — skip parity for that driver.
           if ((DriverTypes[i] = DriverTypeShtrihDriver) or
               (DriverTypes[i] = DriverTypeTorgBalance)) and
              (Pos('ResultCode=-70', E.Message) > 0) then

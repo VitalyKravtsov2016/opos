@@ -15,12 +15,12 @@ uses
 type
   TFrEmulatorKind = (
     ekShtrih,       // Internal / generic SHTRIH-M
-    ekPosCenter,    // PosCenter DrvKKT ‚Äî close Ex4 = FF7B
-    ekTorgBalance,  // TorgBalance DrvFR5 ‚Äî close Ex4 = FF78
+    ekPosCenter,    // PosCenter DrvKKT ó close Ex4 = FF7B
+    ekTorgBalance,  // TorgBalance DrvFR5 ó close Ex4 = FF78
     ekRRElectro     // RR-Electro KKTDrv
   );
 
-  { TFiscalPrinterEmulator ‚Äî Protocol 1 base (default = SHTRIH-M profile) }
+  { TFiscalPrinterEmulator ó Protocol 1 base (default = SHTRIH-M profile) }
 
   TFiscalPrinterEmulator = class
   private
@@ -117,7 +117,7 @@ type
     function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
   end;
 
-  { RR-Electro KKTDrv: model 3 = –†–†-01–§ (—Å–º. –ù–æ–º–µ—Ä–∞ –º–æ–¥–µ–ª–µ–π –ö–ö–¢) }
+  { RR-Electro KKTDrv: model 3 = ––-01‘ (ÒÏ. ÕÓÏÂ‡ ÏÓ‰ÂÎÂÈ   “) }
 
   TRRElectroFrEmulator = class(TFiscalPrinterEmulator)
   protected
@@ -220,8 +220,8 @@ end;
 function TFiscalPrinterEmulator.BuildF7Flags: Int64;
 begin
   // Protocol F7 type=1, bits 57/58 (PosCenter v1.23 / RR A.2.0):
-  // 57 ‚Äî commercial license valid
-  // 58 ‚Äî legislative license valid
+  // 57 ó commercial license valid
+  // 58 ó legislative license valid
   // Also enable common FN capabilities used by DrvFR/KKTDrv.
   Result :=
     (Int64(1) shl 22) or  // CapNonfiscalDoc
@@ -884,13 +884,13 @@ end;
 
 function TPosCenterFrEmulator.GetModelID: Byte;
 begin
-  // ModelID=0 matches PosCenter DrvFR licensed model name (–®–¢–†–ò–•-M-01–§).
+  // ModelID=0 matches PosCenter DrvFR licensed model name (ÿ“–»’-M-01‘).
   Result := 0;
 end;
 
 function TPosCenterFrEmulator.GetDeviceName: AnsiString;
 begin
-  // cp1251: –®–¢–†–ò–•-M-01–§ + padding (as in DrvKKT.log)
+  // cp1251: ÿ“–»’-M-01‘ + padding (as in DrvKKT.log)
   Result := #$D8#$D2#$D0#$C8#$D5'-M-01'#$D4'         ';
 end;
 
@@ -950,14 +950,14 @@ end;
 
 function TRRElectroFrEmulator.GetModelID: Byte;
 begin
-  // –ö–æ–¥ –º–æ–¥–µ–ª–∏ –ö–ö–¢ 0003 = –†–†-01–§
-  // (–ù–æ–º–µ—Ä–∞ –º–æ–¥–µ–ª–µ–π_—Ç–æ–ª—å–∫–æ_–ö–ö–¢_271125.docx)
+  //  Ó‰ ÏÓ‰ÂÎË   “ 0003 = ––-01‘
+  // (ÕÓÏÂ‡ ÏÓ‰ÂÎÂÈ_ÚÓÎ¸ÍÓ_  “_271125.docx)
   Result := 3;
 end;
 
 function TRRElectroFrEmulator.GetDeviceName: AnsiString;
 begin
-  // cp1251: –†–†-01–§ + padding
+  // cp1251: ––-01‘ + padding
   Result := #$D0#$D0'-01'#$D4'              ';
 end;
 

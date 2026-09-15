@@ -288,7 +288,7 @@ end;
 function TFSSalesReceipt.GetLastItem: TFSSaleItem;
 begin
   if FLastItem = nil then
-    raiseException(_('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ'));
+    raiseException(_('Не задан последний элемент чека'));
   Result := FLastItem;
 end;
 
@@ -329,7 +329,7 @@ begin
     ItemAmount := Round2(GetLastItem.Quantity * GetLastItem.Price);
     DiscountAmount := GetLastItem.Discount + Abs(Discount.Amount);
     if DiscountAmount > (ItemAmount + GetLastItem.Charge) then
-      raiseException(_('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ'));
+      raiseException(_('Сумма скидки больше суммы позиции'));
 
     GetLastItem.Discount := GetLastItem.Discount + Abs(Discount.Amount);
   end else
@@ -902,19 +902,19 @@ begin
 end;
 
 (*
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ. 1.
-пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ. 2.
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ. 1.
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ. 2, пїЅпїЅпїЅ:
-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-пїЅ700599######0040пїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅ7005пїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-пїЅ99пїЅ - 7-пїЅ пїЅ 8-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ3% Loyalty 000302992000000040пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅ. пїЅпїЅпїЅ.1);
-пїЅ######пїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
-пїЅ0040пїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ3% Loyalty 000302992000000040пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅ. пїЅпїЅпїЅ.1).
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅГ» пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 95.00+37.90+49.90+199.82=382.62);
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: 2.85+1.14+1.50+5.98=11.47).
+Вид оригинального чека представлен на рис. 1.
+Вид модифицированного чека представлен на рис. 2.
+Требуется:
+убрать информацию по разбивке скидки на каждую позиции в чеке, см. выделенные строки желтым на рис. 1.
+Добавить строку с номером карты, см. выделенное желтым на рис. 2, где:
+«КАРТА КОМАНДА» - текст-константа;
+«700599######0040» - номер карты, в котором
+«7005» - префикс-константа;
+«99» - 7-й и 8-й символы из номера карты в строке «3% Loyalty 000302992000000040» оригинального чека (см. рис.1);
+«######» - символы маскирования;
+«0040» - последние 4 символа из номера карты в строке «3% Loyalty 000302992000000040» оригинального чека (см. рис.1).
+Изменить сумму в строке «ПОДИТОГ» на сумму чека в рублях без учета скидки (в примере: 95.00+37.90+49.90+199.82=382.62);
+Указать информацию по общей скидке на чек в рублях (в примере: 2.85+1.14+1.50+5.98=11.47).
 
 *)
 
@@ -999,6 +999,7 @@ var
   Operation: TPriceReg;
   FSRegistration: TFSSale;
   ReceiptItem: TReceiptItem;
+  PaymentItem: Integer;
 begin
   FillChar(FSSale2, Sizeof(FSSale2), 0);
   if Item.PreLine <> '' then
@@ -1022,6 +1023,13 @@ begin
 
   if Device.CapFiscalStorage then
   begin
+    if Parameters.WebKassaEnabled then
+    begin
+      PaymentItem := StrToInt64Def(FSRegistration.Parameter4, PaymentItemNormal);
+      Printer.PrintTextLine(Format('PT:[%d]', [PaymentItem]));
+    end;
+
+
     for i := 0 to Item.Barcodes.Count-1 do
     begin
       Device.Check(Device.CheckItemCode(Item.Barcodes[i]));
@@ -1104,7 +1112,7 @@ var
 begin
   if Item.Quantity < 0 then
   begin
-    Printer.Printer.PrintLines('пїЅпїЅпїЅпїЅпїЅпїЅ', '');
+    Printer.Printer.PrintLines('СТОРНО', '');
     Item.Quantity := Abs(Item.Quantity);
   end;
 
@@ -1174,7 +1182,7 @@ begin
       CustomerPhone := '+7';
       if ShowPhoneDlg(CustomerPhone) then
       begin
-        AddRecMessage('пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: ' + CustomerPhone, PRINTER_STATION_REC, 1);
+        AddRecMessage('Номер телефона: ' + CustomerPhone, PRINTER_STATION_REC, 1);
         Device.WriteCustomerAddress(CustomerPhone);
       end;
     end;
@@ -1183,7 +1191,7 @@ begin
       CustomerEMail := '';
       if ShowEMailDlg(CustomerEMail) then
       begin
-        AddRecMessage('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: ' + CustomerEMail, PRINTER_STATION_REC, 1);
+        AddRecMessage('Электронная почта: ' + CustomerEMail, PRINTER_STATION_REC, 1);
         Device.WriteCustomerAddress(CustomerEMail);
       end;
     end;
@@ -1270,8 +1278,8 @@ begin
         CloseParams2.TaxAmount[8] := StrToInt64Def(Parameters.Parameter9, 0);
         CloseParams2.TaxAmount[9] := StrToInt64Def(Parameters.Parameter10, 0);
         CloseParams2.TaxAmount[10] := StrToInt64Def(Parameters.Parameter11, 0);
-        CloseParams2.TaxAmount[11] := StrToInt64Def(Parameters.Parameter12, 0); // РќР”РЎ 22%
-        CloseParams2.TaxAmount[12] := StrToInt64Def(Parameters.Parameter13, 0); // РќР”РЎ 22/122
+        CloseParams2.TaxAmount[11] := StrToInt64Def(Parameters.Parameter12, 0); // НДС 22%
+        CloseParams2.TaxAmount[12] := StrToInt64Def(Parameters.Parameter13, 0); // НДС 22/122
         CloseParams2.TaxSystem := StrToInt64Def(Parameters.Parameter7, 0);
         CloseParams2.Text := Parameters.CloseRecText;
         Device.Check(Device.ReceiptClose2(CloseParams2, FCloseResult2));
@@ -1700,7 +1708,7 @@ var
   Item: TTLVOperationReceiptItem;
 begin
   if FLastItem = nil then
-    raiseException(_('пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ'));
+    raiseException(_('Не задан последний элемент чека'));
 
   Item := TTLVOperationReceiptItem.Create(FLastItem.Tags);
   Item.Data := TLVData;
