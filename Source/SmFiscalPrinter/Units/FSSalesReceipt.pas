@@ -993,6 +993,23 @@ begin
 end;
 
 procedure TFSSalesReceipt.PrintFSSale(Item: TFSSaleItem);
+
+  // PT:[0] Ч товар
+  // PT:[1] Ч работа
+  // PT:[2] Ч услуга
+
+  function PaymentItemToPaymentType(Value: Integer): Integer;
+  begin
+    case Value of
+      PaymentItemNormal,
+      PaymentItemExcise: Result := PositionTypeGoods;
+      PaymentItemJob: Result := PositionTypeWork;
+      PaymentItemService: Result := PositionTypeService;
+    else
+      Result := PositionTypeGoods;
+    end;
+  end;
+
 var
   i: Integer;
   FSSale2: TFSSale2;
@@ -1000,6 +1017,7 @@ var
   FSRegistration: TFSSale;
   ReceiptItem: TReceiptItem;
   PaymentItem: Integer;
+  PositionType: Integer;
 begin
   FillChar(FSSale2, Sizeof(FSSale2), 0);
   if Item.PreLine <> '' then
@@ -1025,8 +1043,15 @@ begin
   begin
     if Parameters.WebKassaEnabled then
     begin
-      PaymentItem := StrToInt64Def(FSRegistration.Parameter4, PaymentItemNormal);
-      Printer.PrintTextLine(Format('PT:[%d]', [PaymentItem]));
+      if FSRegistration.Parameter4 <> '' then
+      begin
+        PaymentItem := StrToInt64Def(FSRegistration.Parameter4, PaymentItemNormal);
+        PositionType := PaymentItemToPaymentType(PaymentItem);
+      end else
+      begin
+        PositionType := Parameters.PositionType;
+      end;
+      Printer.PrintTextLine(Format('PT:[%d]', [PositionType]));
     end;
 
 

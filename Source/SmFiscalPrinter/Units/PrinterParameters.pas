@@ -13,6 +13,14 @@ uses
 
 const
   /////////////////////////////////////////////////////////////////////////////
+  // PositionType constants
+
+  PositionTypeGoods   = 0; // товар
+  PositionTypeWork    = 1; // работа
+  PositionTypeService = 2; // услуга
+  DefPositionType = PositionTypeGoods;
+
+  /////////////////////////////////////////////////////////////////////////////
   // DriverType constants
 
   DriverTypeInternal      = 0;
@@ -587,6 +595,7 @@ type
     UsePrintHeaderParameter: Boolean;
     WebKassaEnabled: Boolean;
     DriverType: Integer;
+    PositionType: Integer;
   public
     constructor Create(ALogger: ILogFile);
     destructor Destroy; override;
@@ -939,6 +948,7 @@ begin
   SingleQuantityOnZeroUnitPrice := True;
   UsePrintHeaderParameter := DefUsePrintHeaderParameter;
   WebKassaEnabled := DefWebKassaEnabled;
+  PositionType := DefPositionType;
 end;
 
 procedure TPrinterParameters.LogText(const Caption, Text: WideString);
@@ -1087,6 +1097,8 @@ begin
   Logger.Debug('ValidTimeDiffInSecs: ' + IntToStr(ValidTimeDiffInSecs));
   Logger.Debug('UsePrintHeaderParameter: ' + BoolToStr(UsePrintHeaderParameter));
   Logger.Debug('WebKassaEnabled: ' + BoolToStr(WebKassaEnabled));
+  Logger.Debug('PositionType: ' + IntToStr(PositionType));
+
 
   // PayTypes
   for i := 0 to PayTypes.Count-1 do

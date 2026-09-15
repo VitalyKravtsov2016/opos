@@ -18,6 +18,8 @@ type
 
   TfmWebKassa = class(TFptrPage)
     chbWebKassaEnabled: TTntCheckBox;
+    lblPositionType: TLabel;
+    cbPositionType: TTntComboBox;
     procedure PageChange(Sender: TObject);
   public
     procedure UpdatePage; override;
@@ -36,11 +38,13 @@ end;
 procedure TfmWebKassa.UpdatePage;
 begin
   chbWebKassaEnabled.Checked := Parameters.WebKassaEnabled;
+  cbPositionType.ItemIndex := Parameters.PositionType;
 end;
 
 procedure TfmWebKassa.UpdateObject;
 begin
   Parameters.WebKassaEnabled := chbWebKassaEnabled.Checked;
+  Parameters.PositionType := cbPositionType.ItemIndex;
 end;
 
 end.

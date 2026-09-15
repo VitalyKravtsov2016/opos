@@ -565,6 +565,9 @@ begin
       if Reg.ValueExists('WebKassaEnabled') then
         FParameters.WebKassaEnabled := Reg.ReadBool('WebKassaEnabled');
 
+      if Reg.ValueExists('PositionType') then
+        FParameters.PositionType := Reg.ReadInteger('PositionType');
+
       Reg.CloseKey;
     end;
     // VatCodes
@@ -742,6 +745,7 @@ begin
     Reg.WriteInteger('ValidTimeDiffInSecs', FParameters.ValidTimeDiffInSecs);
     Reg.WriteBool('UsePrintHeaderParameter', FParameters.UsePrintHeaderParameter);
     Reg.WriteBool('WebKassaEnabled', FParameters.WebKassaEnabled);
+    Reg.WriteInteger('PositionType', FParameters.PositionType);
     Reg.CloseKey;
 
     // VatCodes

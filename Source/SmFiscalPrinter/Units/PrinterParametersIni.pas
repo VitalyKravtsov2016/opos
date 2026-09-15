@@ -347,6 +347,7 @@ begin
       FParameters.ValidTimeDiffInSecs := IniFile.ReadInteger(Section, 'ValidTimeDiffInSecs', DefValidTimeDiffInSecs);
       FParameters.UsePrintHeaderParameter := IniFile.ReadBool(Section, 'UsePrintHeaderParameter', DefUsePrintHeaderParameter);
       FParameters.WebKassaEnabled := IniFile.ReadBool(Section, 'WebKassaEnabled', DefWebKassaEnabled);
+      FParameters.PositionType := IniFile.ReadInteger(Section, 'PositionType', DefPositionType);
     end;
     // VatCodes
     Section := GetSectionName(DeviceName) + '_VatCodes';
@@ -518,6 +519,7 @@ begin
     IniFile.WriteInteger(Section, 'ValidTimeDiffInSecs', FParameters.ValidTimeDiffInSecs);
     IniFile.WriteBool(Section, 'UsePrintHeaderParameter', FParameters.UsePrintHeaderParameter);
     IniFile.WriteBool(Section, 'WebKassaEnabled', FParameters.WebKassaEnabled);
+    IniFile.WriteInteger(Section, 'PositionType', FParameters.PositionType);
 
     // PayTypes
     Section := GetSectionName(DeviceName) + '_PaymentTypes';
