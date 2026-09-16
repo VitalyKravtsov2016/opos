@@ -252,7 +252,6 @@ begin
   OpenReceipt(RecTypeSale);
 
   PrintPreLine;
-  PrintPositionType;
 
   Operation.Quantity := Quantity;
   if UnitPrice = 0 then
@@ -285,6 +284,7 @@ begin
   FItems.Add(Operation);
   FLastItemSumm := Round2(Operation.Price*Operation.Quantity/1000);
   SendItemBarcode;
+  PrintPositionType;
   PrintPostLine;
 end;
 

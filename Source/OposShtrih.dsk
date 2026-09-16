@@ -8,12 +8,12 @@ File_5=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\Printe
 File_6=SourceModule,'D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\PrinterParametersRegIBT.pas',0,1,731,23,736,0,0
 
 [Modules]
-Module0=D:\Projects\Shtrih\opos\Test\AcceptanceTest\Units\duFiscalPrinter.pas
-Module1=D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas
-Module2=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SalesReceipt.pas
-Module3=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas
-Module4=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas
-Module5=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas
+Module0=D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas
+Module1=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas
+Module2=D:\Projects\Shtrih\opos\Test\AcceptanceTest\Units\duFiscalPrinter.pas
+Module3=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SalesReceipt.pas
+Module4=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas
+Module5=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas
 Module6=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\oleFiscalPrinter.pas
 Module7=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\DirectIOAPI.pas
 Module8=D:\Projects\Shtrih\opos\Source\Shared\DIOHandlers.pas
@@ -21,17 +21,7 @@ Count=9
 EditWindowCount=1
 TypeLibWindowCount=3
 
-[D:\Projects\Shtrih\opos\Test\AcceptanceTest\Units\duFiscalPrinter.pas]
-ModuleType=SourceModule
-FormState=0
-FormOnTop=0
-
 [D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas]
-ModuleType=SourceModule
-FormState=0
-FormOnTop=0
-
-[D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SalesReceipt.pas]
 ModuleType=SourceModule
 FormState=0
 FormOnTop=0
@@ -41,12 +31,22 @@ ModuleType=SourceModule
 FormState=0
 FormOnTop=0
 
-[D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas]
+[D:\Projects\Shtrih\opos\Test\AcceptanceTest\Units\duFiscalPrinter.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SalesReceipt.pas]
 ModuleType=SourceModule
 FormState=0
 FormOnTop=0
 
 [D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas]
 ModuleType=SourceModule
 FormState=0
 FormOnTop=0
@@ -144,7 +144,7 @@ FormOnTop=0
 
 [EditWindow0]
 ViewCount=9
-CurrentView=7
+CurrentView=5
 View0=0
 View1=1
 View2=2
@@ -179,23 +179,23 @@ BottomPanelData=00000400000000008007000000000000024D0000000000000001000000000000
 
 [View0]
 Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FiscalPrinterImpl.pas
-CursorX=56
-CursorY=2088
-TopLine=2082
+CursorX=1
+CursorY=2507
+TopLine=2491
 LeftCol=1
 
 [View1]
-Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas
-CursorX=1
-CursorY=519
-TopLine=507
+Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas
+CursorX=34
+CursorY=19
+TopLine=1
 LeftCol=1
 
 [View2]
-Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\FSSalesReceipt.pas
+Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\CustomReceipt.pas
 CursorX=1
-CursorY=1001
-TopLine=985
+CursorY=38
+TopLine=85
 LeftCol=1
 
 [View3]
@@ -214,21 +214,21 @@ LeftCol=1
 
 [View5]
 Module=D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas
-CursorX=14
-CursorY=2227
-TopLine=2211
+CursorX=102
+CursorY=2270
+TopLine=2248
 LeftCol=1
 
 [View6]
 Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\oleFiscalPrinter.pas
 CursorX=1
-CursorY=371
-TopLine=357
+CursorY=1209
+TopLine=1193
 LeftCol=1
 
 [View7]
 Module=D:\Projects\Shtrih\opos\Test\AcceptanceTest\Units\duFiscalPrinter.pas
-CursorX=38
+CursorX=50
 CursorY=23
 TopLine=1
 LeftCol=1
@@ -236,8 +236,8 @@ LeftCol=1
 [View8]
 Module=D:\Projects\Shtrih\opos\Source\SmFiscalPrinter\Units\SalesReceipt.pas
 CursorX=1
-CursorY=228
-TopLine=222
+CursorY=126
+TopLine=110
 LeftCol=1
 
 [TypeLibEditWindow0]
@@ -304,8 +304,7 @@ LRDockWidth=320
 Dockable=1
 
 [Breakpoints]
-Count=1
-Breakpoint0='D:\Projects\Shtrih\opos\Test\SmFiscalPrinterTest\Units\duFiscalPrinter.pas',2227,'',0,1,'',1,0,0,'',1,'','',''
+Count=0
 
 [AddressBreakpoints]
 Count=0
@@ -318,8 +317,8 @@ Left=571
 Top=27
 Width=1349
 Height=123
-MaxLeft=-1
-MaxTop=-1
+MaxLeft=-8
+MaxTop=-8
 MaxWidth=1936
 MaxHeight=123
 ClientWidth=1920
@@ -612,7 +611,7 @@ DockHostCount=1
 [DockSite0]
 DockSiteType=0
 Create=1
-Visible=0
+Visible=1
 State=0
 Left=907
 Top=165
