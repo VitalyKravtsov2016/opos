@@ -36,6 +36,7 @@ type
     function GetIsCashPayment: Boolean;
     procedure SendItemBarcode;
     function GetOperationText(const Text: WideString): WideString;
+    procedure PrintPositionType;
   public
     GTIN: WideString;   // GTIN
     NTIN: WideString;   // NTIN
@@ -122,6 +123,7 @@ implementation
 constructor TSalesReceipt.CreateReceipt(AContext: TReceiptContext; ARecType: Integer);
 begin
   inherited Create(AContext);
+  FOpened := True;
   FRecType := ARecType;
   FItems := TRecItems.Create;
   FDiscounts := TRecDiscounts.Create;
@@ -203,6 +205,41 @@ begin
   end;
 end;
 
+  // PT:[0] Ч товар
+  // PT:[1] Ч работа
+  // PT:[2] Ч услуга
+
+  function PaymentItemToPaymentType(Value: Integer): Integer;
+  begin
+    case Value of
+      PaymentItemNormal,
+      PaymentItemExcise: Result := PositionTypeGoods;
+      PaymentItemJob: Result := PositionTypeWork;
+      PaymentItemService: Result := PositionTypeService;
+    else
+      Result := PositionTypeGoods;
+    end;
+  end;
+
+procedure TSalesReceipt.PrintPositionType;
+var
+  PaymentItem: Integer;
+  PositionType: Integer;
+begin
+  if Parameters.WebKassaEnabled then
+  begin
+    if Parameters.Parameter4 <> '' then
+    begin
+      PaymentItem := StrToInt64Def(Parameters.Parameter4, PaymentItemNormal);
+      PositionType := PaymentItemToPaymentType(PaymentItem);
+    end else
+    begin
+      PositionType := Parameters.PositionType;
+    end;
+    Device.PrintText(PRINTER_STATION_REC, Format('PT:[%d]', [PositionType]));
+  end;
+end;
+
 procedure TSalesReceipt.PrintRecItem(const Description: WideString; Price: Currency;
   Quantity: Integer; VatInfo: Integer; UnitPrice: Currency;
   const UnitName: WideString);
@@ -215,6 +252,7 @@ begin
   OpenReceipt(RecTypeSale);
 
   PrintPreLine;
+  PrintPositionType;
 
   Operation.Quantity := Quantity;
   if UnitPrice = 0 then
@@ -588,11 +626,8 @@ begin
   begin
     if Device.CapFiscalStorage then
     begin
-      if not Device.IsRecOpened then
-      begin
-        FRecType := ARecType;
-        Printer.OpenReceipt(ARecType);
-      end;
+      FRecType := ARecType;
+      Printer.OpenReceipt(ARecType);
     end;
     FOpened := True;
   end;
@@ -600,8 +635,6 @@ end;
 
 procedure TSalesReceipt.BeginFiscalReceipt(PrintHeader: Boolean);
 begin
-  FOpened := False;
-  FIsVoided := False;
   inherited BeginFiscalReceipt(PrintHeader);
 end;
 

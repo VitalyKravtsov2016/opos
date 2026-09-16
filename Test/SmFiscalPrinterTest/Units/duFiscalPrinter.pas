@@ -43,9 +43,10 @@ type
 
     procedure CheckCapJrnEmptySensor; // !!
     procedure CheckFiscalReceipt1;
-    procedure CheckRefundReceipt;
     procedure CheckRefundReceipt2;
   published
+    procedure CheckSalesReceipt;
+    procedure CheckRefundReceipt;
     procedure OpenDevice;
     // common properties
     procedure CheckCapCompareFirmwareVersion;
@@ -2164,34 +2165,70 @@ begin
 end;
 
 procedure TFiscalPrinterTest.CheckRefundReceipt;
-const
-  Line0 = 'NUM:[DriverParameterReceiptNumber2]';
-  Line1 = 'RNM:[DriverParameterRegistrationNumber2]';
-  Line2 = 'DATETIME:[DriverParameterReceiptDateTime2]';
-  Line3 = 'TOTAL:[DriverParameterReceiptTotal2]';
-  Line4 = 'ISOFF:[DriverParameterReceiptIsOffline2]';
-  Line5 = 'CutPaper(1)';
 begin
   Parameters.WebKassaEnabled := True;
   Parameters.ModelId := MODEL_ID_WEB_CASSA;
-
   OpenClaimEnable;
-  (*
-  Таблица 2:
-  20 строка - фискальный признак (ФП)
-  21 строка - дата и время фискализации
-  22 строка - РНК
-  23 строка - ЗНК
-  24 строка - признак автономности чека
-  25 строка - общая сумма
-  *)
-
   // check sales parameters
   CheckEquals('', GetParameter(DriverParameterReceiptNumber));
   CheckEquals('', GetParameter(DriverParameterReceiptDateTime));
   CheckEquals('', GetParameter(DriverParameterRegistrationNumber));
   CheckEquals('', GetParameter(DriverParameterReceiptTotal));
   CheckEquals('', GetParameter(DriverParameterReceiptIsOffline));
+
+  SetParameter(DriverParameterReceiptNumber, 'DriverParameterReceiptNumber');
+  SetParameter(DriverParameterReceiptDateTime, 'DriverParameterReceiptDateTime');
+
+  Device.TableValues[2,20,2] := 'DriverParameterReceiptNumber';
+  Device.TableValues[2,21,2] := 'DriverParameterReceiptDateTime';
+  Device.TableValues[2,22,2] := 'DriverParameterRegistrationNumber';
+  Device.TableValues[2,25,2] := 'DriverParameterReceiptTotal';
+  Device.TableValues[2,24,2] := 'DriverParameterReceiptIsOffline';
+
+  CheckEquals('DriverParameterReceiptNumber', Device.ReadTableStr(2,20,2));
+  CheckEquals('DriverParameterReceiptDateTime', Device.ReadTableStr(2,21,2));
+  CheckEquals('DriverParameterRegistrationNumber', Device.ReadTableStr(2,22,2));
+  CheckEquals('DriverParameterReceiptTotal', Device.ReadTableStr(2,25,2));
+  CheckEquals('DriverParameterReceiptIsOffline', Device.ReadTableStr(2,24,2));
+  // sales receipt
+  Driver.SetPropertyNumber(PIDXFptr_FiscalReceiptType, FPTR_RT_REFUND);
+  CheckResult(Driver.BeginFiscalReceipt(False));
+  SetParameter(DriverParameterParam4, '1');
+  CheckResult(Driver.PrintRecItem('Receipt item 1', 100, 1, 1, 0, ''));
+  CheckResult(Driver.PrintRecTotal(100, 100, '0'));
+  CheckResult(Driver.EndFiscalReceipt(False));
+  // check sales parameters
+  CheckEquals('DriverParameterRegistrationNumber', GetParameter(DriverParameterRegistrationNumber));
+  CheckEquals('DriverParameterReceiptTotal', GetParameter(DriverParameterReceiptTotal));
+  CheckEquals('DriverParameterReceiptIsOffline', GetParameter(DriverParameterReceiptIsOffline));
+  CheckEquals('DriverParameterReceiptNumber', GetParameter(DriverParameterReceiptNumber));
+  CheckEquals('DriverParameterReceiptDateTime', GetParameter(DriverParameterReceiptDateTime));
+  //
+  Driver.Close;
+
+  CheckEquals(6, Device.RecStation.Count, 'Device.RecStation.Count');
+  CheckEquals('PT:[0]', Device.RecStation[0], 'Device.RecStation[0]');
+  CheckEquals('NUM:[DriverParameterReceiptNumber]', Device.RecStation[1], 'Device.RecStation[1]');
+  CheckEquals('DATETIME:[DriverParameterReceiptDateTime]', Device.RecStation[2], 'Device.RecStation[2]');
+  CheckEquals('', Device.RecStation[3], 'Device.RecStation[3]');
+  CheckEquals('ИТОГ', Device.RecStation[4], 'Device.RecStation[4]');
+  CheckEquals('CutPaper(1)', Device.RecStation[5], 'Device.RecStation[5]');
+end;
+
+procedure TFiscalPrinterTest.CheckSalesReceipt;
+begin
+  Parameters.WebKassaEnabled := True;
+  Parameters.ModelId := MODEL_ID_WEB_CASSA;
+  OpenClaimEnable;
+  // check sales parameters
+  CheckEquals('', GetParameter(DriverParameterReceiptNumber));
+  CheckEquals('', GetParameter(DriverParameterReceiptDateTime));
+  CheckEquals('', GetParameter(DriverParameterRegistrationNumber));
+  CheckEquals('', GetParameter(DriverParameterReceiptTotal));
+  CheckEquals('', GetParameter(DriverParameterReceiptIsOffline));
+
+  SetParameter(DriverParameterReceiptNumber, 'DriverParameterReceiptNumber');
+  SetParameter(DriverParameterReceiptDateTime, 'DriverParameterReceiptDateTime');
 
   Device.TableValues[2,20,2] := 'DriverParameterReceiptNumber';
   Device.TableValues[2,21,2] := 'DriverParameterReceiptDateTime';
@@ -2207,44 +2244,26 @@ begin
   // sales receipt
   Driver.SetPropertyNumber(PIDXFptr_FiscalReceiptType, FPTR_RT_SALES);
   CheckResult(Driver.BeginFiscalReceipt(False));
+  SetParameter(DriverParameterParam4, '1');
   CheckResult(Driver.PrintRecItem('Receipt item 1', 100, 1, 1, 0, ''));
   CheckResult(Driver.PrintRecTotal(100, 100, '0'));
   CheckResult(Driver.EndFiscalReceipt(False));
   // check sales parameters
-  CheckEquals('DriverParameterReceiptNumber', GetParameter(DriverParameterReceiptNumber));
-  CheckEquals('DriverParameterReceiptDateTime', GetParameter(DriverParameterReceiptDateTime));
   CheckEquals('DriverParameterRegistrationNumber', GetParameter(DriverParameterRegistrationNumber));
   CheckEquals('DriverParameterReceiptTotal', GetParameter(DriverParameterReceiptTotal));
   CheckEquals('DriverParameterReceiptIsOffline', GetParameter(DriverParameterReceiptIsOffline));
-  // set refund parameters
-  SetParameter(DriverParameterReceiptNumber, 'DriverParameterReceiptNumber2');
-  SetParameter(DriverParameterReceiptDateTime, 'DriverParameterReceiptDateTime2');
-  SetParameter(DriverParameterRegistrationNumber, 'DriverParameterRegistrationNumber2');
-  SetParameter(DriverParameterReceiptTotal, 'DriverParameterReceiptTotal2');
-  SetParameter(DriverParameterReceiptIsOffline, 'DriverParameterReceiptIsOffline2');
-  // check refund parameters
-  CheckEquals('DriverParameterReceiptNumber2', GetParameter(DriverParameterReceiptNumber));
-  CheckEquals('DriverParameterReceiptDateTime2', GetParameter(DriverParameterReceiptDateTime));
-  CheckEquals('DriverParameterRegistrationNumber2', GetParameter(DriverParameterRegistrationNumber));
-  CheckEquals('DriverParameterReceiptTotal2', GetParameter(DriverParameterReceiptTotal));
-  CheckEquals('DriverParameterReceiptIsOffline2', GetParameter(DriverParameterReceiptIsOffline));
-  // receipt
-  Device.RecStation.Clear;
-  Driver.SetPropertyNumber(PIDXFptr_FiscalReceiptType, FPTR_RT_REFUND);
-  CheckResult(Driver.BeginFiscalReceipt(False));
-  CheckResult(Driver.PrintRecItem('Receipt item 1', 100, 1, 1, 0, ''));
-  CheckResult(Driver.PrintRecTotal(100, 100, '0'));
-  CheckResult(Driver.EndFiscalReceipt(False));
+  CheckEquals('DriverParameterReceiptNumber', GetParameter(DriverParameterReceiptNumber));
+  CheckEquals('DriverParameterReceiptDateTime', GetParameter(DriverParameterReceiptDateTime));
   //
   Driver.Close;
 
   CheckEquals(6, Device.RecStation.Count, 'Device.RecStation.Count');
-  CheckEquals(Line0, Device.RecStation[0], 'Device.RecStation[0]');
-  CheckEquals(Line1, Device.RecStation[1], 'Device.RecStation[1]');
-  CheckEquals(Line2, Device.RecStation[2], 'Device.RecStation[2]');
-  CheckEquals(Line3, Device.RecStation[3], 'Device.RecStation[3]');
-  CheckEquals(Line4, Device.RecStation[4], 'Device.RecStation[4]');
-  CheckEquals(Line5, Device.RecStation[5], 'Device.RecStation[5]');
+  CheckEquals('PT:[0]', Device.RecStation[0], 'Device.RecStation[0]');
+  CheckEquals('1 Receipt item 1 :G[] :N[] 100.00 X 1.000 = 100.00', Device.RecStation[1], 'Device.RecStation[1]');
+  CheckEquals('1  0.00 X 0.000 = 0.00', Device.RecStation[2], 'Device.RecStation[2]');
+  CheckEquals('', Device.RecStation[3], 'Device.RecStation[3]');
+  CheckEquals('ИТОГ', Device.RecStation[4], 'Device.RecStation[4]');
+  CheckEquals('CutPaper(1)', Device.RecStation[5], 'Device.RecStation[5]');
 end;
 
 procedure TFiscalPrinterTest.CheckRefundReceipt2;
