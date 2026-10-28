@@ -27,6 +27,7 @@ unit KKTDrvLib_TLB;
 {$WARN SYMBOL_PLATFORM OFF}
 {$WRITEABLECONST ON}
 {$VARPROPSETTER ON}
+{$WARN HIDING_MEMBER OFF}
 interface
 
 uses Windows, ActiveX, Classes, Graphics, OleCtrls, StdVCL, Variants;

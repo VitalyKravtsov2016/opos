@@ -1098,7 +1098,7 @@ begin
   Logger.Debug('UsePrintHeaderParameter: ' + BoolToStr(UsePrintHeaderParameter));
   Logger.Debug('WebKassaEnabled: ' + BoolToStr(WebKassaEnabled));
   Logger.Debug('PositionType: ' + IntToStr(PositionType));
-
+  Logger.Debug('DriverType: ' + IntToStr(DriverType));
 
   // PayTypes
   for i := 0 to PayTypes.Count-1 do

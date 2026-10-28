@@ -5444,22 +5444,12 @@ end;
 function TFiscalPrinterDriverTB.FSStartWrite(DataSize: Word;
   var BlockSize: Byte): Integer;
 begin
-(*
-  Driver.DataLength := DataSize;
-  Result := Driver.FSStartWrite;
-  if Result = 0 then
-    BlockSize := Driver.DataBlockSize;
-*)
+  Result := 0;
 end;
 
 function TFiscalPrinterDriverTB.FSWriteBlock(const Block: TFSBlock): Integer;
 begin
-(*
-  Driver.DataBlockNumber := Block.Offset;
-  Driver.DataLength := Length(Block.Data);
-  Driver.DataBlock := Block.Data;
-  Result := Driver.FNWriteBufferDataBlock;
-*)
+  Result := 0;
 end;
 
 function TFiscalPrinterDriverTB.FSReadBlockData: AnsiString;
