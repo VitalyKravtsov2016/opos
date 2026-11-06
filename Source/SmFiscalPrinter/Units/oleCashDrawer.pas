@@ -351,6 +351,11 @@ begin
       Connect;
     end else
     begin
+      if FConnected then
+      begin
+        Printer.Disconnect;
+        FConnected := False;
+      end;
       OposDevice.PowerState := OPOS_PS_UNKNOWN;
     end;
     FDeviceEnabled := Value;

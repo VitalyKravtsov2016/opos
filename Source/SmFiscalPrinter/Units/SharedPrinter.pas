@@ -649,10 +649,12 @@ procedure TSharedPrinter.Disconnect;
 begin
   Lock;
   try
-    Device.Disconnect;
-    Dec(FConnectCount);
+    if FConnectCount > 0 then
+      Dec(FConnectCount);
+
     if FConnected and (FConnectCount = 0) then
     begin
+      Device.Disconnect;
       FConnected := False;
     end;
   finally

@@ -36,6 +36,8 @@ type
   public
     FCapFiscalStorage: Boolean;
     FSCloseReceiptResult2: TFSCloseReceiptResult2;
+    ConnectCount: Integer;
+    DisconnectCount: Integer;
 
     constructor Create;
     destructor Destroy; override;
@@ -1384,12 +1386,12 @@ end;
 
 procedure TMockFiscalPrinterDevice.Connect;
 begin
-
+  Inc(ConnectCount);
 end;
 
 procedure TMockFiscalPrinterDevice.Disconnect;
 begin
-
+  Inc(DisconnectCount);
 end;
 
 procedure TMockFiscalPrinterDevice.PrintTextFont(Station, Font: Integer;

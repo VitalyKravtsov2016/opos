@@ -9,7 +9,7 @@ uses
   TestFramework,
   // This
   SharedPrinter, FiscalPrinterTypes, oleCashDrawer, SmFiscalPrinterLib_TLB,
-  CashDrawerParameters, LogFile, oleFiscalPrinter, FileUtils;
+  CashDrawerParameters, LogFile, oleFiscalPrinter, FileUtils, MockFiscalPrinterDevice;
 
 type
   { TSharedPrinterTest }
@@ -21,6 +21,7 @@ type
     procedure TestFiscalPrinter;
     procedure TestCashDrawer2;
     procedure TestLogger;
+    procedure TestConnectDisconnectRefCount;
   end;
 
 implementation
@@ -139,6 +140,42 @@ begin
   end;
   CheckEquals('Test', ReadFileData(FileName), 'ReadFileData');
   Check(DeleteFile(FileName), 'DeleteFile.1');
+end;
+
+procedure TSharedPrinterTest.TestConnectDisconnectRefCount;
+var
+  Device: TMockFiscalPrinterDevice;
+  Printer: ISharedPrinter;
+begin
+  CheckEquals(0, GetPrintersCount, 'GetPrintersCount <> 0');
+
+  Device := TMockFiscalPrinterDevice.Create;
+  try
+    Printer := GetPrinter('RefCountDevice');
+    Printer.Device := Device;
+
+    // Two clients (fiscal printer + cash drawer) share the same device.
+    Printer.Connect;
+    Printer.Connect;
+    CheckEquals(1, Device.ConnectCount,
+      'Device.Connect must be called once for the first client');
+
+    // Disconnecting the first client must not disconnect the shared device
+    // because the second client is still connected.
+    Printer.Disconnect;
+    CheckEquals(0, Device.DisconnectCount,
+      'Device.Disconnect must not be called while other clients are connected');
+
+    // Disconnecting the last client disconnects the device.
+    Printer.Disconnect;
+    CheckEquals(1, Device.DisconnectCount,
+      'Device.Disconnect must be called once after the last client disconnects');
+  finally
+    Printer := nil;
+    Device.Free;
+  end;
+
+  CheckEquals(0, GetPrintersCount, 'GetPrintersCount <> 0 after release');
 end;
 
 initialization
