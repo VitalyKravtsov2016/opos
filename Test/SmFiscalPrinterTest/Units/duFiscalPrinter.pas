@@ -47,6 +47,7 @@ type
   published
     procedure CheckSalesReceipt;
     procedure CheckRefundReceipt;
+    procedure CheckReceiptParamsReadFromTable;
     procedure OpenDevice;
     // common properties
     procedure CheckCapCompareFirmwareVersion;
@@ -2213,6 +2214,37 @@ begin
   CheckEquals('', Device.RecStation[3], 'Device.RecStation[3]');
   CheckEquals('хрнц', Device.RecStation[4], 'Device.RecStation[4]');
   CheckEquals('CutPaper(1)', Device.RecStation[5], 'Device.RecStation[5]');
+end;
+
+procedure TFiscalPrinterTest.CheckReceiptParamsReadFromTable;
+begin
+  Parameters.WebKassaEnabled := True;
+  Parameters.ModelId := MODEL_ID_WEB_CASSA;
+  OpenClaimEnable;
+
+  // Values stored in the FR table (table 2, rows 20-25)
+  Device.TableValues[2,20,2] := 'TBL20';
+  Device.TableValues[2,21,2] := 'TBL21';
+  Device.TableValues[2,22,2] := 'TBL22';
+  Device.TableValues[2,24,2] := 'TBL24';
+  Device.TableValues[2,25,2] := 'TBL25';
+
+  // Cached driver fields are deliberately set to different values:
+  // DirectIO(29, ...) must read the values from the FR table,
+  // not from the cached receipt fields.
+  CheckResult(SetParameter(DriverParameterReceiptNumber, 'CACHED20'));
+  CheckResult(SetParameter(DriverParameterReceiptDateTime, 'CACHED21'));
+  CheckResult(SetParameter(DriverParameterRegistrationNumber, 'CACHED22'));
+  CheckResult(SetParameter(DriverParameterReceiptIsOffline, 'CACHED24'));
+  CheckResult(SetParameter(DriverParameterReceiptTotal, 'CACHED25'));
+
+  CheckEquals('TBL20', GetParameter(DriverParameterReceiptNumber));
+  CheckEquals('TBL21', GetParameter(DriverParameterReceiptDateTime));
+  CheckEquals('TBL22', GetParameter(DriverParameterRegistrationNumber));
+  CheckEquals('TBL24', GetParameter(DriverParameterReceiptIsOffline));
+  CheckEquals('TBL25', GetParameter(DriverParameterReceiptTotal));
+
+  Driver.Close;
 end;
 
 procedure TFiscalPrinterTest.CheckSalesReceipt;
