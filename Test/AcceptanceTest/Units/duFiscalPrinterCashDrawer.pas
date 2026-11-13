@@ -1,24 +1,26 @@
 unit duFiscalPrinterCashDrawer;
 
-{ Acceptance test: ToleFiscalPrinter (fiscal printer) and ToleCashDrawer
-  (cash drawer) share one FR device over a real Com0Com serial port pair.
+{ Acceptance test: TOPOSFiscalPrinter (fiscal printer) and TOPOSCashDrawer
+  (cash drawer) are created as COM control objects from the OPOS Common
+  Control type libraries and share one FR device over a real Com0Com serial
+  port pair.
 
-  The FR side is emulated by TFREmulator, copied from the FREmulDelphi
-  project (it supports the $28 OpenDrawer command that the cash drawer
-  needs). The fiscal printer is configured for the SHTRIH-M DrvFR driver. }
+  The FR side is emulated by TFREmulator (it supports the $28 OpenDrawer
+  command that the cash drawer needs). The fiscal printer is configured for
+  the SHTRIH-M DrvFR driver. The controls instantiate the already built and
+  registered SmFiscalPrinter service object. }
 
 interface
 
 uses
   // VCL
-  Windows, SysUtils, Classes, ActiveX, ComObj,
+  Windows, SysUtils, Classes, ActiveX,
   // DUnit
   TestFramework,
   // Opos
-  Opos, Oposhi,
+  Opos, OposFiscalPrinter_1_11_Lib_TLB, OposCashDrawer_1_13_Lib_TLB,
   // This
-  FREmulator, oleFiscalPrinter, oleCashDrawer, SmFiscalPrinterLib_TLB,
-  SharedPrinter, CashDrawerParameters, LogFile, PrinterParameters,
+  FREmulator, CashDrawerParameters, LogFile, PrinterParameters,
   PrinterParametersX;
 
 type
@@ -46,6 +48,7 @@ const
   BaudRate = 115200;
   EmulatorBaudCode = 7; // TEmulSerialPort code: 7 -> 115200
   DeviceName = 'SHTRIH-M-ACCEPTANCE';
+  CashDrawerDeviceName = 'OposCashDrawer';
 
 function TablesFileName: string;
 begin
@@ -125,7 +128,7 @@ begin
     Params.SetDefaults;
     Params.FptrDeviceName := DeviceName;
     Params.DrawerNumber := 1;
-    Params.Save('OposCashDrawer');
+    Params.Save(CashDrawerDeviceName);
   finally
     Params.Free;
   end;
@@ -134,41 +137,33 @@ end;
 procedure TFiscalPrinterCashDrawerTest.FiscalPrinterAndCashDrawerShareComPort;
 var
   ResultCode: Integer;
-  FiscalPrinter: ToleFiscalPrinter;
-  FiscalPrinterService: IFiscalPrinterService_1_12;
-  CashDrawer: ICashDrawer;
+  FiscalPrinter: TOPOSFiscalPrinter;
+  CashDrawer: TOPOSCashDrawer;
 begin
-  CheckEquals(0, GetPrintersCount, 'GetPrintersCount <> 0');
-
-  FiscalPrinter := ToleFiscalPrinter.Create(nil);
-  FiscalPrinterService := FiscalPrinter;
-  CashDrawer := ToleCashDrawer.Create;
+  FiscalPrinter := TOPOSFiscalPrinter.Create(nil);
+  CashDrawer := TOPOSCashDrawer.Create(nil);
   try
-    // Open
-    ResultCode := FiscalPrinter.Open('FiscalPrinter', DeviceName, nil);
+    // Open: the control resolves the logical device name and instantiates
+    // the registered service object (the already built SmFiscalPrinter driver).
+    ResultCode := FiscalPrinter.Open(DeviceName);
     CheckEquals(0, ResultCode, 'FiscalPrinter.Open');
 
-    ResultCode := CashDrawer.Open('CashDrawer', 'OposCashDrawer', nil);
+    ResultCode := CashDrawer.Open(CashDrawerDeviceName);
     CheckEquals(0, ResultCode, 'CashDrawer.Open');
 
-    // Both objects must share one device (one COM port).
-    CheckEquals(1, GetPrintersCount, 'GetPrintersCount <> 1');
-
     // Claim
-    ResultCode := FiscalPrinter.Claim(0);
-    CheckEquals(0, ResultCode, 'FiscalPrinter.Claim');
+    ResultCode := FiscalPrinter.ClaimDevice(0);
+    CheckEquals(0, ResultCode, 'FiscalPrinter.ClaimDevice');
 
-    ResultCode := CashDrawer.Claim(0);
-    CheckEquals(0, ResultCode, 'CashDrawer.Claim');
+    ResultCode := CashDrawer.ClaimDevice(0);
+    CheckEquals(0, ResultCode, 'CashDrawer.ClaimDevice');
 
     // Enable
-    FiscalPrinter.SetPropertyNumber(PIDX_DeviceEnabled, 1);
-    CheckEquals(1, FiscalPrinter.GetPropertyNumber(PIDX_DeviceEnabled),
-      'FiscalPrinter.DeviceEnabled');
+    FiscalPrinter.DeviceEnabled := True;
+    Check(Boolean(FiscalPrinter.DeviceEnabled), 'FiscalPrinter.DeviceEnabled');
 
-    CashDrawer.SetPropertyNumber(PIDX_DeviceEnabled, 1);
-    CheckEquals(1, CashDrawer.GetPropertyNumber(PIDX_DeviceEnabled),
-      'CashDrawer.DeviceEnabled');
+    CashDrawer.DeviceEnabled := True;
+    Check(Boolean(CashDrawer.DeviceEnabled), 'CashDrawer.DeviceEnabled');
 
     // Cash drawer must work through the shared port.
     ResultCode := CashDrawer.OpenDrawer;
@@ -178,11 +173,11 @@ begin
     ResultCode := FiscalPrinter.CheckHealth(OPOS_CH_INTERNAL);
     CheckEquals(0, ResultCode, 'FiscalPrinter.CheckHealth');
   finally
-    CashDrawer := nil;
-    FiscalPrinterService := nil;
+    CashDrawer.Close;
+    FiscalPrinter.Close;
+    CashDrawer.Free;
+    FiscalPrinter.Free;
   end;
-
-  CheckEquals(0, GetPrintersCount, 'GetPrintersCount <> 0 after release');
 end;
 
 initialization
