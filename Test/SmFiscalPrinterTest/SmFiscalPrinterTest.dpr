@@ -233,17 +233,7 @@ uses
   KKTDrvLib_TLB in '..\..\Source\Shared\KKTDrvLib_TLB.pas',
   FiscalPrinterEmulator in '..\AcceptanceTest\Units\FiscalPrinterEmulator.pas',
   duMarkedReceiptDrivers in '..\AcceptanceTest\Units\duMarkedReceiptDrivers.pas',
-  FptrTypes in '..\AcceptanceTest\Units\Emul\FptrTypes.pas',
-  EmulBinUtils in '..\AcceptanceTest\Units\Emul\EmulBinUtils.pas',
-  EmulSerialPort in '..\AcceptanceTest\Units\Emul\EmulSerialPort.pas',
-  EmulTables in '..\AcceptanceTest\Units\Emul\EmulTables.pas',
-  EmulFNState in '..\AcceptanceTest\Units\Emul\EmulFNState.pas',
-  PrinterEmulator in '..\AcceptanceTest\Units\Emul\PrinterEmulator.pas',
-  EmulFECommands in '..\AcceptanceTest\Units\Emul\EmulFECommands.pas',
-  EmulFNCommands in '..\AcceptanceTest\Units\Emul\EmulFNCommands.pas',
-  EmulProtocolCommands in '..\AcceptanceTest\Units\Emul\EmulProtocolCommands.pas',
-  EmulProtocolServer in '..\AcceptanceTest\Units\Emul\EmulProtocolServer.pas',
-  FREmulator in '..\AcceptanceTest\Units\Emul\FREmulator.pas',
+  FREmulator in '..\AcceptanceTest\Units\FREmulator.pas',
   duFiscalPrinterCashDrawer in '..\AcceptanceTest\Units\duFiscalPrinterCashDrawer.pas';
 
 {$R *.RES}

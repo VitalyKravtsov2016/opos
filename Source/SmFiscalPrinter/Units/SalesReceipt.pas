@@ -37,6 +37,7 @@ type
     procedure SendItemBarcode;
     function GetOperationText(const Text: WideString): WideString;
     procedure PrintPositionType;
+    procedure SetRefundReceipt;
   public
     GTIN: WideString;   // GTIN
     NTIN: WideString;   // NTIN
@@ -417,6 +418,7 @@ var
   Operation: TPriceReg;
 begin
   CheckAmount(Amount);
+  SetRefundReceipt;
   OpenReceipt(RecTypeRetSale);
   PrintPreLine;
 
@@ -620,6 +622,12 @@ begin
   end;
 end;
 
+procedure TSalesReceipt.SetRefundReceipt;
+begin
+  if FItems.Count = 0 then
+    FRecType := RecTypeRetSale;
+end;
+
 procedure TSalesReceipt.OpenReceipt(ARecType: Integer);
 begin
   if not FOpened then
@@ -759,6 +767,7 @@ begin
   CheckAmount(Amount);
   CheckAmount(UnitAmount);
   CheckQuantity(Quantity);
+  SetRefundReceipt;
   OpenReceipt(RecTypeRetSale);
 
   PrintPreLine;

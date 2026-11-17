@@ -15,12 +15,12 @@ uses
 type
   TFrEmulatorKind = (
     ekShtrih,       // Internal / generic SHTRIH-M
-    ekPosCenter,    // PosCenter DrvKKT — close Ex4 = FF7B
-    ekTorgBalance,  // TorgBalance DrvFR5 — close Ex4 = FF78
+    ekPosCenter,    // PosCenter DrvKKT пїЅ close Ex4 = FF7B
+    ekTorgBalance,  // TorgBalance DrvFR5 пїЅ close Ex4 = FF78
     ekRRElectro     // RR-Electro KKTDrv
   );
 
-  { TFiscalPrinterEmulator — Protocol 1 base (default = SHTRIH-M profile) }
+  { TFiscalPrinterEmulator пїЅ Protocol 1 base (default = SHTRIH-M profile) }
 
   TFiscalPrinterEmulator = class
   private
@@ -117,7 +117,7 @@ type
     function IsCloseReceiptCommand(CommandCode: Integer): Boolean; override;
   end;
 
-  { RR-Electro KKTDrv: model 3 = РР-01Ф (см. Номера моделей ККТ) }
+  { RR-Electro KKTDrv: model 3 = пїЅпїЅ-01пїЅ (пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ) }
 
   TRRElectroFrEmulator = class(TFiscalPrinterEmulator)
   protected
@@ -220,8 +220,8 @@ end;
 function TFiscalPrinterEmulator.BuildF7Flags: Int64;
 begin
   // Protocol F7 type=1, bits 57/58 (PosCenter v1.23 / RR A.2.0):
-  // 57 — commercial license valid
-  // 58 — legislative license valid
+  // 57 пїЅ commercial license valid
+  // 58 пїЅ legislative license valid
   // Also enable common FN capabilities used by DrvFR/KKTDrv.
   Result :=
     (Int64(1) shl 22) or  // CapNonfiscalDoc
@@ -713,7 +713,7 @@ begin
         Result := BuildAnswer(Code, Body);
       end;
 
-    // FE-prefix license/feature queries (see FREmul EmulFECommands;
+    // FE-prefix license/feature queries (see FREmulator.EmulFEExecute;
     // PosCenter answer framing: FE <error> <data>, without subcode echo).
     $FEE6:
       begin
@@ -884,13 +884,13 @@ end;
 
 function TPosCenterFrEmulator.GetModelID: Byte;
 begin
-  // ModelID=0 matches PosCenter DrvFR licensed model name (ШТРИХ-M-01Ф).
+  // ModelID=0 matches PosCenter DrvFR licensed model name (пїЅпїЅпїЅпїЅпїЅ-M-01пїЅ).
   Result := 0;
 end;
 
 function TPosCenterFrEmulator.GetDeviceName: AnsiString;
 begin
-  // cp1251: ШТРИХ-M-01Ф + padding (as in DrvKKT.log)
+  // cp1251: пїЅпїЅпїЅпїЅпїЅ-M-01пїЅ + padding (as in DrvKKT.log)
   Result := #$D8#$D2#$D0#$C8#$D5'-M-01'#$D4'         ';
 end;
 
@@ -950,14 +950,14 @@ end;
 
 function TRRElectroFrEmulator.GetModelID: Byte;
 begin
-  // Код модели ККТ 0003 = РР-01Ф
-  // (Номера моделей_только_ККТ_271125.docx)
+  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 0003 = пїЅпїЅ-01пїЅ
+  // (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ_пїЅпїЅпїЅпїЅпїЅпїЅ_пїЅпїЅпїЅ_271125.docx)
   Result := 3;
 end;
 
 function TRRElectroFrEmulator.GetDeviceName: AnsiString;
 begin
-  // cp1251: РР-01Ф + padding
+  // cp1251: пїЅпїЅ-01пїЅ + padding
   Result := #$D0#$D0'-01'#$D4'              ';
 end;
 

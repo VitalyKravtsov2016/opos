@@ -2502,6 +2502,8 @@ function TFiscalPrinterImpl.EndFiscalReceipt(APrintHeader: WordBool): Integer;
 
   procedure PrintRefundReceiptDetails;
   begin
+    Logger.Debug(Format('PrintRefundReceiptDetails: WebKassaEnabled=%s RecType=%d NUM=[%s] RNM=[%s] DATETIME=[%s] TOTAL=[%s] ISOFF=[%s]',
+      [BoolToStr(Parameters.WebKassaEnabled), Receipt.RecType, ReceiptNumber, RegistrationNumber, ReceiptDateTime, ReceiptTotal, ReceiptIsOffline]));
     if Parameters.WebKassaEnabled then
     begin
       if Receipt.RecType = RecTypeRetSale then

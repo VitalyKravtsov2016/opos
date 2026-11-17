@@ -47,6 +47,8 @@ type
   published
     procedure CheckSalesReceipt;
     procedure CheckRefundReceipt;
+    procedure CheckRefundReceiptTransmitsAllFields;
+    procedure CheckRefundReceiptTransmitsAllFieldsOnSalesReceipt;
     procedure CheckReceiptParamsReadFromTable;
     procedure OpenDevice;
     // common properties
@@ -2216,6 +2218,63 @@ begin
   CheckEquals('CutPaper(1)', Device.RecStation[5], 'Device.RecStation[5]');
 end;
 
+procedure TFiscalPrinterTest.CheckRefundReceiptTransmitsAllFields;
+begin
+  Parameters.WebKassaEnabled := True;
+  Parameters.ModelId := MODEL_ID_WEB_CASSA;
+  OpenClaimEnable;
+
+  CheckResult(SetParameter(DriverParameterReceiptNumber, 'NUM1'));
+  CheckResult(SetParameter(DriverParameterRegistrationNumber, 'RNM1'));
+  CheckResult(SetParameter(DriverParameterReceiptDateTime, 'DT1'));
+  CheckResult(SetParameter(DriverParameterReceiptTotal, 'TOT1'));
+  CheckResult(SetParameter(DriverParameterReceiptIsOffline, 'ISO1'));
+
+  Driver.SetPropertyNumber(PIDXFptr_FiscalReceiptType, FPTR_RT_REFUND);
+  CheckResult(Driver.BeginFiscalReceipt(False));
+  CheckResult(Driver.PrintRecItem('Receipt item 1', 100, 1, 1, 0, ''));
+  CheckResult(Driver.PrintRecTotal(100, 100, '0'));
+  CheckResult(Driver.EndFiscalReceipt(False));
+
+  Check(Device.RecStation.IndexOf('NUM:[NUM1]') >= 0, 'NUM not transmitted');
+  Check(Device.RecStation.IndexOf('RNM:[RNM1]') >= 0, 'RNM not transmitted');
+  Check(Device.RecStation.IndexOf('DATETIME:[DT1]') >= 0, 'DATETIME not transmitted');
+  Check(Device.RecStation.IndexOf('TOTAL:[TOT1]') >= 0, 'TOTAL not transmitted');
+  Check(Device.RecStation.IndexOf('ISOFF:[ISO1]') >= 0, 'ISOFF not transmitted');
+
+  Driver.Close;
+end;
+
+procedure TFiscalPrinterTest.CheckRefundReceiptTransmitsAllFieldsOnSalesReceipt;
+begin
+  Parameters.WebKassaEnabled := True;
+  Parameters.ModelId := MODEL_ID_WEB_CASSA;
+  OpenClaimEnable;
+
+  // Accounting system opens a sales receipt (FPTR_RT_SALES) and registers
+  // the refund item by PrintRecItemRefund - the same way as the POS in issue #15.
+  Driver.SetPropertyNumber(PIDXFptr_FiscalReceiptType, FPTR_RT_SALES);
+  CheckResult(Driver.BeginFiscalReceipt(False));
+
+  CheckResult(SetParameter(DriverParameterReceiptNumber, 'NUM1'));
+  CheckResult(SetParameter(DriverParameterRegistrationNumber, 'RNM1'));
+  CheckResult(SetParameter(DriverParameterReceiptDateTime, 'DT1'));
+  CheckResult(SetParameter(DriverParameterReceiptTotal, 'TOT1'));
+  CheckResult(SetParameter(DriverParameterReceiptIsOffline, 'ISO1'));
+
+  CheckResult(Driver.PrintRecItemRefund('Receipt item 1', 100, 1, 1, 0, ''));
+  CheckResult(Driver.PrintRecTotal(100, 100, '0'));
+  CheckResult(Driver.EndFiscalReceipt(False));
+
+  Check(Device.RecStation.IndexOf('NUM:[NUM1]') >= 0, 'NUM not transmitted');
+  Check(Device.RecStation.IndexOf('RNM:[RNM1]') >= 0, 'RNM not transmitted');
+  Check(Device.RecStation.IndexOf('DATETIME:[DT1]') >= 0, 'DATETIME not transmitted');
+  Check(Device.RecStation.IndexOf('TOTAL:[TOT1]') >= 0, 'TOTAL not transmitted');
+  Check(Device.RecStation.IndexOf('ISOFF:[ISO1]') >= 0, 'ISOFF not transmitted');
+
+  Driver.Close;
+end;
+
 procedure TFiscalPrinterTest.CheckReceiptParamsReadFromTable;
 begin
   Parameters.WebKassaEnabled := True;
@@ -2290,8 +2349,8 @@ begin
   Driver.Close;
 
   CheckEquals(6, Device.RecStation.Count, 'Device.RecStation.Count');
-  CheckEquals('PT:[0]', Device.RecStation[0], 'Device.RecStation[0]');
-  CheckEquals('1 Receipt item 1 :G[] :N[] 100.00 X 1.000 = 100.00', Device.RecStation[1], 'Device.RecStation[1]');
+  CheckEquals('1 Receipt item 1 :G[] :N[] 100.00 X 1.000 = 100.00', Device.RecStation[0], 'Device.RecStation[0]');
+  CheckEquals('PT:[0]', Device.RecStation[1], 'Device.RecStation[1]');
   CheckEquals('1  0.00 X 0.000 = 0.00', Device.RecStation[2], 'Device.RecStation[2]');
   CheckEquals('', Device.RecStation[3], 'Device.RecStation[3]');
   CheckEquals('хрнц', Device.RecStation[4], 'Device.RecStation[4]');

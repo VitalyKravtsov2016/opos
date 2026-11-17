@@ -38,7 +38,9 @@ uses
   DrvFRLib_TLB in '..\..\Source\Shared\DrvFRLib_TLB.pas',
   OposCashDrawerIntf in '..\..\Source\Opos\OposCashDrawerIntf.pas',
   OposCashDrawer_1_13_Lib_TLB in '..\..\Source\Opos\OposCashDrawer_1_13_Lib_TLB.pas',
-  duFiscalPrinterCashDrawer in 'Units\duFiscalPrinterCashDrawer.pas';
+  duFiscalPrinterCashDrawer in 'Units\duFiscalPrinterCashDrawer.pas',
+  FREmulator in 'Units\FREmulator.pas',
+  CashDrawerParameters in '..\..\Source\SmFiscalPrinter\Units\CashDrawerParameters.pas';
 
 {$R *.RES}
 

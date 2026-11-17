@@ -20,7 +20,7 @@ uses
   // Opos
   Opos, OposFiscalPrinter_1_11_Lib_TLB, OposCashDrawer_1_13_Lib_TLB,
   // This
-  FREmulator, CashDrawerParameters, LogFile, PrinterParameters,
+  FREmulator, PrinterParameters, CashDrawerParameters, LogFile,
   PrinterParametersX;
 
 type
@@ -30,7 +30,7 @@ type
   private
     FEmulator: TFREmulator;
 
-    procedure SaveDrvFrParameters(const DeviceName: WideString);
+    procedure SaveFptrParameters(const DeviceName: WideString);
     procedure SaveDrawerParameters(const DeviceName: WideString);
   protected
     procedure SetUp; override;
@@ -47,8 +47,8 @@ const
   EmulatorPort = 21;
   BaudRate = 115200;
   EmulatorBaudCode = 7; // TEmulSerialPort code: 7 -> 115200
-  DeviceName = 'SHTRIH-M-ACCEPTANCE';
-  CashDrawerDeviceName = 'OposCashDrawer';
+  CashDrawerDeviceName = 'CashDrawerDeviceName';
+  FiscalPrinterDeviceName = 'FiscalPrinterDeviceName';
 
 function TablesFileName: string;
 begin
@@ -69,9 +69,9 @@ begin
   Sleep(300);
 
   // Fiscal printer talks to the emulator via the DrvFR driver.
-  SaveDrvFrParameters(DeviceName);
+  SaveFptrParameters(FiscalPrinterDeviceName);
   // Cash drawer points to the same fiscal printer device.
-  SaveDrawerParameters(DeviceName);
+  SaveDrawerParameters(CashDrawerDeviceName);
 end;
 
 procedure TFiscalPrinterCashDrawerTest.TearDown;
@@ -85,7 +85,7 @@ begin
   CoUninitialize;
 end;
 
-procedure TFiscalPrinterCashDrawerTest.SaveDrvFrParameters(
+procedure TFiscalPrinterCashDrawerTest.SaveFptrParameters(
   const DeviceName: WideString);
 var
   Logger: ILogFile;
@@ -95,7 +95,8 @@ begin
   Params := TPrinterParameters.Create(Logger);
   try
     Params.SetDefaults;
-    Params.DriverType := DriverTypeShtrihDriver;
+    Params.Storage := StorageIni;
+    Params.DriverType := DriverTypeInternal;
     Params.ConnectionType := 0; // local serial
     Params.PortNumber := DriverPort;
     Params.BaudRate := BaudRate;
@@ -126,7 +127,7 @@ begin
   Params := TCashDrawerParameters.Create(TLogFile.Create);
   try
     Params.SetDefaults;
-    Params.FptrDeviceName := DeviceName;
+    Params.FptrDeviceName := FiscalPrinterDeviceName;
     Params.DrawerNumber := 1;
     Params.Save(CashDrawerDeviceName);
   finally
@@ -145,7 +146,7 @@ begin
   try
     // Open: the control resolves the logical device name and instantiates
     // the registered service object (the already built SmFiscalPrinter driver).
-    ResultCode := FiscalPrinter.Open(DeviceName);
+    ResultCode := FiscalPrinter.Open(FiscalPrinterDeviceName);
     CheckEquals(0, ResultCode, 'FiscalPrinter.Open');
 
     ResultCode := CashDrawer.Open(CashDrawerDeviceName);

@@ -139,6 +139,7 @@ uses
   ReceiptPrinter in '..\..\Source\SmFiscalPrinter\Units\ReceiptPrinter.pas',
   SharedPrinter in '..\..\Source\SmFiscalPrinter\Units\SharedPrinter.pas',
   duFiscalPrinterDevice in 'Units\duFiscalPrinterDevice.pas',
+  duFiscalPrinter in 'Units\duFiscalPrinter.pas',
   duEscPrinter in 'Units\duEscPrinter.pas',
   duPrinterParameters in 'Units\duPrinterParameters.pas',
   duPrinterEncoding in 'Units\duPrinterEncoding.pas',
